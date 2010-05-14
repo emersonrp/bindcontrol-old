@@ -16,6 +16,8 @@ use constant MENUITEM_FAQ => 202;
 use constant MENUITEM_LICENSE => 203;
 use constant MENUITEM_ABOUT => 204;
 
+# panel that the profile tabs live on
+use constant PANEL_PROFILETABS => 301;
 
 package ProfileTabs;
 use constant PROFILE_NOTEBOOK => 101;

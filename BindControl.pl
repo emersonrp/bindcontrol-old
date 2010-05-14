@@ -70,14 +70,21 @@ sub new {
 	$ProfMenu->Append(MENUITEM_EXIT, "Exit", "Exit $0");
 
 	$ProfMenu->Enable(MENUITEM_SAVEPROF, 0);
+	$ProfMenu->Enable(MENUITEM_LOADPROF, 0);
+	$ProfMenu->Enable(MENUITEM_SAVEPROF, 0);
+	$ProfMenu->Enable(MENUITEM_PREFS, 0);
 
 	# "Help" Menu
 	my $HelpMenu = Wx::Menu->new();
 
-	$HelpMenu->Append(MENUITEM_MANUAL,"$0 Manual","Read the Manual for $0");
-	$HelpMenu->Append(MENUITEM_FAQ,"FAQ","$0 FAQ");
+	$HelpMenu->Append(MENUITEM_MANUAL,"Manual","User's Manual");
+	$HelpMenu->Append(MENUITEM_FAQ,"FAQ","Frequently Asked Questions");
 	$HelpMenu->Append(MENUITEM_LICENSE,"License Info","");
 	$HelpMenu->Append(MENUITEM_ABOUT,"About","About");
+
+	$ProfMenu->Enable(MENUITEM_MANUAL, 0);
+	$ProfMenu->Enable(MENUITEM_FAQ, 0);
+	$ProfMenu->Enable(MENUITEM_LICENSE, 0);
 
 	# cram the separate menus into a menubar
 	my $MenuBar = Wx::MenuBar->new();
@@ -113,9 +120,14 @@ newProfileWindow($self);
 sub newProfileWindow {
 	my $self = shift;
 
+	if (my $oldpanel = Wx::Window::FindWindowById(PANEL_PROFILETABS)) {
+		$oldpanel->Destroy();
+	}
+
+
 	my $panel = Wx::Panel->new(
 		$self,
-		-1,
+		PANEL_PROFILETABS,
 		wxDefaultPosition,
 		wxDefaultSize,
 		wxTAB_TRAVERSAL,

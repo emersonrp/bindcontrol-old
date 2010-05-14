@@ -14,7 +14,7 @@ use base 'Wx::Notebook';
 
 sub new {
 	my ($class, $parentpanel) = @_;
-print STDERR Data::Dumper::Dumper [@_];
+
 	my $self = $class->SUPER::new($parentpanel);
 
 	# General Panel:  arch / origin / primary / secondary / pools / epic
