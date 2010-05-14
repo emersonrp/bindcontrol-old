@@ -1,9 +1,11 @@
+use strict;
+
 use Wx::Perl::Packager;
 use Data::Dumper;
 
 use About;
-use BindsWindow;
 use PowerSets;
+use ProfileTabs;
 use StdDefault;
 
 use BCConstants;
@@ -35,9 +37,8 @@ sub OnInit{
 ###################
 package BCMainWindow;
 
-use Wx qw(
-	:id
-);
+use Wx qw(wxVERTICAL wxHORIZONTAL wxDefaultSize wxDefaultPosition
+		wxTAB_TRAVERSAL wxEXPAND wxALL wxLB_SORT :id);
 
 use Wx::Event qw(
 	EVT_MENU
@@ -101,15 +102,33 @@ sub new {
 	# TODO - read in the config for the window (size, location, etc)
 	# and apply it before ->Show()
 
+# TODO TODO TODO -- remove this once we actually start making and saving profiles
+newProfileWindow($self);
+# TODO TODO TODO
+
 
 	return $self;
 }
 
 sub newProfileWindow {
 	my $self = shift;
-	my $newProfPanel = BindsWindow::NewProfilePanel($self);
+
+	my $panel = Wx::Panel->new(
+		$self,
+		-1,
+		wxDefaultPosition,
+		wxDefaultSize,
+		wxTAB_TRAVERSAL,
+	);
+	my $sizer = Wx::BoxSizer->new(Wx::wxVERTICAL);
+
+	my $profileTabs = ProfileTabs->new($panel);
+
+	$sizer->Add ($profileTabs, 1, wxEXPAND | wxALL, 3);
+	$panel->SetSizerAndFit($sizer);
+
 }
 
-sub showAboutBox { return Wx::AboutBox($aboutDialogInfo); }
+sub showAboutBox { return Wx::AboutBox(our $aboutDialogInfo); }
 
 1;
