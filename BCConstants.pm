@@ -17,9 +17,10 @@ use constant MENUITEM_LICENSE => 203;
 use constant MENUITEM_ABOUT => 204;
 
 
-package BindsWindow;
-use constant PICKER_ARCHETYPE => 101;
-use constant PICKER_PRIMARY => 102;
-use constant PICKER_SECONDARY => 103;
+package ProfileTabs;
+use constant PROFILE_NOTEBOOK => 101;
+use constant PICKER_ARCHETYPE => 201;
+use constant PICKER_PRIMARY => 202;
+use constant PICKER_SECONDARY => 203;
 
 1;
