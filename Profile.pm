@@ -32,7 +32,7 @@ sub pickSecondaryPowerSet {
 }
 
 
-
+use Wx 'wxNullBitmap';
 
 sub fillPickers {
 	# my ($self, $event) = @_;
@@ -47,12 +47,12 @@ sub fillPickers {
 
 	my $pPicker = Wx::Window::FindWindowById(ProfileTabs::PICKER_PRIMARY);
 	$pPicker->Clear();
-	for (sort keys %{$ArchData->{'Primary'}}) { $pPicker->Append($_); }
+	for (sort keys %{$ArchData->{'Primary'}}) { $pPicker->Append($_, wxNullBitmap); }
 	$pPicker->SetStringSelection($current->{'Primary'});
 
 	my $sPicker = Wx::Window::FindWindowById(ProfileTabs::PICKER_SECONDARY);
 	$sPicker->Clear();
-	for (sort keys %{$ArchData->{'Secondary'}}) { $sPicker->Append($_); }
+	for (sort keys %{$ArchData->{'Secondary'}}) { $sPicker->Append($_, wxNullBitmap); }
 	$sPicker->SetStringSelection($current->{'Secondary'});
 
 }

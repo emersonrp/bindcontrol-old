@@ -2,9 +2,10 @@ package ProfileTabs;
 
 use strict;
 use Wx qw(wxVERTICAL wxHORIZONTAL
+		wxTOP wxBOTTOM wxLEFT wxRIGHT wxALL
 		wxDefaultSize wxDefaultPosition wxDefaultValidator
-		wxTAB_TRAVERSAL wxEXPAND wxALL wxLB_SORT);
-use Wx::Event qw( EVT_CHOICE EVT_LISTBOX );
+		wxTAB_TRAVERSAL wxEXPAND wxCB_READONLY);
+use Wx::Event qw( EVT_COMBOBOX );
 
 use BCConstants;
 use GameData;
@@ -42,16 +43,12 @@ sub new {
 	my $MastermindPanel = $self->mastermindPanel();
 	$self->AddPage($MastermindPanel, "Mastermind Binds");
 
-#	$self->SetSizer($sizer);
-#	$self->Layout();
-
 	return $self;
 }
 
 
 sub generalPanel {
 	my $self = shift;
-
  
 	my $a = ($Profile::current->{'Archetype'} ||= $Profile::defaults->{'Archetype'});
 	my $o = ($Profile::current->{'Origin'}    ||= $Profile::defaults->{'Origin'});
@@ -60,55 +57,112 @@ sub generalPanel {
  
 	my $panel = Wx::Panel->new($self, -1);
 	$panel->SetBackgroundColour( Wx::Colour->new( BCConstants::HERO_COLOUR ) );
+	$panel->SetForegroundColour( Wx::Colour->new( 'white' ) );
  
 	my $topSizer = Wx::FlexGridSizer->new(0,3,5,5);
 
 	# Name
-	$topSizer->Add( Wx::StaticText->new( $panel, -1, "Name:") );
-	$topSizer->Add( Wx::TextCtrl->new( $panel, PROFILE_NAMETEXT, "",)) ;
+	$topSizer->Add(
+		Wx::StaticText->new( $panel, -1, "Name:")
+		0
+		wxALL
+		10,
+	);
+	$topSizer->Add(
+		Wx::TextCtrl->new( $panel, PROFILE_NAMETEXT, "",),
+		0,
+		wxALL,
+		10,
+	) ;
 	$topSizer->AddSpacer(1);
 
 	# Archetype
-	$topSizer->Add( Wx::StaticText->new( $panel, -1, "Archetype:") );
-	$topSizer->Add( Wx::Choice->new(
-		$panel, PICKER_ARCHETYPE,
-		wxDefaultPosition, wxDefaultSize,
-		[sort keys %$GameData::Archetypes],
-	) );
+	$topSizer->Add(
+		Wx::StaticText->new( $panel, -1, "Archetype:"),
+		0,
+		wxALL,
+		10,
+	);
+	$topSizer->Add( 
+		Wx::BitmapComboBox->new(
+			$panel, PICKER_ARCHETYPE, '',
+			wxDefaultPosition, wxDefaultSize,
+			[sort keys %$GameData::Archetypes],
+			wxCB_READONLY,
+		),
+		0,
+		wxALL,
+		10,
+	);
 	$topSizer->AddSpacer(1);
 
 	# Origin
-	$topSizer->Add( Wx::StaticText->new( $panel, -1, "Origin:") );
-	$topSizer->Add( Wx::Choice->new(
-		$panel, PICKER_ORIGIN,
-		wxDefaultPosition, wxDefaultSize,
-		[@GameData::Origins],
-	) );
+	$topSizer->Add(
+		Wx::StaticText->new( $panel, -1, "Origin:"),
+		0,
+		wxALL,
+		10,
+	);
+
+	$topSizer->Add(
+		Wx::BitmapComboBox->new(
+			$panel, PICKER_ORIGIN, '',
+			wxDefaultPosition, wxDefaultSize,
+			[@GameData::Origins],
+			wxCB_READONLY,
+		),
+		0,
+		wxALL,
+		10,
+	);
 	$topSizer->AddSpacer(1);
 
 	# Primary
-	$topSizer->Add( Wx::StaticText->new( $panel, -1, "Primary Powerset:") );
- 	$topSizer->Add( Wx::Choice->new(
- 		$panel, PICKER_PRIMARY,
-		wxDefaultPosition, wxDefaultSize,
- 		[sort keys %{$GameData::PowerSets->{$a}->{'Primary'}}],
- 	) );
+	$topSizer->Add(
+		Wx::StaticText->new( $panel, -1, "Primary Powerset:"),
+		0,
+		wxALL,
+		10,
+	);
+ 	$topSizer->Add(
+		Wx::BitmapComboBox->new(
+ 			$panel, PICKER_PRIMARY, '',
+			wxDefaultPosition, wxDefaultSize,
+ 			[sort keys %{$GameData::PowerSets->{$a}->{'Primary'}}],
+			wxCB_READONLY,
+ 		),
+		0,
+		wxALL,
+		10,
+	);
 	$topSizer->AddSpacer(1);
 
 	# Secondary
-	$topSizer->Add( Wx::StaticText->new( $panel, -1, "Secondary Powerset:") );
- 	$topSizer->Add( Wx::Choice->new(
- 		$panel, PICKER_SECONDARY,
-		wxDefaultPosition, wxDefaultSize,
- 		[sort keys %{$GameData::PowerSets->{$a}->{'Secondary'}}],
- 	));
+	$topSizer->Add(
+		Wx::StaticText->new( $panel, -1, "Secondary Powerset:"),
+		0,
+		wxALL,
+		10,
+	);
+ 	$topSizer->Add(
+		Wx::BitmapComboBox->new(
+ 			$panel, PICKER_SECONDARY, '',
+			wxDefaultPosition, wxDefaultSize,
+ 			[sort keys %{$GameData::PowerSets->{$a}->{'Secondary'}}],
+			wxCB_READONLY,
+ 		),
+		0,
+		wxALL,
+		10,
+	);
 	$topSizer->AddSpacer(1);
 
 	$panel->SetSizerAndFit($topSizer);
 
-	EVT_CHOICE( $self, PICKER_ARCHETYPE, \&Profile::pickArchetype );
-	EVT_CHOICE( $self, PICKER_PRIMARY, \&Profile::pickPrimaryPowerSet );
-	EVT_CHOICE( $self, PICKER_SECONDARY, \&Profile::pickSecondaryPowerSet );
+	EVT_COMBOBOX( $self, PICKER_ARCHETYPE, \&Profile::pickArchetype );
+	EVT_COMBOBOX( $self, PICKER_ORIGIN, \&Profile::pickOrigin );
+	EVT_COMBOBOX( $self, PICKER_PRIMARY, \&Profile::pickPrimaryPowerSet );
+	EVT_COMBOBOX( $self, PICKER_SECONDARY, \&Profile::pickSecondaryPowerSet );
 
 	Profile::fillPickers();
 
