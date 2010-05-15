@@ -4,7 +4,6 @@ use Wx::Perl::Packager;
 use Data::Dumper;
 
 use About;
-use PowerSets;
 use ProfileTabs;
 use StdDefault;
 
@@ -82,9 +81,9 @@ sub new {
 	$HelpMenu->Append(MENUITEM_LICENSE,"License Info","");
 	$HelpMenu->Append(MENUITEM_ABOUT,"About","About");
 
-	$ProfMenu->Enable(MENUITEM_MANUAL, 0);
-	$ProfMenu->Enable(MENUITEM_FAQ, 0);
-	$ProfMenu->Enable(MENUITEM_LICENSE, 0);
+	$HelpMenu->Enable(MENUITEM_MANUAL, 0);
+	$HelpMenu->Enable(MENUITEM_FAQ, 0);
+	$HelpMenu->Enable(MENUITEM_LICENSE, 0);
 
 	# cram the separate menus into a menubar
 	my $MenuBar = Wx::MenuBar->new();

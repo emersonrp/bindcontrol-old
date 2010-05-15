@@ -1,9 +1,12 @@
-package PowerSets;
+package GameData;
 use strict;
 
-our $powersets = {
+our @Origins = qw( Magic Mutation Natural Science Technology);
+
+our $Archetypes = {
 	"Arachnos Soldier" => {
-		"Epic Pool" => {
+		'Faction' => 'V',
+		"Epic" => {
 			"Mace Mastery" => [
 				"Mace Blast",
 				"Web Envelope",
@@ -84,7 +87,8 @@ our $powersets = {
 		},
 	},
 	"Arachnos Widow" => {
-		"Epic Pool" => {
+		'Faction' => 'V',
+		"Epic" => {
 			"Mace Mastery" => [
 				"Mace Blast",
 				"Web Envelope",
@@ -166,7 +170,8 @@ our $powersets = {
 		},
 	},
 	Blaster => {
-		"Epic Pool" => {
+		'Faction' => 'H',
+		"Epic" => {
 			"Cold Mastery" => [
 				"Snow Storm",
 				"Flash Freeze",
@@ -379,7 +384,8 @@ our $powersets = {
 		},
 	},
 	Brute => {
-		"Epic Pool" => {
+		'Faction' => 'V',
+		"Epic" => {
 			"Mace Mastery" => [
 				"Mace Blast",
 				"Web Envelope",
@@ -592,7 +598,8 @@ our $powersets = {
 		},
 	},
 	Controller => {
-		"Epic Pool" => {
+		'Faction' => 'H',
+		"Epic" => {
 			"Fire Mastery" => [
 				"Fire Blast",
 				"Fire Ball",
@@ -806,7 +813,8 @@ our $powersets = {
 		},
 	},
 	Corruptor => {
-		"Epic Pool" => {
+		'Faction' => 'V',
+		"Epic" => {
 			"Mace Mastery" => [
 				"Web Envelope",
 				"Scorpion Shield",
@@ -1057,7 +1065,8 @@ our $powersets = {
 		},
 	},
 	Defender => {
-		"Epic Pool" => {
+		'Faction' => 'H',
+		"Epic" => {
 			"Dark Mastery" => [
 				"Oppressive Gloom",
 				"Dark Consumption",
@@ -1309,7 +1318,8 @@ our $powersets = {
 		},
 	},
 	Dominator => {
-		"Epic Pool" => {
+		'Faction' => 'V',
+		"Epic" => {
 			"Mace Mastery" => [
 				"Poisonous Ray",
 				"Scorpion Shield",
@@ -1482,93 +1492,9 @@ our $powersets = {
 			],
 		},
 	},
-# -- TODO!!! split accolades by hero / villain
-	General => {
-		"Badge" => {
-			"Accolade" => [
-				"Eye of the Magus",
-				"Crey CBX-9 Pistol",
-				"Demonic Aura",
-				"Elusive Mind",
-				"Force of Nature",
-				"Geas of the Kind Ones",
-				"Portable Workbench",
-				"Stolen Immobilizer Ray",
-				"Megalomaniac",
-				"Vanguard Medal",
-			],
-		},
-		"General" => {
-			"General" => [
-				"Sprint",
-				"Brawl",
-				"Rest",
-				"Prestige Power Slide",
-				"Prestige Power Rush",
-				"Prestige Power Dash",
-				"Prestige Power Surge ",
-				"Prestige Power Quick",
-			],
-		},
-		"Pool" => {
-			"Concealment" => [
-				"Stealth",
-				"Grant Invisibility",
-				"Invisibility",
-				"Phase Shift",
-			],
-			"Fighting" => [
-				"Boxing",
-				"Kick",
-				"Tough",
-				"Weave",
-			],
-			"Flight" => [
-				"Hover",
-				"Air Superiority",
-				"Fly",
-				"Group Fly",
-			],
-			"Leadership" => [
-				"Maneuvers",
-				"Assault",
-				"Tactics",
-				"Vengeance",
-			],
-			"Leaping" => [
-				"Jump Kick",
-				"Combat Jumping",
-				"Super Jump",
-				"Acrobatics",
-			],
-			"Medicine" => [
-				"Aid Other",
-				"Stimulant",
-				"Aid Self",
-				"Resuscitate",
-			],
-			"Presence" => [
-				"Challenge",
-				"Provoke",
-				"Intimidate",
-				"Invoke Panic",
-			],
-			"Speed" => [
-				"Flurry",
-				"Hasten",
-				"Super Speed",
-				"Whirlwind",
-			],
-			"Teleportation" => [
-				"Recall Friend",
-				"Teleport Foe",
-				"Teleport",
-				"Team Teleport",
-			],
-		},
-	},
 	Mastermind => {
-		"Epic Pool" => {
+		'Faction' => 'V',
+		"Epic" => {
 			"Mace Mastery" => [
 				"Web Envelope",
 				"Scorpion Shield",
@@ -1753,6 +1679,7 @@ our $powersets = {
 		},
 	},
 	Peacebringer => {
+		'Faction' => 'H',
 		"Dependent" => {
 			"Bright Nova" => [
 				"Bright Nova Bolt",
@@ -1810,7 +1737,8 @@ our $powersets = {
 		},
 	},
 	Scrapper => {
-		"Epic Pool" => {
+		'Faction' => 'H',
+		"Epic" => {
 			"Body Mastery" => [
 				"Conserve Power",
 				"Focused Accuracy",
@@ -2007,7 +1935,8 @@ our $powersets = {
 		},
 	},
 	Stalker => {
-		"Epic Pool" => {
+		'Faction' => 'V',
+		"Epic" => {
 			"Mace Mastery" => [
 				"Summon Blaster",
 				"Mace Blast",
@@ -2204,7 +2133,8 @@ our $powersets = {
 		},
 	},
 	Tanker => {
-		"Epic Pool" => {
+		'Faction' => 'H',
+		"Epic" => {
 			"Arctic Mastery" => [
 				"Chilblain",
 				"Block of Ice",
@@ -2422,6 +2352,7 @@ our $powersets = {
 		},
 	},
 	Warshade => {
+		'Faction' => 'H',
 		"Dependent" => {
 			"Black Dwarf" => [
 				"Black Dwarf Strike",
@@ -2479,3 +2410,93 @@ our $powersets = {
 		},
 	},
 };
+
+our $MiscPowers = {
+# -- TODO!!! split accolades by hero / villain
+	General => {
+		"Badge" => {
+			"Accolade" => [
+				"Eye of the Magus",
+				"Crey CBX-9 Pistol",
+				"Demonic Aura",
+				"Elusive Mind",
+				"Force of Nature",
+				"Geas of the Kind Ones",
+				"Portable Workbench",
+				"Stolen Immobilizer Ray",
+				"Megalomaniac",
+				"Vanguard Medal",
+			],
+		},
+		"General" => {
+			"General" => [
+				"Sprint",
+				"Brawl",
+				"Rest",
+				"Prestige Power Slide",
+				"Prestige Power Rush",
+				"Prestige Power Dash",
+				"Prestige Power Surge ",
+				"Prestige Power Quick",
+			],
+		},
+		"Pool" => {
+			"Concealment" => [
+				"Stealth",
+				"Grant Invisibility",
+				"Invisibility",
+				"Phase Shift",
+			],
+			"Fighting" => [
+				"Boxing",
+				"Kick",
+				"Tough",
+				"Weave",
+			],
+			"Flight" => [
+				"Hover",
+				"Air Superiority",
+				"Fly",
+				"Group Fly",
+			],
+			"Leadership" => [
+				"Maneuvers",
+				"Assault",
+				"Tactics",
+				"Vengeance",
+			],
+			"Leaping" => [
+				"Jump Kick",
+				"Combat Jumping",
+				"Super Jump",
+				"Acrobatics",
+			],
+			"Medicine" => [
+				"Aid Other",
+				"Stimulant",
+				"Aid Self",
+				"Resuscitate",
+			],
+			"Presence" => [
+				"Challenge",
+				"Provoke",
+				"Intimidate",
+				"Invoke Panic",
+			],
+			"Speed" => [
+				"Flurry",
+				"Hasten",
+				"Super Speed",
+				"Whirlwind",
+			],
+			"Teleportation" => [
+				"Recall Friend",
+				"Teleport Foe",
+				"Teleport",
+				"Team Teleport",
+			],
+		},
+	},
+};
+
+1;
