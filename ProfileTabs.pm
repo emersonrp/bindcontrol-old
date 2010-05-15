@@ -63,9 +63,9 @@ sub generalPanel {
 
 	# Name
 	$topSizer->Add(
-		Wx::StaticText->new( $panel, -1, "Name:")
-		0
-		wxALL
+		Wx::StaticText->new( $panel, -1, "Name:"),
+		0,
+		wxALL,
 		10,
 	);
 	$topSizer->Add(
