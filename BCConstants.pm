@@ -42,4 +42,10 @@ use constant PICKER_ORIGIN => 222;
 use constant PICKER_PRIMARY => 223;
 use constant PICKER_SECONDARY => 224;
 
+
+###################################################
+package SoD;
+
+use constant USE_SOD => 301;
+
 1;

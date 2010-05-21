@@ -10,6 +10,7 @@ use Wx::Event qw( EVT_COMBOBOX );
 use BCConstants;
 use GameData;
 use Profile;
+use SoD;
 
 
 use base 'Wx::Notebook';
@@ -175,6 +176,8 @@ sub sodPanel {
 	my $self = shift;
 
 	my $panel = Wx::Panel->new($self, -1);
+
+	SoD::fillPanel($panel);
 
 	return $panel;
 }
