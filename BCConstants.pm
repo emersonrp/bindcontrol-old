@@ -33,7 +33,11 @@ use constant PANEL_PROFILETABS => 121;
 ###################################################
 package ProfileTabs;
 
-use constant PROFILE_NOTEBOOK => 201;
+use constant PROFILE_NOTEBOOK => 151;
+
+
+###################################################
+package General;
 
 use constant PROFILE_NAMETEXT => 211;
 
