@@ -34,7 +34,7 @@ sub new {
 	my $UtilPanel = $self->utilPanel();
 	$self->AddPage($UtilPanel, "Utility");
 
-	# Chat
+	# Chat / costume / pets / emotes / etc
 	my $SocialPanel = $self->socialPanel();
 	$self->AddPage($SocialPanel, "Social and Chat");
 
@@ -76,7 +76,6 @@ sub customPanel {
 
 	return $panel;
 }
-
 
 sub mastermindPanel {
 	my $self = shift;

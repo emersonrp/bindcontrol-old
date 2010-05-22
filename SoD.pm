@@ -2,7 +2,8 @@ package SoD;
 
 use strict;
 use Wx qw(
-	wxALL
+	wxALL wxVERTICAL
+	wxDefaultPosition wxDefaultSize wxDefaultValidator
 );
 use Wx::Event qw(
 	EVT_CHECKBOX
@@ -34,21 +35,8 @@ sub new {
 
 	my $self = $class->SUPER::new($parentwindow);
 
-	my $topSizer = Wx::FlexGridSizer->new(0,2,3,3);
+	my $topSizer = Wx::FlexGridSizer->new(0,1,3,3);
 
-# 	local credits = iup.hbox{iup.fill{};iup.vbox{
-# 		iup.fill{size="5"},
-# 		iup.label{title = "The Speed on Demand Binds"},
-# 		iup.label{title = "were originally Created by Gnarly's"},
-# 		iup.label{title = "Speed on Demand Binds Program, v 3.0"},
-# 		iup.fill{size="5"},
-# 		iup.label{title = "Advanced Teleport Binds by DrLetharga"},
-# 		iup.fill{},
-# 		alignment = "ACENTER"
-# 	};iup.fill{};alignment = "ACENTER",rastersize="200x84"}
-	# cbToolTip("Check this to Enable the Speed on Demand Binds")
-	# local sodenable = cbCheckBox("Enable Speed on Demand Binds",$SoD->{'enable'},
-		# cbCheckBoxCB(profile,SoD,'enable'))
 	$topSizer->Add(
 		Wx::CheckBox->new( $self, USE_SOD, "Enable Speed On Demand Binds" ),
 		0,
@@ -56,138 +44,56 @@ sub new {
 		10,
 	);
 
-	EVT_CHECKBOX( $self, USE_SOD, &FillSoDPanel );
+	$self->SetSizer($topSizer);
+
+	EVT_CHECKBOX( $self, USE_SOD, \&FillSoDPanel );
 
 	return $self;
 }
 
-sub bindsettings {
-	my $profile = shift;
-
-	$profile->{'SoD'} ||= {
-
-		Base => 1,
-		Up => "SPACE",
-		Down => "X",
-		Forward => "W",
-		Back => "S",
-		Left => "A",
-		Right => "D",
-		RunModeKey => "C",
-		FlyModeKey => "F",
-		AutoRunKey => "R",
-		FollowKey => "TILDE",
-		Run => {
-			Primary => "none",
-			PrimaryNumber => 1,
-			Secondary => "Sprint",
-			SecondaryNumber => 1,
-		},
-		Fly => {
-			Hover => undef,
-			Fly => undef,
-			GFly => undef,
-		},
-		Unqueue => true,
-		AutoMouseLook => undef,
-		ToggleKey => "LCTRL+M",
-		enable => undef,
-	};
-
-	my $SoD = $profile->{'SoD'};
-
-	if (not $SoD->{'Version'}) {
-		$SoD->{'Version'} = 0.51;
-		if ($SoD->{'Run'}->{'SecondaryNumber'} < 4) {
-			$SoD->{'Run'}->{'SecondaryNumber'} = 1;
-			$SoD->{'Run'}->{'Secondary'} = "Sprint";
-		}
-		if ($SoD->{'Run'}->{'SecondaryNumber'} > 3) {
-			$SoD->{'Run'}->{'SecondaryNumber'} -= 2;
-		}
-	}
-	if (not $SoD->{'Version'} or $SoD->{'Version'} < 0.51) {
-		$SoD->{'Version'} = 0.51;
-		$SoD->{'Base'} = 1;
-	}
-	# $SoD->{'MouseChord'} ||= undef;
-	$SoD->{'JumpModeKey'} ||= "T";
-	$SoD->{'GFlyModeKey'} ||= "G";
-	$SoD->{'NonSoDModeKey'} ||= "UNBOUND";
-	$SoD->{'BaseModeKey'} ||= "UNBOUND";
-	$SoD->{'Default'} ||= "Base";
-	$SoD->{'Jump'} ||= {};
-	# $SoD->{'Run.UseCamdist'} ||= undef;
-	$SoD->{'Run.Camdist'} ||= "15";
-	# $SoD->{'Fly.UseCamdist'} ||= undef;
-	$SoD->{'Fly.Camdist'} ||= "60";
-	$SoD->{'SS'} ||= $SoD->{'SS'} or {};
-	if (!$SoD->{'SS'}->{'SS'} and ($SoD->{'Run'}->{'PrimaryNumber'} == 2)) { $SoD->{'SS'}->{'SS'} = 1; }
-
-	$SoD->{'TTP'} ||= {};
-	$SoD->{'TTP'}->{'BindKey'} ||="LSHIFT+LBUTTON";
-	$SoD->{'TTP'}->{'ComboKey'} ||="LSHIFT";
-	$SoD->{'TTP'}->{'ResetKey'} ||="LCTRL+T";
-
-	$SoD->{'TP'} ||= {};
-	$SoD->{'TP'}->{'BindKey'} ||= "LSHIFT+LBUTTON";
-	$SoD->{'TP'}->{'ComboKey'} ||= "LSHIFT";
-	$SoD->{'TP'}->{'ResetKey'} ||= "LCTRL+T";
-
-	if (!$SoD->{'Version'} or $SoD->{'Version'} < 0.71) {
-		$SoD->{'TP'}->{'HideWindows'} = 1;
-		$SoD->{'Version'} = 0.71
-	}
-
-	# $SoD->{'TP'}->{'TP'} ||= "Teleport";
-	# $SoD->{'TP'}->{'Num'} ||= 1;
-
-	$SoD->{'Nova'} ||= {};
-	$SoD->{'Nova'}->{'ModeKey'} ||= "T";
-	$SoD->{'Nova'}->{'PowerTray'} ||= "4";
-
-	$SoD->{'Dwarf'} ||= {};
-	$SoD->{'Dwarf'}->{'ModeKey'} ||= "G";
-	$SoD->{'Dwarf'}->{'PowerTray'} ||= "5";
-
-	if ($profile->{'archetype'} eq "Peacebringer") {
-		$SoD->{'Nova'}->{'Nova'} = "Bright Nova";
-		$SoD->{'Dwarf'}->{'Dwarf'} = "White Dwarf";
-		$SoD->{'HumanFormShield'} ||= "Shining Shield";
-
-	} elsif ($profile->{'archetype'} eq "Warshade") {
-		$SoD->{'Nova'}->{'Nova'} = "Dark Nova";
-		$SoD->{'Dwarf'}->{'Dwarf'} = "Black Dwarf";
-		$SoD->{'HumanFormShield'} ||= "Gravity Shield";
-	}
-
-	$SoD->{'Human'} ||= {};
-	$SoD->{'Human'}->{'ModeKey'} ||= "UNBOUND";
-	$SoD->{'Human'}->{'HumanPBind'} ||= "nop";
-	$SoD->{'Human'}->{'NovaPBind'} ||= "nop";
-	$SoD->{'Human'}->{'DwarfPBind'} ||= "nop";
-
-	$SoD->{'Detail'} ||= {};
-	$SoD->{'Detail'}->{'NormalAmt'} ||= "1.0";
-	$SoD->{'Detail'}->{'MovingAmt'} ||= "0.5";
-
-	$SoD->{'DefaultMode'} ||= "Base";
-
-	#  Temp Travel Powers
-	$SoD->{'Temp'} ||= {};
-	$SoD->{'Temp'}->{'Tray'} ||= "6";
-	$SoD->{'Temp'}->{'TraySwitch'} ||= "UNBOUND";
-	$SoD->{'TempModeKey'} ||= "UNBOUND";
-
-
-
-
-	$SoD->{'dialog'} ||= makeSoDDialog();
-	$SoD->{'dialog'}->show();
-}
 
 sub FillSoDPanel {
-	my @args = @_;
+
+	my ($panel, $event) = @_;
+
+	my $overallSizer = $panel->GetSizer();
+
+	# general movement keys
+	my $generalPanel = Wx::Panel->new($panel,);
+	my $generalSizer = Wx::FlexGridSizer->new(0,2,3,3);
+
+	$generalSizer->Add( Wx::StaticText->new($panel, -1, "Up:"), 0, wxALL,);
+	$generalSizer->Add( Wx::TextCtrl->  new($panel, UP_KEY, ""), 0, wxALL,);
+
+	$generalSizer->Add( Wx::StaticText->new($panel, -1, "Down:"), 0, wxALL,);
+	$generalSizer->Add( Wx::TextCtrl->  new($panel, DOWN_KEY, ""), 0, wxALL,);
+
+	$generalSizer->Add( Wx::StaticText->new($panel, -1, "Forward:"), 0, wxALL,);
+	$generalSizer->Add( Wx::TextCtrl->  new($panel, FORWARD_KEY, ""), 0, wxALL,);
+
+	$generalSizer->Add( Wx::StaticText->new($panel, -1, "Back:"), 0, wxALL,);
+	$generalSizer->Add( Wx::TextCtrl->  new($panel, BACK_KEY, ""), 0, wxALL,);
+
+	$generalSizer->Add( Wx::StaticText->new($panel, -1, "Strafe Left:"), 0, wxALL,);
+	$generalSizer->Add( Wx::TextCtrl->  new($panel, STRAFE_LEFT_KEY, ""), 0, wxALL,);
+
+	$generalSizer->Add( Wx::StaticText->new($panel, -1, "Strafe Right:"), 0, wxALL,);
+	$generalSizer->Add( Wx::TextCtrl->  new($panel, STRAFE_RIGHT_KEY, ""), 0, wxALL,);
+
+	$generalSizer->Add( Wx::StaticText->new($panel, -1, "Turn Left:"), 0, wxALL,);
+	$generalSizer->Add( Wx::TextCtrl->  new($panel, TURN_LEFT_KEY, ""), 0, wxALL,);
+
+	$generalSizer->Add( Wx::StaticText->new($panel, -1, "Turn Right:"), 0, wxALL,);
+	$generalSizer->Add( Wx::TextCtrl->  new($panel, TURN_RIGHT_KEY, ""), 0, wxALL,);
+
+	$generalPanel->SetSizerAndFit($generalSizer);
+
+	$overallSizer->Add($generalSizer);
+
+
+	# keep moving this to the bottom?
+	$overallSizer->Fit($panel);
+
 #			cbToolTip("Choose the Key you use to move Up or Jump")
 #			local soduphbox = cbBindBox("Up Key",SoD,"Up",nil,profile)
 #			cbToolTip("Choose the Key you use to move Down")
@@ -271,6 +177,14 @@ sub FillSoDPanel {
 #			local sodhidewindows = cbCheckBox("Hide Windows when Teleporting?",$SoD->{'TP'}->{'HideWindows'},cbCheckBoxCB(profile,$SoD->{'TP'},"HideWindows"))
 #			local sodfeedback = cbCheckBox("Send Self-tells When Changing SoD Modes?",$SoD->{'Feedback'},cbCheckBoxCB(profile,SoD,"Feedback"))
 #		
+	my $poolPowers = Profile::poolPowers();
+
+	# OK, now find all the movement powers
+	for ( sort keys %$poolPowers ) {
+
+	}
+
+
 #			local sssjEnabled
 #			cbToolTip("Choose the Key Combo to Toggle Super Speed mode")
 #			local sodrunmodehbox = cbBindBox("Speed Mode Key",SoD,"RunModeKey",nil,profile)
@@ -652,6 +566,130 @@ sub FillSoDPanel {
 }
 
 
+sub bindsettings {
+	my $profile = shift;
+
+	$profile->{'SoD'} ||= {
+
+		Base => 1,
+		Up => "SPACE",
+		Down => "X",
+		Forward => "W",
+		Back => "S",
+		Left => "A",
+		Right => "D",
+		RunModeKey => "C",
+		FlyModeKey => "F",
+		AutoRunKey => "R",
+		FollowKey => "TILDE",
+		Run => {
+			Primary => "none",
+			PrimaryNumber => 1,
+			Secondary => "Sprint",
+			SecondaryNumber => 1,
+		},
+		Fly => {
+			Hover => undef,
+			Fly => undef,
+			GFly => undef,
+		},
+		Unqueue => true,
+		AutoMouseLook => undef,
+		ToggleKey => "LCTRL+M",
+		enable => undef,
+	};
+
+	my $SoD = $profile->{'SoD'};
+
+	if (not $SoD->{'Version'}) {
+		$SoD->{'Version'} = 0.51;
+		if ($SoD->{'Run'}->{'SecondaryNumber'} < 4) {
+			$SoD->{'Run'}->{'SecondaryNumber'} = 1;
+			$SoD->{'Run'}->{'Secondary'} = "Sprint";
+		}
+		if ($SoD->{'Run'}->{'SecondaryNumber'} > 3) {
+			$SoD->{'Run'}->{'SecondaryNumber'} -= 2;
+		}
+	}
+	if (not $SoD->{'Version'} or $SoD->{'Version'} < 0.51) {
+		$SoD->{'Version'} = 0.51;
+		$SoD->{'Base'} = 1;
+	}
+	# $SoD->{'MouseChord'} ||= undef;
+	$SoD->{'JumpModeKey'} ||= "T";
+	$SoD->{'GFlyModeKey'} ||= "G";
+	$SoD->{'NonSoDModeKey'} ||= "UNBOUND";
+	$SoD->{'BaseModeKey'} ||= "UNBOUND";
+	$SoD->{'Default'} ||= "Base";
+	$SoD->{'Jump'} ||= {};
+	# $SoD->{'Run.UseCamdist'} ||= undef;
+	$SoD->{'Run.Camdist'} ||= "15";
+	# $SoD->{'Fly.UseCamdist'} ||= undef;
+	$SoD->{'Fly.Camdist'} ||= "60";
+	$SoD->{'SS'} ||= $SoD->{'SS'} or {};
+	if (!$SoD->{'SS'}->{'SS'} and ($SoD->{'Run'}->{'PrimaryNumber'} == 2)) { $SoD->{'SS'}->{'SS'} = 1; }
+
+	$SoD->{'TTP'} ||= {};
+	$SoD->{'TTP'}->{'BindKey'} ||="LSHIFT+LBUTTON";
+	$SoD->{'TTP'}->{'ComboKey'} ||="LSHIFT";
+	$SoD->{'TTP'}->{'ResetKey'} ||="LCTRL+T";
+
+	$SoD->{'TP'} ||= {};
+	$SoD->{'TP'}->{'BindKey'} ||= "LSHIFT+LBUTTON";
+	$SoD->{'TP'}->{'ComboKey'} ||= "LSHIFT";
+	$SoD->{'TP'}->{'ResetKey'} ||= "LCTRL+T";
+
+	if (!$SoD->{'Version'} or $SoD->{'Version'} < 0.71) {
+		$SoD->{'TP'}->{'HideWindows'} = 1;
+		$SoD->{'Version'} = 0.71
+	}
+
+	# $SoD->{'TP'}->{'TP'} ||= "Teleport";
+	# $SoD->{'TP'}->{'Num'} ||= 1;
+
+	$SoD->{'Nova'} ||= {};
+	$SoD->{'Nova'}->{'ModeKey'} ||= "T";
+	$SoD->{'Nova'}->{'PowerTray'} ||= "4";
+
+	$SoD->{'Dwarf'} ||= {};
+	$SoD->{'Dwarf'}->{'ModeKey'} ||= "G";
+	$SoD->{'Dwarf'}->{'PowerTray'} ||= "5";
+
+	if ($profile->{'archetype'} eq "Peacebringer") {
+		$SoD->{'Nova'}->{'Nova'} = "Bright Nova";
+		$SoD->{'Dwarf'}->{'Dwarf'} = "White Dwarf";
+		$SoD->{'HumanFormShield'} ||= "Shining Shield";
+
+	} elsif ($profile->{'archetype'} eq "Warshade") {
+		$SoD->{'Nova'}->{'Nova'} = "Dark Nova";
+		$SoD->{'Dwarf'}->{'Dwarf'} = "Black Dwarf";
+		$SoD->{'HumanFormShield'} ||= "Gravity Shield";
+	}
+
+	$SoD->{'Human'} ||= {};
+	$SoD->{'Human'}->{'ModeKey'} ||= "UNBOUND";
+	$SoD->{'Human'}->{'HumanPBind'} ||= "nop";
+	$SoD->{'Human'}->{'NovaPBind'} ||= "nop";
+	$SoD->{'Human'}->{'DwarfPBind'} ||= "nop";
+
+	$SoD->{'Detail'} ||= {};
+	$SoD->{'Detail'}->{'NormalAmt'} ||= "1.0";
+	$SoD->{'Detail'}->{'MovingAmt'} ||= "0.5";
+
+	$SoD->{'DefaultMode'} ||= "Base";
+
+	#  Temp Travel Powers
+	$SoD->{'Temp'} ||= {};
+	$SoD->{'Temp'}->{'Tray'} ||= "6";
+	$SoD->{'Temp'}->{'TraySwitch'} ||= "UNBOUND";
+	$SoD->{'TempModeKey'} ||= "UNBOUND";
+
+
+
+
+	$SoD->{'dialog'} ||= makeSoDDialog();
+	$SoD->{'dialog'}->show();
+}
 
 __DATA__
 

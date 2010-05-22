@@ -58,6 +58,7 @@ sub fillPickers {
 }
 
 
+sub poolPowers { return {} }
 
 
 1;

@@ -52,4 +52,14 @@ package SoD;
 
 use constant USE_SOD => 301;
 
+use constant UP_KEY => 310;
+use constant DOWN_KEY => 311;
+use constant FORWARD_KEY => 312;
+use constant BACK_KEY => 313;
+use constant STRAFE_LEFT_KEY => 314;
+use constant STRAFE_RIGHT_KEY => 315;
+use constant TURN_LEFT_KEY => 316;
+use constant TURN_RIGHT_KEY => 317;
+
+
 1;
