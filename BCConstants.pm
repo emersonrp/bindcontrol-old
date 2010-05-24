@@ -60,6 +60,25 @@ use constant STRAFE_LEFT_KEY => 314;
 use constant STRAFE_RIGHT_KEY => 315;
 use constant TURN_LEFT_KEY => 316;
 use constant TURN_RIGHT_KEY => 317;
+use constant MOUSECHORD_SOD => 318;
+
+use constant SPRINT_PICKER => 319;
+
+use constant AUTO_MOUSELOOK => 320;
+use constant AUTORUN_KEY => 321;
+use constant FOLLOW_KEY => 322;
+use constant NON_SOD_KEY => 323;
+use constant SPRINT_ONLY_SOD_KEY => 324;
+use constant SPRINT_SOD => 325;
+use constant SOD_TOGGLE_KEY => 326;
+use constant CHANGE_TRAVEL_CAMERA => 327;
+use constant BASE_CAMERA_DISTANCE => 328;
+use constant TRAVEL_CAMERA_DISTANCE => 329;
+use constant CHANGE_TRAVEL_DETAIL => 330;
+use constant BASE_DETAIL_LEVEL => 331;
+use constant TRAVEL_DETAIL_LEVEL => 332;
+use constant HIDE_WINDOWS_TELEPORTING => 333;
+use constant SEND_SOD_SELF_TELLS => 334;
 
 
 1;

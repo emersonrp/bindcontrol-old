@@ -4,6 +4,8 @@ use strict;
 use Wx qw(
 	wxALL wxVERTICAL
 	wxDefaultPosition wxDefaultSize wxDefaultValidator
+	wxCB_READONLY
+	wxALIGN_RIGHT
 );
 use Wx::Event qw(
 	EVT_CHECKBOX
@@ -51,132 +53,128 @@ sub new {
 	return $self;
 }
 
-
+# is this gonna be right?  scope the various panels here.
+my ($generalSizer,$sprintSizer);
 sub FillSoDPanel {
 
 	my ($panel, $event) = @_;
 
+	my $cb = $event->GetEventObject();
+
 	my $overallSizer = $panel->GetSizer();
 
-	# general movement keys
-	my $generalPanel = Wx::Panel->new($panel,);
-	my $generalSizer = Wx::FlexGridSizer->new(0,2,3,3);
+	##### GENERAL MOVEMENT KEYS
+	if (!$generalSizer) {
 
-	$generalSizer->Add( Wx::StaticText->new($panel, -1, "Up:"), 0, wxALL,);
-	$generalSizer->Add( Wx::TextCtrl->  new($panel, UP_KEY, ""), 0, wxALL,);
+		# general movement keys
+		$generalSizer = Wx::FlexGridSizer->new(0,2,3,3);
 
-	$generalSizer->Add( Wx::StaticText->new($panel, -1, "Down:"), 0, wxALL,);
-	$generalSizer->Add( Wx::TextCtrl->  new($panel, DOWN_KEY, ""), 0, wxALL,);
+		$generalSizer->Add( Wx::StaticText->new($panel, -1, "Up:"), 0, wxALL,);
+		$generalSizer->Add( Wx::TextCtrl->  new($panel, UP_KEY, ""), 0, wxALL,);
 
-	$generalSizer->Add( Wx::StaticText->new($panel, -1, "Forward:"), 0, wxALL,);
-	$generalSizer->Add( Wx::TextCtrl->  new($panel, FORWARD_KEY, ""), 0, wxALL,);
+		$generalSizer->Add( Wx::StaticText->new($panel, -1, "Down:"), 0, wxALL,);
+		$generalSizer->Add( Wx::TextCtrl->  new($panel, DOWN_KEY, ""), 0, wxALL,);
 
-	$generalSizer->Add( Wx::StaticText->new($panel, -1, "Back:"), 0, wxALL,);
-	$generalSizer->Add( Wx::TextCtrl->  new($panel, BACK_KEY, ""), 0, wxALL,);
+		$generalSizer->Add( Wx::StaticText->new($panel, -1, "Forward:"), 0, wxALL,);
+		$generalSizer->Add( Wx::TextCtrl->  new($panel, FORWARD_KEY, ""), 0, wxALL,);
 
-	$generalSizer->Add( Wx::StaticText->new($panel, -1, "Strafe Left:"), 0, wxALL,);
-	$generalSizer->Add( Wx::TextCtrl->  new($panel, STRAFE_LEFT_KEY, ""), 0, wxALL,);
+		$generalSizer->Add( Wx::StaticText->new($panel, -1, "Back:"), 0, wxALL,);
+		$generalSizer->Add( Wx::TextCtrl->  new($panel, BACK_KEY, ""), 0, wxALL,);
 
-	$generalSizer->Add( Wx::StaticText->new($panel, -1, "Strafe Right:"), 0, wxALL,);
-	$generalSizer->Add( Wx::TextCtrl->  new($panel, STRAFE_RIGHT_KEY, ""), 0, wxALL,);
+		$generalSizer->Add( Wx::StaticText->new($panel, -1, "Strafe Left:"), 0, wxALL,);
+		$generalSizer->Add( Wx::TextCtrl->  new($panel, STRAFE_LEFT_KEY, ""), 0, wxALL,);
 
-	$generalSizer->Add( Wx::StaticText->new($panel, -1, "Turn Left:"), 0, wxALL,);
-	$generalSizer->Add( Wx::TextCtrl->  new($panel, TURN_LEFT_KEY, ""), 0, wxALL,);
+		$generalSizer->Add( Wx::StaticText->new($panel, -1, "Strafe Right:"), 0, wxALL,);
+		$generalSizer->Add( Wx::TextCtrl->  new($panel, STRAFE_RIGHT_KEY, ""), 0, wxALL,);
 
-	$generalSizer->Add( Wx::StaticText->new($panel, -1, "Turn Right:"), 0, wxALL,);
-	$generalSizer->Add( Wx::TextCtrl->  new($panel, TURN_RIGHT_KEY, ""), 0, wxALL,);
+		$generalSizer->Add( Wx::StaticText->new($panel, -1, "Turn Left:"), 0, wxALL,);
+		$generalSizer->Add( Wx::TextCtrl->  new($panel, TURN_LEFT_KEY, ""), 0, wxALL,);
 
-	$generalPanel->SetSizerAndFit($generalSizer);
+		$generalSizer->Add( Wx::StaticText->new($panel, -1, "Turn Right:"), 0, wxALL,);
+		$generalSizer->Add( Wx::TextCtrl->  new($panel, TURN_RIGHT_KEY, ""), 0, wxALL,);
 
-	$overallSizer->Add($generalSizer);
+		$generalSizer->Add( Wx::CheckBox->new($panel, MOUSECHORD_SOD, "Use Mousechord as SoD Forward"), 0, wxALL,);
+
+		$overallSizer->Add($generalSizer);
+	}
+
+	$generalSizer->Show($cb->IsChecked());
+	$overallSizer->Layout();
+
+
+	##### SPRINT SOD BINDS
+	if (!$sprintSizer) {
+
+		# general movement keys
+		$sprintSizer = Wx::FlexGridSizer->new(0,2,3,3);
+
+		$sprintSizer->Add( Wx::StaticText->new($panel, -1, "Sprint Power:"), 0, wxALL,);
+		$sprintSizer->Add( Wx::ComboBox->new(
+				$panel, SPRINT_PICKER, '',
+				wxDefaultPosition, wxDefaultSize,
+				[@Profile::SprintPowers],
+				wxCB_READONLY,
+			), 0, wxALL,);
+
+		$sprintSizer->Add( Wx::CheckBox->new($panel, AUTO_MOUSELOOK, "Automatically Mouselook When Moving"), 0, wxALL,);
+		$sprintSizer->AddSpacer(1);
+
+		# TODO -- decide what to do with this.
+		# $sprintSizer->Add( Wx::CheckBox->new($panel, SPRINT_UNQUEUE, "Exec powexecunqueue"), 0, wxALL,);
+
+		$sprintSizer->Add( Wx::StaticText->new($panel, -1, "Autorun:"), 0, wxALL,);
+		$sprintSizer->Add( Wx::TextCtrl->  new($panel, AUTORUN_KEY, ""), 0, wxALL,);
+
+		$sprintSizer->Add( Wx::StaticText->new($panel, -1, "Follow Target:"), 0, wxALL,);
+		$sprintSizer->Add( Wx::TextCtrl->  new($panel, FOLLOW_KEY, ""), 0, wxALL,);
+
+		$sprintSizer->Add( Wx::StaticText->new($panel, -1, "Non-SoD Mode:"), 0, wxALL,);
+		$sprintSizer->Add( Wx::TextCtrl->  new($panel, NON_SOD_KEY, ""), 0, wxALL,);
+
+		$sprintSizer->Add( Wx::StaticText->new($panel, -1, "Sprint-Only SoD Mode:"), 0, wxALL,);
+		$sprintSizer->Add( Wx::TextCtrl->  new($panel, SPRINT_ONLY_SOD_KEY, ""), 0, wxALL,);
+
+		$sprintSizer->Add( Wx::CheckBox->new($panel, SPRINT_SOD, "Enable Sprint SoD"), 0, wxALL,);
+		$sprintSizer->AddSpacer(1);
+
+		$sprintSizer->Add( Wx::StaticText->new($panel, -1, "SoD Mode Toggle:"), 0, wxALL,);
+		$sprintSizer->Add( Wx::TextCtrl->  new($panel, SOD_TOGGLE_KEY, ""), 0, wxALL,);
+
+		$sprintSizer->Add( Wx::CheckBox->new($panel, CHANGE_TRAVEL_CAMERA, "Change Camera Distance When Travel Power Active"), 0, wxALL,);
+		$sprintSizer->AddSpacer(1);
+
+		$sprintSizer->Add( Wx::StaticText->new($panel, -1, "Base Camera Distance:"), 0, wxALL,);
+		$sprintSizer->Add( Wx::TextCtrl->  new($panel, BASE_CAMERA_DISTANCE, ""), 0, wxALL,);
+
+		$sprintSizer->Add( Wx::StaticText->new($panel, -1, "Travelling Camera Distance:"), 0, wxALL,);
+		$sprintSizer->Add( Wx::TextCtrl->  new($panel, TRAVEL_CAMERA_DISTANCE, ""), 0, wxALL,);
+
+		$sprintSizer->Add( Wx::CheckBox->new($panel, CHANGE_TRAVEL_DETAIL, "Change Graphic Detail When Travel Power Active"), 0, wxALL,);
+		$sprintSizer->AddSpacer(1);
+
+		$sprintSizer->Add( Wx::StaticText->new($panel, -1, "Base Detail Level:"), 0, wxALL,);
+		$sprintSizer->Add( Wx::TextCtrl->  new($panel, BASE_DETAIL_LEVEL, ""), 0, wxALL,);
+
+		$sprintSizer->Add( Wx::StaticText->new($panel, -1, "Travelling Detail Level:"), 0, wxALL,);
+		$sprintSizer->Add( Wx::TextCtrl->  new($panel, TRAVEL_DETAIL_LEVEL, ""), 0, wxALL,);
+
+		$sprintSizer->Add( Wx::CheckBox->new($panel, HIDE_WINDOWS_TELEPORTING, "Hide Windows When Teleporting"), 0, wxALL,);
+		$sprintSizer->AddSpacer(1);
+
+		$sprintSizer->Add( Wx::CheckBox->new($panel, SEND_SOD_SELF_TELLS, "Send Self-Tells When Changing SoD Modes"), 0, wxALL,);
+		$sprintSizer->AddSpacer(1);
+
+		$overallSizer->Add($sprintSizer);
+	}
+
+	$sprintSizer->Show($cb->IsChecked());
+	$overallSizer->Layout();
+
 
 
 	# keep moving this to the bottom?
 	$overallSizer->Fit($panel);
 
-#			cbToolTip("Choose the Key you use to move Up or Jump")
-#			local soduphbox = cbBindBox("Up Key",SoD,"Up",nil,profile)
-#			cbToolTip("Choose the Key you use to move Down")
-#			local soddownhbox = cbBindBox("Down Key",SoD,"Down",nil,profile)
-#			cbToolTip("Choose the Key you use to move Forward")
-#			local sodforhbox = cbBindBox("Forward Key",SoD,"Forward",nil,profile)
-#			cbToolTip("Enable this if you want clicking the Left and Right Mouse Buttons to Activate the SoD forward movement")
-#			local sodmousechord = cbCheckBox("Use Mousechord as SoD Forward",$SoD->{'MouseChord'},
-#				cbCheckBoxCB(profile,SoD,"MouseChord"))
-#			cbToolTip("Choose the Key you use to move Back")
-#			local sodbackhbox = cbBindBox("Back Key",SoD,"Back",nil,profile)
-#			cbToolTip("Choose the Key you use to move Left")
-#			local sodlefthbox = cbBindBox("Strafe Left Key",SoD,"Left",nil,profile)
-#			cbToolTip("Choose the Key you use to move Right")
-#			local sodrighthbox = cbBindBox("Strafe Right Key",SoD,"Right",nil,profile)
-#			cbToolTip("Choose the Key you use to turn Left")
-#			local sodtlefthbox = cbBindBox("Turn Left Key",SoD,"TLeft",nil,profile)
-#			cbToolTip("Choose the Key you use to turn Right")
-#			local sodtrighthbox = cbBindBox("Turn Right Key",SoD,"TRight",nil,profile)
-#		
-#			local uiupdate
-#			cbToolTip("Choose your Sprint Power, default is Sprint")
-#			local sodrunsechbox = cbListBox("Sprint Power",{"Sprint","Prestige Power Slide","Prestige Power Dash","Prestige Power Rush","Prestige Power Surge ","Prestige Power Quick"},8,$SoD->{'Run'}->{'SecondaryNumber'},
-#				cbListBoxCB(profile,$SoD->{'Run'},"SecondaryNumber","Secondary"),150,21,50)
-#			# cbToolTip("Check this unless your character uses a weapon")
-#			# local sodunqueue = cbCheckBox("Execute powexecunqueue?",$SoD->{'Unqueue'},
-#			# 	function(_,v) if v == 1 then $SoD->{'Unqueue'} = true else $SoD->{'Unqueue'} = nil end end)
-#			cbToolTip("Check this if you want the movement keys to initiate Mouselook automatically")
-#			local sodamlook = cbCheckBox("Auto-Mouselook while moving?",$SoD->{'AutoMouseLook'},
-#				cbCheckBoxCB(profile,SoD,"AutoMouseLook"))
-#			cbToolTip("Choose the Key Combo to Autorun")
-#			local sodautorunhbox = cbBindBox("AutoRun Key",SoD,"AutoRunKey",nil,profile)
-#			cbToolTip("Choose the Key Combo to Follow your target")
-#			local sodfollowhbox = cbBindBox("Follow Key",SoD,"FollowKey",nil,profile)
-#			cbToolTip("Choose the Key Combo to enter Non-SoD mode")
-#			local sodnonsodkeyhbox = cbBindBox("NonSoD Key",SoD,"NonSoDModeKey",nil,profile)
-#			cbToolTip("Check this if you want to enable Non-Speed on Demand movement keys")
-#			local sodnonsodtgl = cbCheckBox("Enable Non-SoD Movement Mode?",$SoD->{'NonSoD'},
-#				function(_,v)
-#					profile.modified = true
-#					if v == 1 then
-#						SoD["NonSoD"] = true
-#						if $SoD->{'Default'} ~= "NonSoD" then sodnonsodkeyhbox.active = "YES" else sodnonsodkeyhbox.active = "NO" end
-#					else
-#						SoD["NonSoD"] = nil
-#						sodnonsodkeyhbox.active = "NO"
-#					end
-#				end)
-#			cbToolTip("Choose the Key Combo to enter Sprint only SoD Mode")
-#			local sodbasekeyhbox = cbBindBox("Sprint Mode Key",SoD,"BaseModeKey",nil,profile)
-#			cbToolTip("Check this if you want to enable Sprint Speed on Demand movement keys")
-#			local sodbasetgl = cbCheckBox("Enable Sprint Movement Mode?",$SoD->{'Base'},
-#				function(_,v)
-#					profile.modified = true
-#					if v == 1 then
-#						SoD["Base"] = true
-#						if $SoD->{'Default'} ~= "Base" then sodbasekeyhbox.active = "YES" else sodbasekeyhbox.active = "NO" end
-#					else
-#						SoD["Base"] = nil
-#						sodbasekeyhbox.active = "NO"
-#					end
-#				end)
-#			# cbToolTip("Choose the toggle key to be used to enter or leave Speed on Demand mode")
-#			# local sodtogglehbox = cbBindBox("Normal/SoD Mode Toggle Key",SoD,"ToggleKey",nil,profile)
-#		
-#			cbToolTip("Check this to enable Camera Distance changes when exiting Fly Mode, or stopping a Teleport Chain, and choose the distance in feet")
-#			local sodruncamdist = cbToggleText("Base Cam Distance",$SoD->{'Run'}->{'UseCamdist'},$SoD->{'Run'}->{'Camdist'},
-#				cbCheckBoxCB(profile,$SoD->{'Run'},'UseCamdist'),
-#				cbTextBoxCB(profile,$SoD->{'Run'},'Camdist'))
-#			cbToolTip("Check this to enable Camera Distance changes when entering Fly Mode, or starting a Teleport Chain, and choose the distance in feet")
-#			local sodflycamdist = cbToggleText("Moving Cam Distance",$SoD->{'Fly'}->{'UseCamdist'},$SoD->{'Fly'}->{'Camdist'},
-#				cbCheckBoxCB(profile,$SoD->{'Fly'},'UseCamdist'),
-#				cbTextBoxCB(profile,$SoD->{'Fly'},'Camdist'))
-#			cbToolTip("Check this to enable Detail changes when using Fly Mode, or using the Teleport Bind, and Choose the Normal World Detail level")
-#			local sodworlddetailnormal = cbToggleText("Normal Detail",$SoD->{'Detail'}->{'Enable'},$SoD->{'Detail'}->{'NormalAmt'},
-#				cbCheckBoxCB(profile,$SoD->{'Detail'},'Enable'),
-#				cbTextBoxCB(profile,$SoD->{'Detail'},'NormalAmt'))
-#			cbToolTip("Choose the World Detail level to use when Moving if World Detail Changes are enabled")
-#			local sodworlddetailmoving = cbTextBox("Moving World Detail",$SoD->{'Detail'}->{'MovingAmt'},
-#				cbTextBoxCB(profile,$SoD->{'Detail'},'MovingAmt'))
-#			local sodhidewindows = cbCheckBox("Hide Windows when Teleporting?",$SoD->{'TP'}->{'HideWindows'},cbCheckBoxCB(profile,$SoD->{'TP'},"HideWindows"))
-#			local sodfeedback = cbCheckBox("Send Self-tells When Changing SoD Modes?",$SoD->{'Feedback'},cbCheckBoxCB(profile,SoD,"Feedback"))
-#		
 	my $poolPowers = Profile::poolPowers();
 
 	# OK, now find all the movement powers
@@ -691,6 +689,7 @@ sub bindsettings {
 	$SoD->{'dialog'}->show();
 }
 
+1;
 __DATA__
 
 #  toggleon variation
@@ -2579,3 +2578,5 @@ function module.bindisused(profile)
 end
 
 cbAddModule(module,"Speed on Demand","Movement")
+
+1;
