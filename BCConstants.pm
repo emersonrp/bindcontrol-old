@@ -77,8 +77,37 @@ use constant TRAVEL_CAMERA_DISTANCE => 329;
 use constant CHANGE_TRAVEL_DETAIL => 330;
 use constant BASE_DETAIL_LEVEL => 331;
 use constant TRAVEL_DETAIL_LEVEL => 332;
-use constant HIDE_WINDOWS_TELEPORTING => 333;
-use constant SEND_SOD_SELF_TELLS => 334;
+use constant DEFAULT_MOVEMENT_MODE => 333;
+use constant HIDE_WINDOWS_TELEPORTING => 334;
 
+
+use constant SEND_SOD_SELF_TELLS => 335;
+use constant SS_KEY => 336;
+use constant SS_ONLY_WHEN_MOVING => 327;
+use constant SS_SJ_MODE => 328;
+
+use constant SJ_KEY => 329;
+use constant SJ_SIMPLE_TOGGLE => 330;
+
+use constant FLY_KEY => 331;
+use constant FLY_GROUPFLY_KEY => 332;
+
+use constant TP_KEY => 333;
+use constant TP_COMBO_KEY => 334;
+use constant TP_RESET_KEY => 335;
+use constant TP_HOVER_WHEN_TP => 336;
+use constant TP_TEAM_COMBO_KEY => 337;
+use constant TP_TEAM_RESET_KEY => 338;
+use constant TP_GROUP_FLY_WHEN_TP_TEAM => 339;
+
+use constant TEMP_KEY => 341;
+use constant TEMP_POWERTRAY => 341;
+
+use constant KHELD_NOVA_KEY => 342;
+use constant KHELD_NOVA_POWERTRAY => 343;
+use constant KHELD_DWARF_KEY => 344;
+use constant KHELD_DWARF_POWERTRAY => 345;
+use constant KHELD_HUMAN_KEY => 346;
+use constant KHELD_HUMAN_POWERTRAY => 347;
 
 1;

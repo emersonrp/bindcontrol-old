@@ -54,7 +54,7 @@ sub new {
 }
 
 # is this gonna be right?  scope the various panels here.
-my ($generalSizer,$sprintSizer);
+my ($generalSizer, $sprintSizer, $superSpeedSizer, $superJumpSizer, $flySizer, $teleportSizer, $tempSizer, $kheldianSizer);
 sub FillSoDPanel {
 
 	my ($panel, $event) = @_;
@@ -94,12 +94,21 @@ sub FillSoDPanel {
 		$generalSizer->Add( Wx::TextCtrl->  new($panel, TURN_RIGHT_KEY, ""), 0, wxALL,);
 
 		$generalSizer->Add( Wx::CheckBox->new($panel, MOUSECHORD_SOD, "Use Mousechord as SoD Forward"), 0, wxALL,);
+		$generalSizer->AddSpacer(1);
+
+		# TODO!  fill this picker with only the appropriate bits.
+		$generalSizer->Add( Wx::StaticText->new($panel, -1, "Default Movement Mode:"), 0, wxALL,);
+		$generalSizer->Add( Wx::ComboBox->new(
+				$panel, DEFAULT_MOVEMENT_MODE, '',
+				wxDefaultPosition, wxDefaultSize,
+				['No SoD','Sprint','Super Speed','Jump','Fly'],
+				wxCB_READONLY,
+			), 0, wxALL,);
 
 		$overallSizer->Add($generalSizer);
 	}
 
 	$generalSizer->Show($cb->IsChecked());
-	$overallSizer->Layout();
 
 
 	##### SPRINT SOD BINDS
@@ -172,395 +181,154 @@ sub FillSoDPanel {
 
 
 
-	# keep moving this to the bottom?
-	$overallSizer->Fit($panel);
 
 	my $poolPowers = Profile::poolPowers();
 
 	# OK, now find all the movement powers
 	for ( sort keys %$poolPowers ) {
 
+		# TODO!
 	}
 
+	##### SuperSpeed
+	if (!$superSpeedSizer) {
 
-#			local sssjEnabled
-#			cbToolTip("Choose the Key Combo to Toggle Super Speed mode")
-#			local sodrunmodehbox = cbBindBox("Speed Mode Key",SoD,"RunModeKey",nil,profile)
-#			if not $SoD->{'SS'}->{'SS'} or $SoD->{'Default'} == "Run" then
-#				sodrunmodehbox.active="NO"
-#			else
-#				sodrunmodehbox.active="YES"
-#			end
-#			cbToolTip("Check this if you only want Super Speed to be used when moving.")
-#			local sodssmobileonly = cbCheckBox("Mobile SS Only",$SoD->{'SS'}->{'MobileOnly'},cbCheckBoxCB(profile,$SoD->{'SS'},"MobileOnly"))
-#			cbToolTip("Check this to enable Super Speed+Super Jump Mode.")
-#			local sodsssjmode = cbCheckBox("Super Speed+Super Jump Mode",$SoD->{'SS'}->{'SSSJMode'},cbCheckBoxCB(profile,$SoD->{'SS'},"SSSJMode"))
-#			cbToolTip("Check this if you want to use Super Speed SoD Binds")
-#			local sodrunprimhbox = cbCheckBox("Character has Super Speed?",$SoD->{'SS'}->{'SS'},
-#				function(_,v) profile.modified = true 
-#					if v == 1 then
-#						$SoD->{'Run'}->{'Primary'} = "Super Speed"
-#						$SoD->{'SS'}->{'SS'} = true
-#						$SoD->{'Run'}->{'PrimaryNumber'} = 2
-#						if $SoD->{'Default'} ~= "Run" then
-#							sodrunmodehbox.active="YES"
-#						end
-#						sodssmobileonly.active = "YES"
-#						sssjEnabled()
-#					else
-#						$SoD->{'Run'}->{'Primary'} = "None"
-#						$SoD->{'SS'}->{'SS'} = nil
-#						$SoD->{'Run'}->{'PrimaryNumber'} = 1
-#						sodrunmodehbox.active="NO"
-#						sodssmobileonly.active = "NO"
-#						sssjEnabled()
-#					end
-#				end
-#			)
-#			if not $SoD->{'SS'}->{'SS'} then sodssmobileonly.active="NO" end
-#			
-#			cbToolTip("Choose the Key Combo to switch to Jump mode")
-#			local sodjmpmodehbox = cbBindBox("Jump Mode Key",SoD,"JumpModeKey",nil,profile)
-#			cbToolTip("Check this if you want to use a simple mode toggle for Combat Jumping and Super Jump")
-#			local sodsimplejump = cbCheckBox("Use Simple CJ/SJ Mode Toggle?",$SoD->{'Jump'}->{'Simple'},
-#				cbCheckBoxCB(profile,$SoD->{'Jump'},"Simple"))
-#			local jmpEnabled = function()
-#				if $SoD->{'Jump'}->{'CJ'} or $SoD->{'Jump'}->{'SJ'} then
-#					if $SoD->{'Default'} ~= "Jump" then
-#						sodjmpmodehbox.active = "YES"
-#					else
-#						sodjmpmodehbox.active = "NO"
-#					end
-#					sodsimplejump.active = "YES"
-#				else
-#					sodjmpmodehbox.active = "NO"
-#					sodsimplejump.active = "NO"
-#				end
-#			end
-#			jmpEnabled()
-#			cbToolTip("Check this if your Character has the Combat Jumping power")
-#			#  Use a customized callback here in order to call the jmpEnabled() function when needed
-#			local sodhascj = cbCheckBox("Character has Combat Jumping?",$SoD->{'Jump'}->{'CJ'},
-#				function(_,v) profile.modified = true if v == 1 then $SoD->{'Jump'}->{'CJ'} = true else $SoD->{'Jump'}->{'CJ'} = nil end jmpEnabled() end)
-#			cbToolTip("Check this if your Character has the Super Jump power")
-#			#  Use a customized callback here in order to call the jmpEnabled() function when needed
-#			sssjEnabled = function()
-#				if $SoD->{'SS'}->{'SS'} and $SoD->{'Jump'}->{'SJ'} then
-#					sodsssjmode.active = "YES"
-#				else
-#					sodsssjmode.active = "NO"
-#				end
-#			end
-#			local sodhasjump = cbCheckBox("Character has Super Jump?",$SoD->{'Jump'}->{'SJ'},
-#				function(_,v) profile.modified = true if v == 1 then $SoD->{'Jump'}->{'SJ'} = true else $SoD->{'Jump'}->{'SJ'} = nil end jmpEnabled() sssjEnabled() end
-#			)
-#			
-#			sssjEnabled()
-#			
-#			local flyEnabled
-#			local HasHoverText = "Character Has Hover?"
-#			local sodhasqflight
-#			local sodqflighthbox
-#			if profile.archetype == "Peacebringer" then
-#				HasHoverText = "Character Has Combat Flight?"
-#				cbToolTip("Choose the Key Combo to switch to Quantum Flight mode")
-#				sodqflighthbox = cbBindBox("Q. Fly Mode Key",SoD,"QFlyModeKey",nil,profile)
-#				local function qflyenabled()
-#					if $SoD->{'Fly'}->{'QFly'} then
-#						sodqflighthbox.active = "YES"
-#					else
-#						sodqflighthbox.active = "NO"
-#					end
-#				end
-#				cbToolTip("Check this if your Character has the Quantum Flight power")
-#				sodhasqflight = cbCheckBox("Character Has Quantum Flight?",$SoD->{'Fly'}->{'QFly'},
-#					function(_,v) profile.modified = true if v == 1 then $SoD->{'Fly'}->{'QFly'} = true else $SoD->{'Fly'}->{'QFly'} = nil end qflyenabled() end)
-#				qflyenabled()
-#			end
-#			cbToolTip("Choose the Key Combo to switch to Fly mode")
-#			local sodflymodehbox = cbBindBox("Fly Mode Key",SoD,"FlyModeKey",nil,profile)
-#			cbToolTip("Check this if your Character has the Hover power")
-#			#  Use a customized callback here in order to call the flyEnabled() function when needed
-#			local sodhashover = cbCheckBox(HasHoverText,$SoD->{'Fly'}->{'Hover'},
-#				function(_,v) profile.modified = true if v == 1 then $SoD->{'Fly'}->{'Hover'} = true else $SoD->{'Fly'}->{'Hover'} = nil end flyEnabled() end)
-#			cbToolTip("Check this if your Character has the Fly power")
-#			#  Use a customized callback here in order to call the flyEnabled() function when needed
-#			local sodhasfly = cbCheckBox("Character Has Fly?",$SoD->{'Fly'}->{'Fly'},
-#				function(_,v) profile.modified = true if v == 1 then $SoD->{'Fly'}->{'Fly'} = true else $SoD->{'Fly'}->{'Fly'} = nil end flyEnabled() end)
-#		
-#		
-#			local TPQuestion = "Teleport Bind"
-#			local sodtpbind
-#			if profile.archetype == "Peacebringer" then
-#				TPQuestion = "Dwarf Step Bind"
-#			elseif profile.archetype == "Warshade" then
-#				TPQuestion = "Shd/Dwf Step Bind"
-#			end
-#			cbToolTip("Set this to the first Key in your Teleport Key Combo, e.g. LSHIFT if the Teleport is bound to LSHIFT+LBUTTON")
-#			local sodtpcombo = cbBindBox("TP ComboKey",$SoD->{'TP'},"ComboKey",nil,profile)
-#			cbToolTip("Choose the Reset Key for the teleport bind")
-#			local sodtpreset = cbBindBox("TP ResetKey",$SoD->{'TP'},"ResetKey",nil,profile)
-#			cbToolTip("Choose the Key Combo to teleport with")
-#			sodtpbind = cbBindBox(TPQuestion,$SoD->{'TP'},"BindKey",nil,profile)
-#			cbToolTip("Enable this if you have Hover and want to automatically activate it when teleporting.")
-#			sodtphover = cbCheckBox("Auto-Hover when Teleporting?",$SoD->{'TP'}->{'TPHover'},cbCheckBoxCB(profile,$SoD->{'TP'},"TPHover"))
-#			if not $SoD->{'TP'}->{'Enable'} then
-#				sodtpcombo.active = "NO"
-#				sodtpreset.active = "NO"
-#				sodtpbind.active = "NO"
-#				sodtphover.active = "NO"
-#			elseif $SoD->{'Fly'}->{'Hover'} then
-#				sodtphover.active = "YES"
-#			end
-#			cbToolTip("Chech this to enable the advanced TP binds for the TP power pool, or for Kheldian TP Powers")
-#			local sodhastp = cbCheckBox("Character Has TP?",$SoD->{'TP'}->{'Enable'},
-#				function(_,v) profile.modified = true 
-#					if v == 1 then
-#						$SoD->{'TP'}->{'Enable'} = true
-#						sodtpcombo.active = "YES"
-#						sodtpreset.active = "YES"
-#						sodtpbind.active = "YES"
-#						if $SoD->{'Fly'}->{'Hover'} then
-#							sodtphover.active = "YES"
-#						else
-#							sodtphover.active = "NO"
-#						end
-#					else
-#						$SoD->{'TP'}->{'Enable'} = nil
-#						sodtpcombo.active = "NO"
-#						sodtpreset.active = "NO"
-#						sodtpbind.active = "NO"
-#						sodtphover.active = "NO"
-#					end
-#				end)
-#		
-#		# 	local gflyenabled
-#		# 	cbToolTip("Choose the Key Combo to switch to Group Fly mode")
-#		# 	local sodgflymodehbox = cbBindBox("Group Fly Key",SoD,"GFlyModeKey",nil,profile)
-#		# 	cbToolTip("Check this if your Character has the Group Fly power")
-#		# 	local sodhasgfly = cbCheckBox("Character Has Group Fly?",$SoD->{'Fly'}->{'GFly'},
-#		# 		function(_,v) profile.modified = true 
-#		# 			if v == 1 then
-#		# 				$SoD->{'Fly'}->{'GFly'} = true
-#		# 			else
-#		# 				$SoD->{'Fly'}->{'GFly'} = nil
-#		# 			end
-#		# 			gflyEnabled()
-#		# 		end
-#		# 	)
-#		
-#		
-#			local TTPQuestion = "Team TP Bind"
-#			local sodttpbind
-#			cbToolTip("Set this to the first Key in your Team TP Key Combo, e.g. LSHIFT if the Team TP is bound to LSHIFT+LBUTTON")
-#			local sodttpcombo = cbBindBox("TTP ComboKey",$SoD->{'TTP'},"ComboKey",nil,profile)
-#			cbToolTip("Choose the Reset Key for the teleport bind")
-#			local sodttpreset = cbBindBox("TTP ResetKey",$SoD->{'TTP'},"ResetKey",nil,profile)
-#			cbToolTip("Choose the Key Combo to teleport with")
-#			sodttpbind = cbBindBox(TPQuestion,$SoD->{'TTP'},"BindKey",nil,profile)
-#		# 	cbToolTip("Enable this if you have Group Fly and want to automatically activate it when team teleporting.")
-#		# 	sodttpgfly = cbCheckBox("Auto-Group Fly when Team 'Porting?",$SoD->{'TP'}->{'TTPGFly'},cbCheckBoxCB(profile,$SoD->{'TP'},"TTPGFly"))
-#			if not $SoD->{'TTP'}->{'Enable'} then
-#				sodttpcombo.active = "NO"
-#				sodttpreset.active = "NO"
-#				sodttpbind.active = "NO"
-#			end
-#		# 	if $SoD->{'Fly'}->{'GFly'} and $SoD->{'TTP'}->{'Enable'} then
-#		# 		sodttpgfly.active = "YES"
-#		# 	else
-#		# 		sodttpgfly.active = "NO"
-#		# 	end
-#			cbToolTip("Chech this to enable the advanced TP binds for the Team TP power")
-#			local sodhasttp = cbCheckBox("Character Has Team TP?",$SoD->{'TTP'}->{'Enable'},
-#				function(_,v) profile.modified = true 
-#					if v == 1 then
-#						$SoD->{'TTP'}->{'Enable'} = true
-#						sodttpcombo.active = "YES"
-#						sodttpreset.active = "YES"
-#						sodttpbind.active = "YES"
-#		# 				if $SoD->{'Fly'}->{'GFly'} then
-#		# 					sodttpgfly.active = "YES"
-#		# 				else
-#		# 					sodttpgfly.active = "NO"
-#		# 				end
-#					else
-#						$SoD->{'TTP'}->{'Enable'} = nil
-#						sodttpcombo.active = "NO"
-#						sodttpreset.active = "NO"
-#						sodttpbind.active = "NO"
-#		# 				sodttpgfly.active = "NO"
-#					end
-#				end)
-#		
-#			cbToolTip("Check this to Enable the Temp Travel Power Mode")
-#			local sodtempenable = cbCheckBox("Enable Temp Travel Mode",$SoD->{'Temp'}->{'Enable'},cbCheckBoxCB(profile,$SoD->{'Temp'},'Enable'))
-#			cbToolTip("Choose the Key Combo to switch to Temp Travel mode")
-#			local sodtempmodehbox = cbBindBox("Temp Mode Key",SoD,"TempModeKey",nil,profile)
-#			cbToolTip("Set this to a powertray to change to Use for Temp Travel Powers")
-#			local sodtemptrayhbox = cbTextBox("Temp Travel Tray",$SoD->{'Temp'}->{'Tray'},cbTextBoxCB(profile,$SoD->{'Temp'},"Tray"))
-#			cbToolTip("Choose the Key Combo to Toggle to Temp Travel power tray")
-#			local sodtemptrayswitchhbox = cbBindBox("Tray Toggle Key",$SoD->{'Temp'},"TraySwitch",nil,profile)
-#		
-#			flyEnabled = function()
-#				if $SoD->{'Fly'}->{'Hover'} and $SoD->{'TP'}->{'Enable'} then
-#					sodtphover.active = "YES"
-#				else
-#					sodtphover.active = "NO"
-#				end
-#				if $SoD->{'Fly'}->{'Hover'} or $SoD->{'Fly'}->{'Fly'} then
-#					if $SoD->{'Default'} ~= "Fly" then
-#						sodflymodehbox.active = "YES"
-#					else
-#						sodflymodehbox.active = "NO"
-#					end
-#				else
-#					sodflymodehbox.active = "NO"
-#				end
-#			end
-#			flyEnabled()
-#		
-#		# 	gflyEnabled = function()
-#		# 		if $SoD->{'Fly'}->{'GFly'} and $SoD->{'TTP'}->{'Enable'} then
-#		# 			sodttpgfly.active = "YES"
-#		# 		else
-#		# 			sodttpgfly.active = "NO"
-#		# 		end
-#		# 		if $SoD->{'Fly'}->{'GFly'} and $SoD->{'Default'} ~= "GFly" then
-#		# 			sodgflymodehbox.active = "YES"
-#		# 		else
-#		# 			sodgflymodehbox.active = "NO"
-#		# 		end
-#		# 	end
-#		# 	gflyEnabled()
-#		
-#			
-#			local khnovatgl,khnovatray,khdwarftgl,khdwarftray,khhumanpwr,khhumanbnd,khhumanpbind,khnovapbind,khdwarfpbind
-#			if profile.archetype == "Warshade" or profile.archetype == "Peacebringer" then
-#				cbToolTip("Check this to Enable a toggle key for Nova Form")
-#				khnovatgl = cbCheckBox("Use Nova Toggle?",$SoD->{'Nova'}->{'Enable'},
-#					cbCheckBoxCB(profile,$SoD->{'Nova'},"Enable"))
-#				cbToolTip("Choose the Key Combo to toggle Nova Form with")
-#				khnovabnd = cbBindBox("Nova Form Bind",$SoD->{'Nova'},"ModeKey",nil,profile)
-#				cbToolTip("Set this to a powertray to change to when in Nova Form")
-#				khnovatray = cbTextBox("Nova Power Tray",$SoD->{'Nova'}->{'PowerTray'},cbTextBoxCB(profile,$SoD->{'Nova'},"PowerTray"))
-#				cbToolTip("Check this to Enable a toggle key for Dwarf Form")
-#				khdwarftgl = cbCheckBox("Use Dwarf Toggle?",$SoD->{'Dwarf'}->{'Enable'},
-#					cbCheckBoxCB(profile,$SoD->{'Dwarf'},"Enable"))
-#				cbToolTip("Choose the Key Combo to toggle Dwarf Form with")
-#				khdwarfbnd = cbBindBox("Dwarf Form Bind",$SoD->{'Dwarf'},"ModeKey",nil,profile)
-#				cbToolTip("Set this to a powertray to change to when in Dwarf Form")
-#				khdwarftray = cbTextBox("Dwarf Power Tray",$SoD->{'Dwarf'}->{'PowerTray'},cbTextBoxCB(profile,$SoD->{'Dwarf'},"PowerTray"))
-#				khhumanpwr = cbTogglePower("Human Form Power",profile.powerset,$SoD->{'UseHumanFormPower'},SoD,"HumanFormShield",
-#					cbCheckBoxCB(profile,SoD,"UseHumanFormPower"),profile)
-#				khhumanpbind = iup.hbox{iup.label{title="Human",rastersize="50x"},(cbPowerBindBtn(nil,$SoD->{'Human'},"HumanPBind",nil,150,nil,profile))}
-#				khnovapbind = iup.hbox{iup.label{title="Nova",rastersize="50x"},(cbPowerBindBtn(nil,$SoD->{'Human'},"NovaPBind",nil,150,nil,profile))}
-#				khdwarfpbind = iup.hbox{iup.label{title="Dwarf",rastersize="50x"},(cbPowerBindBtn(nil,$SoD->{'Human'},"DwarfPBind",nil,150,nil,profile))}
-#				local function humanpbindenable()
-#					if $SoD->{'Human'}->{'Enable'} then
-#						khhumanpbind.active = "YES"
-#						khnovapbind.active = "YES"
-#						khdwarfpbind.active = "YES"
-#					else
-#						khhumanpbind.active = "NO"
-#						khnovapbind.active = "NO"
-#						khdwarfpbind.active = "NO"
-#					end
-#				end
-#				cbToolTip("Check this and choose a key if you want a separate key to enter human form, instead of toggling with Nova and Dwarf keys.")
-#				khhumanbnd = cbCheckBind("Human Form Bind",$SoD->{'Human'},"ModeKey","Enable",nil,profile,nil,nil,nil,nil,humanpbindenable)
-#				humanpbindenable()
-#			end
-#		
-#			if $SoD->{'NonSoD'} and $SoD->{'Default'} ~= "NonSoD" then sodnonsodkeyhbox.active = "YES" else sodnonsodkeyhbox.active = "NO" end
-#			if $SoD->{'Base'} and $SoD->{'Default'} ~= "Base" then sodbasekeyhbox.active = "YES" else sodbasekeyhbox.active = "NO" end
-#			uiupdate = function()
-#				#  enable all those bind boxes that aren't the new default.
-#				jmpEnabled() #  these check for default status
-#				flyEnabled()
-#		# 		gflyEnabled()
-#				if $SoD->{'NonSoD'} and $SoD->{'Default'} ~= "NonSoD" then sodnonsodkeyhbox.active = "YES" else sodnonsodkeyhbox.active = "NO" end
-#				if $SoD->{'Base'} and $SoD->{'Default'} ~= "Base" then sodbasekeyhbox.active = "YES" else sodbasekeyhbox.active = "NO" end
-#				if $SoD->{'SS'}->{'SS'} and $SoD->{'Default'} ~= "Run" then
-#					sodrunmodehbox.active="YES"
-#				else
-#					sodrunmodehbox.active="NO"
-#				end
-#			end
-#			
-#			cbToolTip("Choose your Default Movement Mode")
-#			local soddefaulthbox = cbListBox("Default Move Mode",{"Non-SoD","Sprint SoD","Super Speed","Super Jump","Flight"},5,sodConvertDefault[$SoD->{'Default'}],
-#				sodConvertDefaultBack(profile,SoD,uiupdate),150,21,50)
-#			
-#			
-#			#  Credits and Enable SoD Checkbox go in the same Hbox
-#			local boxa = iup.vbox{credits,sodenable}
-#			#  Movement Keys all go in a single frame titled Movement Keys
-#			local boxb = iup.frame{iup.vbox{soduphbox,soddownhbox,sodforhbox,sodmousechord,sodbackhbox,sodlefthbox,sodrighthbox,sodtlefthbox,sodtrighthbox},
-#				margin="0x0",Title="Movement Keys"}
-#			#  General Movement Settings are in the next frame
-#			# local boxc = iup.frame{iup.vbox{sodrunsechbox,sodunqueue,sodamlook,sodautorunhbox,sodfollowhbox,sodtogglehbox},
-#			local boxc = iup.frame{iup.vbox{sodrunsechbox,soddefaulthbox,sodamlook,sodautorunhbox,sodfollowhbox,sodnonsodtgl,sodnonsodkeyhbox,sodbasetgl,sodbasekeyhbox},
-#				margin="0x0",Title="General Settings"}
-#			#  Detail Settings are placed in the next Frame
-#			local boxd = iup.frame{iup.vbox{sodruncamdist,sodflycamdist,sodworlddetailnormal,sodworlddetailmoving,sodhidewindows,sodfeedback},
-#				margin="0x0",Title="Detail Settings"}
-#				
-#			#  Next Column, first box is the Superspeed options
-#			local boxe = iup.frame{iup.vbox{sodrunprimhbox,sodrunmodehbox,sodssmobileonly,sodsssjmode},margin="0x0",Title="Super Speed on Demand"}
-#			#  Next is SuperJump Settings
-#			local boxf = iup.frame{iup.vbox{sodhasjump,sodhascj,sodsimplejump,sodjmpmodehbox},margin="0x0",Title="Super Jump on Demand"}
-#			#  Next is Flight stuff.  Only used by non warshades
-#			local boxg
-#			if profile.archetype == "Peacebringer" then
-#				boxg = iup.frame{iup.vbox{sodhashover,sodflymodehbox,sodhasqflight,sodqflighthbox},margin="0x0",Title="Flight on Demand"}
-#			elseif not (profile.archetype == "Warshade") then
-#				boxg = iup.frame{iup.vbox{sodhashover,sodhasfly,sodflymodehbox},margin="0x0",Title="Flight on Demand"}
-#			end
-#			#  Next is the Teleport stuff
-#			local boxh
-#			if profile.archetype ~= "Warshade" and profile.archetype ~= "Peacebringer" then
-#				boxh = iup.frame{iup.vbox{sodhastp,sodtpbind,sodtpcombo,sodtpreset,sodtphover},margin="0x0",
-#					Title="Advanced Teleport Binds"}
-#			else
-#				boxh = iup.frame{iup.vbox{sodhastp,sodtpbind,sodtpcombo,sodtpreset},margin="0x0",
-#					Title="Advanced Teleport Binds"}
-#			end
-#			#  Next is the Kheldian only Nova/Dwarf Toggles
-#			local boxi = iup.frame{iup.vbox{khnovatgl,khnovabnd,khnovatray,khdwarftgl,khdwarfbnd,khdwarftray,khhumanpwr,khhumanbnd,
-#				iup.label{title="Kheldian Form Powerbinds"},
-#				khhumanpbind,khnovapbind,khdwarfpbind},margin="0x0",
-#				Title="Nova/Dwarf Form Toggle Settings"}
-#		
-#			#  Third Column is for Team TP and Group Fly
-#			# local boxj = iup.frame{iup.vbox{sodhasgfly,sodgflymodehbox},margin="0x0",Title="Group Fly Mode"}
-#			local boxk = iup.frame{iup.vbox{sodhasttp,sodttpbind,sodttpcombo,sodttpreset},margin="0x0",
-#				Title="Team Teleport Binds"}
-#			local expimpbtn = cbImportExportButtons(profile,"SoD",module.bindsettings,100,nil,100)
-#			
-#			local boxt = iup.frame{iup.vbox{sodtempenable,sodtempmodehbox,sodtemptrayhbox,sodtemptrayswitchhbox},margin="0x0",Title="Temp Travel Power Mode"}
-#		
-#			local soddlg
-#			if profile.archetype == "Peacebringer" then
-#				soddlg = iup.dialog{iup.hbox{iup.fill{size="5"},iup.vbox{boxa,iup.fill{size="5"},boxb,iup.fill{size="5"},boxc,iup.fill{size="5"}},iup.fill{size="5"},
-#					iup.vbox{iup.fill{size="5"},boxd,iup.fill{size="5"},boxe,iup.fill{size="5"},boxf,iup.fill{size="5"},boxg,iup.fill{size="5"},boxh,iup.fill{size="5"}},iup.fill{size="5"},
-#					iup.vbox{iup.fill{size="5"},boxi,iup.fill{size="5"},boxt,iup.fill{size="5"},expimpbtn},iup.fill{size="5"}
-#					},title = "Movement : Speed on Demand",maxbox="NO",resize="NO",mdichild="YES",mdiclient=mdiClient}
-#			elseif profile.archetype == "Warshade" then
-#				soddlg = iup.dialog{iup.hbox{iup.fill{size="5"},iup.vbox{boxa,iup.fill{size="5"},boxb,iup.fill{size="5"},boxc,iup.fill{size="5"}},iup.fill{size="5"},
-#					iup.vbox{iup.fill{size="5"},boxd,iup.fill{size="5"},boxe,iup.fill{size="5"},boxf,iup.fill{size="5"},boxh,iup.fill{size="5"}},iup.fill{size="5"},
-#					iup.vbox{iup.fill{size="5"},boxi,iup.fill{size="5"},boxt,iup.fill{size="5"},expimpbtn},iup.fill{size="5"}
-#					},title = "Movement : Speed on Demand",maxbox="NO",resize="NO",mdichild="YES",mdiclient=mdiClient}
-#			else
-#				soddlg = iup.dialog{iup.hbox{iup.fill{size="5"},iup.vbox{boxa,iup.fill{size="5"},boxb,iup.fill{size="5"},boxc,iup.fill{size="5"}},iup.fill{size="5"},
-#					iup.vbox{iup.fill{size="5"},boxd,iup.fill{size="5"},boxe,iup.fill{size="5"},boxf,iup.fill{size="5"},boxg,iup.fill{size="5"},boxh,iup.fill{size="5"}},iup.fill{size="5"},
-#					iup.vbox{iup.fill{size="5"},boxk,boxt,iup.fill{size="5"},expimpbtn},iup.fill{size="5"}
-#					},title = "Movement : Speed on Demand",maxbox="NO",resize="NO",mdichild="YES",mdiclient=mdiClient}
-#			end
-#			# soddlg.close_cb = function(self) $SoD->{'dialog'} = nil end
-#			# soddlg:showxy(218,10)
-#			uiupdate()
-#			cbShowDialog(soddlg,218,10,profile,function(self) $SoD->{'dialog'} = nil end)
-#			$SoD->{'dialog'} = soddlg
+		$superSpeedSizer = Wx::FlexGridSizer->new(0,2,3,3);
+
+		$superSpeedSizer->Add( Wx::StaticText->new($panel, -1, "Toggle Super Speed"), 0, wxALL,);
+		$superSpeedSizer->Add( Wx::TextCtrl->  new($panel, SS_KEY, ""), 0, wxALL,);
+
+		$superSpeedSizer->Add( Wx::CheckBox->new($panel, SS_ONLY_WHEN_MOVING, "Only Super Speed When Moving"), 0, wxALL,);
+		$superSpeedSizer->AddSpacer(1);
+
+		$superSpeedSizer->Add( Wx::CheckBox->new($panel, SS_SJ_MODE, "Enable Super Speed + Super Jump Mode"), 0, wxALL,);
+		$superSpeedSizer->AddSpacer(1);
+
+		$overallSizer->Add($superSpeedSizer);
+	}
+
+	$superSpeedSizer->Show($cb->IsChecked());
+
+	##### SuperJump
+	if (!$superJumpSizer) {
+
+		$superJumpSizer = Wx::FlexGridSizer->new(0,2,3,3);
+
+		$superJumpSizer->Add( Wx::StaticText->new($panel, -1, "Toggle Jump Mode"), 0, wxALL,);
+		$superJumpSizer->Add( Wx::TextCtrl->  new($panel, SJ_KEY, ""), 0, wxALL,);
+
+		$superJumpSizer->Add( Wx::CheckBox->new($panel, SJ_SIMPLE_TOGGLE, "Use Simple CJ / SJ Mode Toggle"), 0, wxALL,);
+		$superJumpSizer->AddSpacer(1);
+
+		$overallSizer->Add($superJumpSizer);
+	}
+
+	$superJumpSizer->Show($cb->IsChecked());
+
+
+	##### Fly
+	if (!$flySizer) {
+
+		$flySizer = Wx::FlexGridSizer->new(0,2,3,3);
+
+		$flySizer->Add( Wx::StaticText->new($panel, -1, "Toggle Fly Mode"), 0, wxALL,);
+		$flySizer->Add( Wx::TextCtrl->  new($panel, FLY_KEY, ""), 0, wxALL,);
+
+		$flySizer->Add( Wx::StaticText->new($panel, -1, "Toggle Group Fly Mode"), 0, wxALL,);
+		$flySizer->Add( Wx::TextCtrl->  new($panel, FLY_GROUPFLY_KEY, ""), 0, wxALL,);
+
+		$overallSizer->Add($flySizer);
+	}
+
+	$flySizer->Show($cb->IsChecked());
+
+	##### Teleport
+	if (!$teleportSizer) {
+
+		$teleportSizer = Wx::FlexGridSizer->new(0,2,3,3);
+
+		my $teleportPowerName = 'Teleport';
+		# if (at == peacebringer) "Dwarf Step Key"
+		# if (at == warshade) "Shadow Step / Dwarf Step Key"
+
+		$teleportSizer->Add( Wx::StaticText->new($panel, -1, "$teleportPowerName Combo Key"), 0, wxALL,);
+		$teleportSizer->Add( Wx::TextCtrl->  new($panel, TP_COMBO_KEY, ""), 0, wxALL,);
+
+		$teleportSizer->Add( Wx::StaticText->new($panel, -1, "$teleportPowerName Reset Key"), 0, wxALL,);
+		$teleportSizer->Add( Wx::TextCtrl->  new($panel, TP_RESET_KEY, ""), 0, wxALL,);
+
+		$teleportSizer->Add( Wx::StaticText->new($panel, -1, "$teleportPowerName Mode"), 0, wxALL,);
+		$teleportSizer->Add( Wx::TextCtrl->  new($panel, TP_KEY, ""), 0, wxALL,);
+
+		# if (player has hover): {
+			$teleportSizer->Add( Wx::CheckBox->new($panel, TP_HOVER_WHEN_TP, "Auto-Hover When Teleporting"), 0, wxALL,);
+			$teleportSizer->AddSpacer(1);
+		# }
+
+		# if (player has team-tp) {
+			$teleportSizer->Add( Wx::StaticText->new($panel, -1, "Team Teleport Combo Key"), 0, wxALL,);
+			$teleportSizer->Add( Wx::TextCtrl->  new($panel, TP_TEAM_COMBO_KEY, ""), 0, wxALL,);
+
+			$teleportSizer->Add( Wx::StaticText->new($panel, -1, "Team Teleport Reset Key"), 0, wxALL,);
+			$teleportSizer->Add( Wx::TextCtrl->  new($panel, TP_TEAM_RESET_KEY, ""), 0, wxALL,);
+
+			# if (player has group fly) {
+				$teleportSizer->Add( Wx::CheckBox->new($panel, TP_GROUP_FLY_WHEN_TP_TEAM, "Auto-Group-Fly When Team Teleporting"), 0, wxALL,);
+				$teleportSizer->AddSpacer(1);
+
+			# }
+		# }
+		$overallSizer->Add($teleportSizer);
+	}
+
+	$teleportSizer->Show($cb->IsChecked());
+
+	##### Fly
+	if (!$tempSizer) {
+
+		$tempSizer = Wx::FlexGridSizer->new(0,2,3,3);
+
+		# if (temp travel powers exist)?  Should this be "custom"?
+		$tempSizer->Add( Wx::StaticText->new($panel, -1, "Toggle Temp Mode"), 0, wxALL,);
+		$tempSizer->Add( Wx::TextCtrl->  new($panel, TEMP_KEY, ""), 0, wxALL,);
+
+		$tempSizer->Add( Wx::StaticText->new($panel, -1, "Temp Travel Power Tray"), 0, wxALL,);
+		$tempSizer->Add( Wx::TextCtrl->  new($panel, TEMP_POWERTRAY, ""), 0, wxALL,);
+
+		$overallSizer->Add($tempSizer);
+	}
+
+	$tempSizer->Show($cb->IsChecked());
+
+	if (!$kheldianSizer) {
+
+		$kheldianSizer = Wx::FlexGridSizer->new(0,2,3,3);
+
+		$kheldianSizer->Add( Wx::StaticText->new($panel, -1, "Toggle Nova Form"), 0, wxALL,);
+		$kheldianSizer->Add( Wx::TextCtrl->  new($panel, KHELD_NOVA_KEY, ""), 0, wxALL,);
+
+		$kheldianSizer->Add( Wx::StaticText->new($panel, -1, "Nova Powertray"), 0, wxALL,);
+		$kheldianSizer->Add( Wx::TextCtrl->  new($panel, KHELD_NOVA_POWERTRAY, ""), 0, wxALL,);
+
+		$kheldianSizer->Add( Wx::StaticText->new($panel, -1, "Toggle Dwarf Form"), 0, wxALL,);
+		$kheldianSizer->Add( Wx::TextCtrl->  new($panel, KHELD_DWARF_KEY, ""), 0, wxALL,);
+
+		$kheldianSizer->Add( Wx::StaticText->new($panel, -1, "Dwarf Powertray"), 0, wxALL,);
+		$kheldianSizer->Add( Wx::TextCtrl->  new($panel, KHELD_DWARF_POWERTRAY, ""), 0, wxALL,);
+
+		# do we want a key to change directly to human form, instead of toggles?
+		$kheldianSizer->Add( Wx::StaticText->new($panel, -1, "Human Form"), 0, wxALL,);
+		$kheldianSizer->Add( Wx::TextCtrl->  new($panel, KHELD_HUMAN_KEY, ""), 0, wxALL,);
+
+		$kheldianSizer->Add( Wx::StaticText->new($panel, -1, "Human Powertray"), 0, wxALL,);
+		$kheldianSizer->Add( Wx::TextCtrl->  new($panel, KHELD_HUMAN_POWERTRAY, ""), 0, wxALL,);
+
+		$overallSizer->Add($kheldianSizer);
+	}
+
+	$kheldianSizer->Show($cb->IsChecked());
+
+	$overallSizer->Fit($panel);
 }
 
 
