@@ -470,29 +470,29 @@ sub makeSoDFile {
 	my $SoD = $Profile::SoD;
 	my $curfile;
 
-	# this wants to be $turnoff = $mobile, $stationary once we know what those are.  arrays?  hashes?
-	# turnoff = turnoff or {mobile,stationary}
+	# this wants to be $turnoff ||= $mobile, $stationary once we know what those are.  arrays?  hashes?
+	# $turnoff ||= {mobile,stationary}
 
 	if (($SoD->{'Default'} eq $modestr) and ($t->{'tkeys'} == 0)) {
 
 		$curfile = $profile->{'resetfile'};
 		sodDefaultResetKey($mobile,$stationary);
 
-		sodUpKey($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,nil,$sssj);
-		sodDownKey($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,nil,$sssj);
+		sodUpKey     ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,nil,$sssj);
+		sodDownKey   ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,nil,$sssj);
 		sodForwardKey($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,nil,$sssj);
-		sodBackKey($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,nil,$sssj);
-		sodLeftKey($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,nil,$sssj);
-		sodRightKey($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,nil,$sssj);
+		sodBackKey   ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,nil,$sssj);
+		sodLeftKey   ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,nil,$sssj);
+		sodRightKey  ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,nil,$sssj);
 
-		if ($modestr eq "NonSoD") { makeNonSoDModeKey($profile,$t,"r",$curfile,{$mobile,$stationary}); }
-		if ($modestr eq "Base") { makeBaseModeKey($profile,$t,"r",$curfile,$turnoff,$fix); }
-		if ($modestr eq "Fly") { makeFlyModeKey($profile,$t,"bo",$curfile,$turnoff,$fix); }
-		# if ($modestr eq "GFly") { makeGFlyModeKey($profile,$t,"gf",$curfile,$turnoff,$fix); }
-		if ($modestr eq "Run") { makeRunModeKey($profile,$t,"s",$curfile,$turnoff,$fix); }
-		if ($modestr eq "Jump") { makeJumpModeKey($profile,$t,"j",$curfile,$turnoff,$path); }
-		if ($modestr eq "Temp") { makeTempModeKey($profile,$t,"r",$curfile,$turnoff,$path); }
-		if ($modestr eq "QFly") { makeQFlyModeKey($profile,$t,"r",$curfile,$turnoff,$modestr); }
+		if ($modestr eq "NonSoD") { makeNonSoDModeKey($profile,$t,"r", $curfile,{$mobile,$stationary}); }
+		if ($modestr eq "Base")   { makeBaseModeKey  ($profile,$t,"r", $curfile,$turnoff,$fix); }
+		if ($modestr eq "Fly")    { makeFlyModeKey   ($profile,$t,"bo",$curfile,$turnoff,$fix); }
+		# if ($modestr eq "GFly") { makeGFlyModeKey  ($profile,$t,"gf",$curfile,$turnoff,$fix); }
+		if ($modestr eq "Run")    { makeRunModeKey   ($profile,$t,"s", $curfile,$turnoff,$fix); }
+		if ($modestr eq "Jump")   { makeJumpModeKey  ($profile,$t,"j", $curfile,$turnoff,$path); }
+		if ($modestr eq "Temp")   { makeTempModeKey  ($profile,$t,"r", $curfile,$turnoff,$path); }
+		if ($modestr eq "QFly")   { makeQFlyModeKey  ($profile,$t,"r", $curfile,$turnoff,$modestr); }
 	
 		sodAutoRunKey($t,$bla,$curfile,$SoD,$mobile,$sssj);
 	
@@ -505,12 +505,12 @@ sub makeSoDFile {
 
 		sodResetKey($curfile,$profile,$path,actPower_toggle(nil,true,$stationary,$mobile));
 
-		sodUpKey($t,$blbo,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,"bo",$sssj);
-		sodDownKey($t,$blbo,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,"bo",$sssj);
+		sodUpKey     ($t,$blbo,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,"bo",$sssj);
+		sodDownKey   ($t,$blbo,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,"bo",$sssj);
 		sodForwardKey($t,$blbo,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,"bo",$sssj);
-		sodBackKey($t,$blbo,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,"bo",$sssj);
-		sodLeftKey($t,$blbo,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,"bo",$sssj);
-		sodRightKey($t,$blbo,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,"bo",$sssj);
+		sodBackKey   ($t,$blbo,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,"bo",$sssj);
+		sodLeftKey   ($t,$blbo,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,"bo",$sssj);
+		sodRightKey  ($t,$blbo,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,"bo",$sssj);
 
 		# if ($modestr ~= "Base") { makeBaseModeKey($profile,$t,"r",$curfile,$turnoff,$fix); }
 		$t->{'ini'} = "-down$$";
@@ -557,12 +557,12 @@ sub makeSoDFile {
 
 		sodResetKey($curfile,$profile,$path,actPower_toggle(nil,true,$stationary,$mobile));
 
-		sodUpKey($t,$blsd,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,"sd",$sssj);
-		sodDownKey($t,$blsd,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,"sd",$sssj);
+		sodUpKey     ($t,$blsd,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,"sd",$sssj);
+		sodDownKey   ($t,$blsd,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,"sd",$sssj);
 		sodForwardKey($t,$blsd,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,"sd",$sssj);
-		sodBackKey($t,$blsd,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,"sd",$sssj);
-		sodLeftKey($t,$blsd,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,"sd",$sssj);
-		sodRightKey($t,$blsd,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,"sd",$sssj);
+		sodBackKey   ($t,$blsd,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,"sd",$sssj);
+		sodLeftKey   ($t,$blsd,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,"sd",$sssj);
+		sodRightKey  ($t,$blsd,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,"sd",$sssj);
 
 		$t->{'ini'} = "-down$$";
 		# if ($modestr ~= "Base") { makeBaseModeKey($profile,$t,"r",$curfile,$turnoff,$fix); }
@@ -583,37 +583,37 @@ sub makeSoDFile {
 
 	sodResetKey($curfile,$profile,$path,actPower_toggle(nil,true,$stationary,$mobile));
 
-	sodUpKey($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,nil,$sssj);
-	sodDownKey($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,nil,$sssj);
+	sodUpKey     ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,nil,$sssj);
+	sodDownKey   ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,nil,$sssj);
 	sodForwardKey($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,nil,$sssj);
-	sodBackKey($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,nil,$sssj);
-	sodLeftKey($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,nil,$sssj);
-	sodRightKey($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,nil,$sssj);
+	sodBackKey   ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,nil,$sssj);
+	sodLeftKey   ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,nil,$sssj);
+	sodRightKey  ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,nil,nil,nil,$sssj);
 
 	if (($flight eq "Fly") and $pathbo) {
 		#  Base to set down
 		if ($modestr eq "NonSoD") { makeNonSoDModeKey($profile,$t,"r",$curfile,{$mobile,$stationary},&sodSetDownFix); }
-		if ($modestr eq "Base") { makeBaseModeKey($profile,$t,"r",$curfile,$turnoff,&sodSetDownFix); }
+		if ($modestr eq "Base")   { makeBaseModeKey($profile,$t,"r",$curfile,$turnoff,&sodSetDownFix); }
 		# if ($t->{'BaseModeKey'}) {
 			# cbWriteBind($curfile,$t->{'BaseModeKey'},"+down$$down 1".actPower(nil,true,$mobile).$t->{'detailhi'}.$t->{'runcamdist'}.$t->{'blsd'}.$t->{'space'} . XWSAD($t) . ".txt")
 		#}
-		if ($modestr eq "Run") { makeRunModeKey($profile,$t,"s",$curfile,$turnoff,&sodSetDownFix); }
-		if ($modestr eq "Fly") { makeFlyModeKey($profile,$t,"bo",$curfile,$turnoff,$fix); }
-		if ($modestr eq "Jump") { makeJumpModeKey($profile,$t,"j",$curfile,$turnoff,$path); }
-		if ($modestr eq "Temp") { makeTempModeKey($profile,$t,"r",$curfile,$turnoff,$path); }
-		if ($modestr eq "QFly") { makeQFlyModeKey($profile,$t,"r",$curfile,$turnoff,$modestr); }
+		if ($modestr eq "Run")     { makeRunModeKey   ($profile,$t,"s", $curfile,$turnoff,&sodSetDownFix); }
+		if ($modestr eq "Fly")     { makeFlyModeKey   ($profile,$t,"bo",$curfile,$turnoff,$fix); }
+		if ($modestr eq "Jump")    { makeJumpModeKey  ($profile,$t,"j", $curfile,$turnoff,$path); }
+		if ($modestr eq "Temp")    { makeTempModeKey  ($profile,$t,"r", $curfile,$turnoff,$path); }
+		if ($modestr eq "QFly")    { makeQFlyModeKey  ($profile,$t,"r", $curfile,$turnoff,$modestr); }
 	} else {
-		if ($modestr eq "NonSoD") { makeNonSoDModeKey($profile,$t,"r",$curfile,{$mobile,$stationary}); }
-		if ($modestr eq "Base") { makeBaseModeKey($profile,$t,"r",$curfile,$turnoff,$fix); }
+		if ($modestr eq "NonSoD")  { makeNonSoDModeKey($profile,$t,"r", $curfile,{$mobile,$stationary}); }
+		if ($modestr eq "Base")    { makeBaseModeKey  ($profile,$t,"r", $curfile,$turnoff,$fix); }
 		if ($flight eq "Jump") {
-			if ($modestr eq "Fly") { makeFlyModeKey($profile,$t,"a",$curfile,$turnoff,$fix,nil,true); }
+			if ($modestr eq "Fly") { makeFlyModeKey   ($profile,$t,"a", $curfile,$turnoff,$fix,nil,true); }
 		} else {
-			if ($modestr eq "Fly") { makeFlyModeKey($profile,$t,"bo",$curfile,$turnoff,$fix); }
+			if ($modestr eq "Fly") { makeFlyModeKey   ($profile,$t,"bo",$curfile,$turnoff,$fix); }
 		}
-		if ($modestr eq "Run") { makeRunModeKey($profile,$t,"s",$curfile,$turnoff,$fix); }
-		if ($modestr eq "Jump") { makeJumpModeKey($profile,$t,"j",$curfile,$turnoff,$path); }
-		if ($modestr eq "Temp") { makeTempModeKey($profile,$t,"r",$curfile,$turnoff,$path); }
-		if ($modestr eq "QFly") { makeQFlyModeKey($profile,$t,"r",$curfile,$turnoff,$modestr); }
+		if ($modestr eq "Run")    { makeRunModeKey    ($profile,$t,"s", $curfile,$turnoff,$fix); }
+		if ($modestr eq "Jump")   { makeJumpModeKey   ($profile,$t,"j", $curfile,$turnoff,$path); }
+		if ($modestr eq "Temp")   { makeTempModeKey   ($profile,$t,"r", $curfile,$turnoff,$path); }
+		if ($modestr eq "QFly")   { makeQFlyModeKey   ($profile,$t,"r", $curfile,$turnoff,$modestr); }
 	}
 
 	sodAutoRunKey($t,$bla,$curfile,$SoD,$mobile,$sssj);
@@ -627,26 +627,26 @@ sub makeSoDFile {
 
 	sodResetKey($curfile,$profile,$path,actPower_toggle(nil,true,$stationary,$mobile));
 
-	sodUpKey($t,$bla,$curfile,$SoD,$mobile,$stationary,$flight,true,nil,nil,$sssj);
-	sodDownKey($t,$bla,$curfile,$SoD,$mobile,$stationary,$flight,true,nil,nil,$sssj);
-	sodForwardKey($t,$bla,$curfile,$SoD,$mobile,$stationary,$flight,$bl,nil,nil,$sssj);
-	sodBackKey($t,$bla,$curfile,$SoD,$mobile,$stationary,$flight,$bl,nil,nil,$sssj);
-	sodLeftKey($t,$bla,$curfile,$SoD,$mobile,$stationary,$flight,true,nil,nil,$sssj);
-	sodRightKey($t,$bla,$curfile,$SoD,$mobile,$stationary,$flight,true,nil,nil,$sssj);
+	sodUpKey     ($t,$bla,$curfile,$SoD,$mobile,$stationary,$flight,true,nil,nil,$sssj);
+	sodDownKey   ($t,$bla,$curfile,$SoD,$mobile,$stationary,$flight,true,nil,nil,$sssj);
+	sodForwardKey($t,$bla,$curfile,$SoD,$mobile,$stationary,$flight,$bl, nil,nil,$sssj);
+	sodBackKey   ($t,$bla,$curfile,$SoD,$mobile,$stationary,$flight,$bl, nil,nil,$sssj);
+	sodLeftKey   ($t,$bla,$curfile,$SoD,$mobile,$stationary,$flight,true,nil,nil,$sssj);
+	sodRightKey  ($t,$bla,$curfile,$SoD,$mobile,$stationary,$flight,true,nil,nil,$sssj);
 
 	if (($flight eq "Fly") and $pathbo) {
 		if ($modestr eq "NonSoD") { makeNonSoDModeKey($profile,$t,"ar",$curfile,{$mobile,$stationary},&sodSetDownFix); }
-		if ($modestr eq "Base") { makeBaseModeKey($profile,$t,"gr",$curfile,$turnoff,&sodSetDownFix); }
-		if ($modestr eq "Run") { makeRunModeKey($profile,$t,"as",$curfile,$turnoff,&sodSetDownFix); }
+		if ($modestr eq "Base")   { makeBaseModeKey  ($profile,$t,"gr",$curfile,$turnoff,&sodSetDownFix); }
+		if ($modestr eq "Run")    { makeRunModeKey   ($profile,$t,"as",$curfile,$turnoff,&sodSetDownFix); }
 	} else {
 		if ($modestr eq "NonSoD") { makeNonSoDModeKey($profile,$t,"ar",$curfile,{$mobile,$stationary}); }
-		if ($modestr eq "Base") { makeBaseModeKey($profile,$t,"gr",$curfile,$turnoff,$fix); }
-		if ($modestr eq "Run") { makeRunModeKey($profile,$t,"as",$curfile,$turnoff,$fix); }
+		if ($modestr eq "Base")   { makeBaseModeKey  ($profile,$t,"gr",$curfile,$turnoff,$fix); }
+		if ($modestr eq "Run")    { makeRunModeKey   ($profile,$t,"as",$curfile,$turnoff,$fix); }
 	}
-	if ($modestr eq "Fly") { makeFlyModeKey($profile,$t,"af",$curfile,$turnoff,$fix); }
-	if ($modestr eq "Jump") { makeJumpModeKey($profile,$t,"aj",$curfile,$turnoff,$patha); }
-	if ($modestr eq "Temp") { makeTempModeKey($profile,$t,"ar",$curfile,$turnoff,$path); }
-	if ($modestr eq "QFly") { makeQFlyModeKey($profile,$t,"ar",$curfile,$turnoff,$modestr); }
+	if ($modestr eq "Fly")        { makeFlyModeKey   ($profile,$t,"af",$curfile,$turnoff,$fix); }
+	if ($modestr eq "Jump")       { makeJumpModeKey  ($profile,$t,"aj",$curfile,$turnoff,$patha); }
+	if ($modestr eq "Temp")       { makeTempModeKey  ($profile,$t,"ar",$curfile,$turnoff,$path); }
+	if ($modestr eq "QFly")       { makeQFlyModeKey  ($profile,$t,"ar",$curfile,$turnoff,$modestr); }
 
 	sodAutoRunOffKey($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight);
 
@@ -659,26 +659,26 @@ sub makeSoDFile {
 
    	sodResetKey($curfile,$profile,$path,actPower_toggle(nil,true,$stationary,$mobile));
    
-   	sodUpKey($t,$blf,$curfile,$SoD,$mobile,$stationary,$flight,nil,$bl,nil,$sssj);
-   	sodDownKey($t,$blf,$curfile,$SoD,$mobile,$stationary,$flight,nil,$bl,nil,$sssj);
+   	sodUpKey     ($t,$blf,$curfile,$SoD,$mobile,$stationary,$flight,nil,$bl,nil,$sssj);
+   	sodDownKey   ($t,$blf,$curfile,$SoD,$mobile,$stationary,$flight,nil,$bl,nil,$sssj);
    	sodForwardKey($t,$blf,$curfile,$SoD,$mobile,$stationary,$flight,nil,$bl,nil,$sssj);
-   	sodBackKey($t,$blf,$curfile,$SoD,$mobile,$stationary,$flight,nil,$bl,nil,$sssj);
-   	sodLeftKey($t,$blf,$curfile,$SoD,$mobile,$stationary,$flight,nil,$bl,nil,$sssj);
-   	sodRightKey($t,$blf,$curfile,$SoD,$mobile,$stationary,$flight,nil,$bl,nil,$sssj);
+   	sodBackKey   ($t,$blf,$curfile,$SoD,$mobile,$stationary,$flight,nil,$bl,nil,$sssj);
+   	sodLeftKey   ($t,$blf,$curfile,$SoD,$mobile,$stationary,$flight,nil,$bl,nil,$sssj);
+   	sodRightKey  ($t,$blf,$curfile,$SoD,$mobile,$stationary,$flight,nil,$bl,nil,$sssj);
    
    	if (($flight eq "Fly") and $pathbo) {
    		if ($modestr eq "NonSoD") { makeNonSoDModeKey($profile,$t,"fr",$curfile,{$mobile,$stationary},&sodSetDownFix); }
-   		if ($modestr eq "Base") { makeBaseModeKey($profile,$t,"fr",$curfile,$turnoff,&sodSetDownFix); }
-   		if ($modestr eq "Run") { makeRunModeKey($profile,$t,"fs",$curfile,$turnoff,&sodSetDownFix); }
+   		if ($modestr eq "Base")   { makeBaseModeKey  ($profile,$t,"fr",$curfile,$turnoff,&sodSetDownFix); }
+   		if ($modestr eq "Run")    { makeRunModeKey   ($profile,$t,"fs",$curfile,$turnoff,&sodSetDownFix); }
    	} else {
    		if ($modestr eq "NonSoD") { makeNonSoDModeKey($profile,$t,"fr",$curfile,{$mobile,$stationary}); }
-   		if ($modestr eq "Base") { makeBaseModeKey($profile,$t,"fr",$curfile,$turnoff,$fix); }
-   		if ($modestr eq "Run") { makeRunModeKey($profile,$t,"fs",$curfile,$turnoff,$fix); }
+   		if ($modestr eq "Base")   { makeBaseModeKey  ($profile,$t,"fr",$curfile,$turnoff,$fix); }
+   		if ($modestr eq "Run")    { makeRunModeKey   ($profile,$t,"fs",$curfile,$turnoff,$fix); }
    	}
-   	if ($modestr eq "Fly") { makeFlyModeKey($profile,$t,"ff",$curfile,$turnoff,$fix); }
-   	if ($modestr eq "Jump") { makeJumpModeKey($profile,$t,"fj",$curfile,$turnoff,$pathf); }
-   	if ($modestr eq "Temp") { makeTempModeKey($profile,$t,"fr",$curfile,$turnoff,$path); }
-   	if ($modestr eq "QFly") { makeQFlyModeKey($profile,$t,"fr",$curfile,$turnoff,$modestr); }
+   	if ($modestr eq "Fly")        { makeFlyModeKey   ($profile,$t,"ff",$curfile,$turnoff,$fix); }
+   	if ($modestr eq "Jump")       { makeJumpModeKey  ($profile,$t,"fj",$curfile,$turnoff,$pathf); }
+   	if ($modestr eq "Temp")       { makeTempModeKey  ($profile,$t,"fr",$curfile,$turnoff,$path); }
+   	if ($modestr eq "QFly")       { makeQFlyModeKey  ($profile,$t,"fr",$curfile,$turnoff,$modestr); }
 
    	cbWriteBind($curfile,$SoD->{'AutoRunKey'},'nop');
 
