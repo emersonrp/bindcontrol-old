@@ -450,7 +450,7 @@ sub makeSoDFile {
 	my $bla = $params->{'bla'};
 	my $blf = $params->{'blf'};
 	my $path = $params->{'path'};
-	my $patha = $params->{'patha'};
+	my $pathr = $params->{'pathr'};
 	my $pathf = $params->{'pathf'};
 	my $mobile = $params->{'mobile'};
 	my $stationary = $params->{'stationary'};
@@ -473,7 +473,7 @@ sub makeSoDFile {
 	# this wants to be $turnoff ||= $mobile, $stationary once we know what those are.  arrays?  hashes?
 	# $turnoff ||= {mobile,stationary}
 
-	if (($SoD->{'Default'} eq $modestr) and ($t->{'tkeys'} == 0)) {
+	if (($SoD->{'Default'} eq $modestr) and ($t->{'totalkeys'} == 0)) {
 
 		$curfile = $profile->{'resetfile'};
 		sodDefaultResetKey($mobile,$stationary);
@@ -623,7 +623,7 @@ sub makeSoDFile {
 	close $curfile;
 
 # AutoRun Binds
-	$curfile = cbOpen($patha.$t->{'space'} . XWSAD($t) . ".txt","w");
+	$curfile = cbOpen($pathr.$t->{'space'} . XWSAD($t) . ".txt","w");
 
 	sodResetKey($curfile,$profile,$path,actPower_toggle(nil,true,$stationary,$mobile));
 
@@ -644,7 +644,7 @@ sub makeSoDFile {
 		if ($modestr eq "Run")    { makeRunModeKey   ($profile,$t,"as",$curfile,$turnoff,$fix); }
 	}
 	if ($modestr eq "Fly")        { makeFlyModeKey   ($profile,$t,"af",$curfile,$turnoff,$fix); }
-	if ($modestr eq "Jump")       { makeJumpModeKey  ($profile,$t,"aj",$curfile,$turnoff,$patha); }
+	if ($modestr eq "Jump")       { makeJumpModeKey  ($profile,$t,"aj",$curfile,$turnoff,$pathr); }
 	if ($modestr eq "Temp")       { makeTempModeKey  ($profile,$t,"ar",$curfile,$turnoff,$path); }
 	if ($modestr eq "QFly")       { makeQFlyModeKey  ($profile,$t,"ar",$curfile,$turnoff,$modestr); }
 
@@ -752,7 +752,7 @@ sub makeModeKey {
 	my $blaj = $t->{'blaj'};
 	my $blfj = $t->{'blfj'};
 	my $blbo = $t->{'blbo'};
-	my $bla = $t->{'bla'};
+	my $blr = $t->{'blr'};
 	my $blaf = $t->{'blaf'};
 	my $blff = $t->{'blff'};
 	my $blgbo = $t->{'blgbo'};
@@ -803,11 +803,7 @@ sub makeModeKey {
 		$t->{'ini'} = "";
 	} elsif ($keytype eq 'TempModeKey') {
 
-# TODO TODO TODO wtf is this doing?
-	# local trayslot = {trayslot = "1 ".$SoD->{'Temp'}->{'Tray'}}
-my $trayslot;
-# end TODO TODO TODO
-
+		my $trayslot = "1 ".$SoD->{'Temp'}->{'Tray'};
 		my $actpower = actPower(nil,true,$trayslot,$turnoff);
 
 		if ($SoD->{'Feedback'}) { $feedback='$$t $name, Temp Mode' }
@@ -963,8 +959,8 @@ my $trayslot;
 				}
 			} elsif ($bl eq "a") {
 				if (not $fb_on_a) { $feedback = "" }
-				my $bindload = $bla.$txtend;
-				if ($t->{'tkeys'}==0) { $actpower = actPower_toggle(true,true,$t->{'hover'},$turnoff); }
+				my $bindload = $blr.$txtend;
+				if ($t->{'totalkeys'} == 0) { $actpower = actPower_toggle(true,true,$t->{'hover'},$turnoff); }
 				if ($fix) {
 					&$fix($profile,$t,$key,&makeFlyModeKey,"f",$bl,$curfile,$turnoff,"",$feedback);
 				} else {
@@ -1055,6 +1051,8 @@ sub makebind {
 	}
 
 	my $t = {
+		sprint => "",
+		speed => "",
 		hover => "",
 		fly => "",
 		flyx => "",
@@ -1063,22 +1061,29 @@ sub makebind {
 		canhov => 0,
 		canfly => 0,
 		canqfly => 0,
+		cangfly => 0,
 		cancj => 0,
 		canjmp => 0,
+		canss => 0,
+		tphover => "",
+		ttpgrpfly => "",
 		on => '$$powexectoggleon ',
 		# on => '$$powexecname ',
 		off => '$$powexectoggleoff ',
+		mlon => "",
+		mloff => "",
+		runcamdist => "",
+		flycamdist => "",
+		detailhi => "",
+		detaillo => "",
 	};
 
 	if ($SoD->{'Jump'}->{'CJ'} and $SoD->{'Jump'}->{'SJ'} == nil) {
 		$t->{'cancj'} = 1;
-		$t->{'canjmp'} = 0;
 		$t->{'cjmp'} = "Combat Jumping";
 		$t->{'jump'} = "Combat Jumping";
-		$t->{'jumpifnocj'} = nil;
 	}
 	if ($SoD->{'Jump'}->{'CJ'} == nil and $SoD->{'Jump'}->{'SJ'}) {
-		$t->{'cancj'} = 0;
 		$t->{'canjmp'} = 1;
 		$t->{'jump'} = "Super Jump";
 		$t->{'jumpifnocj'} = "Super Jump";
@@ -1088,10 +1093,7 @@ sub makebind {
 		$t->{'canjmp'} = 1;
 		$t->{'cjmp'} = "Combat Jumping";
 		$t->{'jump'} = "Super Jump";
-		$t->{'jumpifnocj'} = nil;
 	}
-	$t->{'tphover'} = "";
-	$t->{'ttpgfly'} = "";
 	if ($profile->{'archetype'} eq "Peacebringer") {
 		if ($SoD->{'Fly'}->{'Hover'}) {
 			$t->{'canhov'} = 1;
@@ -1100,7 +1102,6 @@ sub makebind {
 			$t->{'fly'} = "Energy Flight";
 			$t->{'flyx'} = "Energy Flight";
 		 } else {
-			$t->{'canhov'} = 0;
 			$t->{'canfly'} = 1;
 			$t->{'hover'} = "Energy Flight";
 			$t->{'flyx'} = "Energy Flight";
@@ -1108,13 +1109,11 @@ sub makebind {
 	 } elsif (not ($profile->{'archetype'} eq "Warshade")) {
 		if ($SoD->{'Fly'}->{'Hover'} and $SoD->{'Fly'}->{'Fly'} == nil) {
 			$t->{'canhov'} = 1;
-			$t->{'canfly'} = 0;
 			$t->{'hover'} = "Hover";
 			$t->{'flyx'} = "Hover";
 			if ($SoD->{'TP'}->{'TPHover'}) { $t->{'tphover'} = '$$powexectoggleon Hover' }
 		}
 		if ($SoD->{'Fly'}->{'Hover'} == nil and $SoD->{'Fly'}->{'Fly'}) {
-			$t->{'canhov'} = 0;
 			$t->{'canfly'} = 1;
 			$t->{'hover'} = "Fly";
 			$t->{'flyx'} = "Fly";
@@ -1136,150 +1135,57 @@ sub makebind {
 		# $t->{'gfly'} = "Group Fly";
 		# if ($SoD->{'TTP'}->{'TPGFly'}) { $t->{'ttpgfly'} = '$$powexectoggleon Group Fly' }
 	# } else {
-	$t->{'cangfly'} = 0;
 	# }
-	$t->{'sprint'} = "";
-	$t->{'speed'} = "";
 	if ($SoD->{'Run'}->{'PrimaryNumber'} == 1) {
 		$t->{'sprint'} = $SoD->{'Run'}->{'Secondary'};
 		$t->{'speed'} = $SoD->{'Run'}->{'Secondary'};
-		$t->{'canss'} = 0;
 	} else {
 		$t->{'sprint'} = $SoD->{'Run'}->{'Secondary'};
 		$t->{'speed'} = $SoD->{'Run'}->{'Primary'};
 		$t->{'canss'} = 1;
 	}
-	if ($SoD->{'Unqueue'}) { $t->{'unqueue'} = '$$powexecunqueue' } else { $t->{'unqueue'} = "" }
+	$t->{'unqueue'} = $SoD->{'Unqueue'} ? '$$powexecunqueue' : "";
 	$t->{'unqueue'} = "";
 	if ($SoD->{'AutoMouseLook'}) {
 		$t->{'mlon'} = '$$mouselook 1';
 		$t->{'mloff'} = '$$mouselook 0';
-	} else {
-		$t->{'mlon'} = "";
-		$t->{'mloff'} = "";
 	}
-	$t->{'runcamdist'} = "";
-	$t->{'flycamdist'} = "";
 	if ($SoD->{'Run'}->{'UseCamdist'}) {
 		$t->{'runcamdist'} = '$$camdist '.$SoD->{'Run'}->{'Camdist'};
 	}
 	if ($SoD->{'Fly'}->{'UseCamdist'}) {
 		$t->{'flycamdist'} = '$$camdist '.$SoD->{'Fly'}->{'Camdist'};
 	}
-	$t->{'detailhi'} = "";
-	$t->{'detaillo'} = "";
 	if ($SoD->{'Detail'} and $SoD->{'Detail'}->{'Enable'}) {
 		$t->{'detailhi'} = '$$visscale '.$SoD->{'Detail'}->{'NormalAmt'}.'$$shadowvol 0$$ss 0';
 		$t->{'detaillo'} = '$$visscale '.$SoD->{'Detail'}->{'MovingAmt'}.'$$shadowvol 0$$ss 0';
 	}
 
-	my $windowhide = '$$windowhide health$$windowhide chat$$windowhide target$$windowhide tray';
-	my $windowshow = '$$show health$$show chat$$show target$$show tray';
-	
-	if (not $SoD->{'TP'}->{'HideWindows'}) {
-		$windowhide = "";
-		$windowshow = "";
-	}
-	
-	$t->{'basepath'} = $profile->{'base'};
+	my $windowhide = $SoD->{'TP'}->{'HideWindows'} ? '$$windowhide health$$windowhide chat$$windowhide target$$windowhide tray' : '';
+	my $windowshow = $SoD->{'TP'}->{'HideWindows'} ? '$$show health$$show chat$$show target$$show tray' : '';
 
-	$t->{'subdirg'}=$t->{'basepath'}."\\R";
-	$t->{'subdira'}=$t->{'basepath'}."\\F";
-	$t->{'subdirj'}=$t->{'basepath'}."\\J";
-	$t->{'subdirs'}=$t->{'basepath'}."\\S";
-	$t->{'subdirn'}=$t->{'basepath'}."\\N";
-	$t->{'subdirt'}=$t->{'basepath'}."\\T";
-	$t->{'subdirq'}=$t->{'basepath'}."\\Q";
-	# $t->{'subdirga'}=$t->{'basepath'}."\\GF";
-	$t->{'subdirar'}=$t->{'basepath'}."\\AR";
-	$t->{'subdiraf'}=$t->{'basepath'}."\\AF";
-	$t->{'subdiraj'}=$t->{'basepath'}."\\AJ";
-	$t->{'subdiras'}=$t->{'basepath'}."\\AS";
-	# $t->{'subdirgaf'}=$t->{'basepath'}."\\GAF";
-	$t->{'subdiran'}=$t->{'basepath'}."\\AN";
-	$t->{'subdirat'}=$t->{'basepath'}."\\AT";
-	$t->{'subdiraq'}=$t->{'basepath'}."\\AQ";
-	$t->{'subdirfr'}=$t->{'basepath'}."\\FR";
-	$t->{'subdirff'}=$t->{'basepath'}."\\FF";
-	$t->{'subdirfj'}=$t->{'basepath'}."\\FJ";
-	$t->{'subdirfs'}=$t->{'basepath'}."\\FS";
-	# $t->{'subdirgff'}=$t->{'basepath'}."\\GFF";
-	$t->{'subdirfn'}=$t->{'basepath'}."\\FN";
-	$t->{'subdirft'}=$t->{'basepath'}."\\FT";
-	$t->{'subdirfq'}=$t->{'basepath'}."\\FQ";
-	#  Special Modes used for Flight: Blastoff mode and setdown mode
-	$t->{'subdirbo'}=$t->{'basepath'}."\\BO";
-	$t->{'subdirsd'}=$t->{'basepath'}."\\SD";
-	# $t->{'subdirgbo'}=$t->{'basepath'}."\\GBO";
-	# $t->{'subdirgsd'}=$t->{'basepath'}."\\GSD";
+	# ZOMG wtb foreach kthx
+	for (qw( R F J S N T Q GA AR AF AJ AS GAF AN AT AQ FR FF FJ FS GFF FN FT FQ BO SD GBO GSD )) {
+
+		my $sdname = 'subdir' . lc $_;
+		my $pathname = 'path' . lc $_;
+		$t->{$sdname} = "$Profile::basepath\\$_";
+		$t->{$pathname} = "$t->{$sdname}\\$_";
+		$t->{'bl' . lc $_} = '$$bindloadfile ' . $t->{$pathname};
+
+	}
+
 	# my $turn="+zoomin$$-zoomin"  # a non functioning bind used only to activate the keydown/keyup functions of +commands;
 	$t->{'turn'}="+down";  # a non functioning bind used only to activate the keydown/keyup functions of +commands;
 	
-	$t->{'path'}=$t->{'subdirg'}."\\R"; # ground subfolder and base filename.  Keep it shortish
-	$t->{'bl'}='$$bindloadfile '.$t->{'path'};
-	$t->{'patha'}=$t->{'subdira'}."\\F"; # air subfolder and base filename
-	$t->{'bla'}='$$bindloadfile '.$t->{'patha'};
-	$t->{'pathj'}=$t->{'subdirj'}."\\J";
-	$t->{'blj'}='$$bindloadfile '.$t->{'pathj'};
-	$t->{'paths'}=$t->{'subdirs'}."\\S";
-	$t->{'bls'}='$$bindloadfile '.$t->{'paths'};
-	# $t->{'pathga'}=$t->{'subdirga'}."\\GF" # air subfolder and base filename
-	# $t->{'blga'}='$$bindloadfile '.$t->{'pathga'}
-	$t->{'pathn'}=$t->{'subdirn'}."\\N"; # ground subfolder and base filename.  Keep it shortish
-	$t->{'bln'}='$$bindloadfile '.$t->{'pathn'};
-	$t->{'patht'}=$t->{'subdirt'}."\\T"; # ground subfolder and base filename.  Keep it shortish
-	$t->{'blt'}='$$bindloadfile '.$t->{'patht'};
-	$t->{'pathq'}=$t->{'subdirq'}."\\Q"; # ground subfolder and base filename.  Keep it shortish
-	$t->{'blq'}='$$bindloadfile '.$t->{'pathq'};
-	$t->{'pathgr'}=$t->{'subdirar'}."\\AR";  # ground autorun subfolder and base filename
-	$t->{'blgr'}='$$bindloadfile '.$t->{'pathgr'};
-	$t->{'pathaf'}=$t->{'subdiraf'}."\\AF";  # air autorun subfolder and base filename
-	$t->{'blaf'}='$$bindloadfile '.$t->{'pathaf'};
-	$t->{'pathaj'}=$t->{'subdiraj'}."\\AJ";
-	$t->{'blaj'}='$$bindloadfile '.$t->{'pathaj'};
-	$t->{'pathas'}=$t->{'subdiras'}."\\AS";
-	$t->{'blas'}='$$bindloadfile '.$t->{'pathas'};
-	# $t->{'pathgaf'}=$t->{'subdirgaf'}."\\GAF"  # air autorun subfolder and base filename
-	# $t->{'blgaf'}='$$bindloadfile '.$t->{'pathgaf'};
-	$t->{'pathan'}=$t->{'subdiran'}."\\AN"; # ground subfolder and base filename.  Keep it shortish
-	$t->{'blan'}='$$bindloadfile '.$t->{'pathan'};
-	$t->{'pathat'}=$t->{'subdirat'}."\\AT"; # ground subfolder and base filename.  Keep it shortish
-	$t->{'blat'}='$$bindloadfile '.$t->{'pathat'};
-	$t->{'pathaq'}=$t->{'subdiraq'}."\\AQ"; # ground subfolder and base filename.  Keep it shortish
-	$t->{'blaq'}='$$bindloadfile '.$t->{'pathaq'};
-	$t->{'pathfr'}=$t->{'subdirfr'}."\\FR";  # Follow Run subfolder and base filename
-	$t->{'blfr'}='$$bindloadfile '.$t->{'pathfr'};
-	$t->{'pathff'}=$t->{'subdirff'}."\\FF";  # Follow Fly subfolder and base filename
-	$t->{'blff'}='$$bindloadfile '.$t->{'pathff'};
-	$t->{'pathfj'}=$t->{'subdirfj'}."\\FJ";
-	$t->{'blfj'}='$$bindloadfile '.$t->{'pathfj'};
-	$t->{'pathfs'}=$t->{'subdirfs'}."\\FS";
-	$t->{'blfs'}='$$bindloadfile '.$t->{'pathfs'};
-	# $t->{'pathgff'}=$t->{'subdirgff'}."\\GFF"  # Follow Fly subfolder and base filename
-	# $t->{'blgff'}='$$bindloadfile '.$t->{'pathgff'};
-	$t->{'pathfn'}=$t->{'subdirfn'}."\\FN"; # ground subfolder and base filename.  Keep it shortish
-	$t->{'blfn'}='$$bindloadfile '.$t->{'pathfn'};
-	$t->{'pathft'}=$t->{'subdirft'}."\\FT"; # ground subfolder and base filename.  Keep it shortish
-	$t->{'blft'}='$$bindloadfile '.$t->{'pathat'};
-	$t->{'pathfq'}=$t->{'subdirfq'}."\\FQ"; # ground subfolder and base filename.  Keep it shortish
-	$t->{'blfq'}='$$bindloadfile '.$t->{'pathfq'};
-	$t->{'pathbo'}=$t->{'subdirbo'}."\\BO";  # Blastoff Fly subfolder and base filename
-	$t->{'blbo'}='$$bindloadfile '.$t->{'pathbo'};
-	$t->{'pathsd'}=$t->{'subdirsd'}."\\SD";  #  SetDown Fly Subfolder and base filename
-	$t->{'blsd'}='$$bindloadfile '.$t->{'pathsd'};
-	# $t->{'pathgbo'}=$t->{'subdirgbo'}."\\GBO";  # Blastoff Fly subfolder and base filename
-	# $t->{'blgbo'}='$$bindloadfile '.$t->{'pathgbo'};
-	# $t->{'pathgsd'}=$t->{'subdirgsd'}."\\GSD";  #  SetDown Fly Subfolder and base filename
-	# $t->{'blgsd'}='$$bindloadfile '.$t->{'pathgsd'};
-
 	if ($SoD->{'Base'}) {
-		cbMakeDirectory($t->{'subdirg'});
+		cbMakeDirectory($t->{'subdirr'});
 		cbMakeDirectory($t->{'subdirar'});
 		cbMakeDirectory($t->{'subdirfr'});
 	}
 
 	if ($t->{'canhov'}+$t->{'canfly'}>0) {
-		cbMakeDirectory($t->{'subdira'});
+		cbMakeDirectory($t->{'subdirf'});
 		cbMakeDirectory($t->{'subdiraf'});
 		cbMakeDirectory($t->{'subdirff'});
 		cbMakeDirectory($t->{'subdirbo'});
@@ -1304,14 +1210,14 @@ sub makebind {
 	}
 	
 	# [[if ($t->{'cangfly'}>0) {
-		cbMakeDirectory($t->{'subdirga'});
-		cbMakeDirectory($t->{'subdirgaf'});
-		cbMakeDirectory($t->{'subdirgff'});
-		cbMakeDirectory($t->{'subdirgbo'});
-		cbMakeDirectory($t->{'subdirgsd'});
+	#	cbMakeDirectory($t->{'subdirga'});
+	#	cbMakeDirectory($t->{'subdirgaf'});
+	#	cbMakeDirectory($t->{'subdirgff'});
+	#	cbMakeDirectory($t->{'subdirgbo'});
+	#	cbMakeDirectory($t->{'subdirgsd'});
 	#} ]]
 	
-	if ($SoD->{'NonSoD'} or $t->{'canqfly'}>0) {
+	if ($SoD->{'NonSoD'} or $t->{'canqfly'} > 0) {
 		cbMakeDirectory($t->{'subdirn'});
 		cbMakeDirectory($t->{'subdiran'});
 		cbMakeDirectory($t->{'subdirfn'});
@@ -1339,39 +1245,66 @@ sub makebind {
 		$t->{'space'} = $space;
 		$t->{'up'} = '$$up '.$space;
 		$t->{'upx'} = '$$up '.(1-$space);
+
 		for my $X (0..1) {
 			$t->{'X'} = $X;
 			$t->{'dow'} = '$$down '.$X;
 			$t->{'dowx'} = '$$down '.(1-$X);
+
 			for my $W (0..1) {
 				$t->{'W'} = $W;
 				$t->{'forw'} = '$$forward '.$W;
 				$t->{'forx'} = '$$forward '.(1-$W);
+
 				for my $S (0..1) {
 					$t->{'S'} = $S;
 					$t->{'bac'} = '$$backward '.$S;
 					$t->{'bacx'} = '$$backward '.(1-$S);
+
 					for my $A (0..1) {
 						$t->{'A'} = $A;
 						$t->{'lef'} = '$$left '.$A;
 						$t->{'lefx'} = '$$left '.(1-$A);
+
 						for my $D (0..1) {
 							$t->{'D'} = $D;
 							$t->{'rig'} = '$$right '.$D;
 							$t->{'rigx'} = '$$right '.(1-$D);
 
-							$t->{'tkeys'} = $space+$X+$W+$S+$A+$D;	# total number of keys down
+							$t->{'totalkeys'} = $space+$X+$W+$S+$A+$D;	# total number of keys down
 							$t->{'horizkeys'} = $W+$S+$A+$D;	# total # of horizontal move keys.	So Sprint isn't turned on when jumping
 							$t->{'vertkeys'} = $space+$X;
 							$t->{'jkeys'} = $t->{'horizkeys'}+$t->{'space'};
-							if ($SoD->{'NonSoD'} or $t->{'canqfly'}>0) {
+
+							if ($SoD->{'NonSoD'} or $t->{'canqfly'}) {
 								$t->{$SoD->{'Default'}."ModeKey"} = $t->{'NonSoDModeKey'};
-								makeSoDFile($profile,$t,$t->{'bln'},$t->{'blan'},$t->{'blfn'},$t->{'pathn'},$t->{'pathan'},$t->{'pathfn'},nil,nil,"NonSoD",nil);
+								makeSoDFile({
+									profile => $profile,
+									t => $t,
+									bl => $t->{'bln'},
+									bla => $t->{'blan'},
+									blf => $t->{'blfn'},
+									path => $t->{'pathn'},
+									pathr => $t->{'pathan'},
+									pathf => $t->{'pathfn'},
+									modestr => "NonSoD",
+								});
 								$t->{$SoD->{'Default'}."ModeKey"} = nil;
 							}
 							if ($SoD->{'Base'}) {
 								$t->{$SoD->{'Default'}."ModeKey"} = $t->{'BaseModeKey'};
-								makeSoDFile($profile,$t,$t->{'bl'},$t->{'blgr'},$t->{'blfr'},$t->{'path'},$t->{'pathgr'},$t->{'pathfr'},$t->{'sprint'},nil,"Base",nil);
+								makeSoDFile({
+									profile => $profile,
+									t => $t,
+									bl => $t->{'bl'},
+									bla => $t->{'blgr'},
+									blf => $t->{'blfr'},
+									path => $t->{'pathr'},
+									pathr => $t->{'pathgr'},
+									pathf => $t->{'pathfr'},
+									mobile => $t->{'sprint'},
+									modestr => "Base",
+								});
 								$t->{$SoD->{'Default'}."ModeKey"} = nil;
 							}
 							if ($t->{'canss'}>0) {
@@ -1379,9 +1312,34 @@ sub makebind {
 								my $sssj = nil;
 								if ($SoD->{'SS'}->{'SSSJMode'}) { $sssj = $t->{'jump'} }
 								if ($SoD->{'SS'}->{'MobileOnly'}) {
-									makeSoDFile($profile,$t,$t->{'bls'},$t->{'blas'},$t->{'blfs'},$t->{'paths'},$t->{'pathas'},$t->{'pathfs'},$t->{'speed'},nil,"Run",nil,nil,nil,nil,nil,nil,nil,$sssj);
+									makeSoDFile({
+										profile => $profile,
+										t => $t,
+										bl => $t->{'bls'},
+										bla => $t->{'blas'},
+										blf => $t->{'blfs'},
+										path => $t->{'paths'},
+										pathr => $t->{'pathas'},
+										pathf => $t->{'pathfs'},
+										mobile => $t->{'speed'},
+										modestr => "Run",
+										sssj => $sssj,
+									});
 								 } else {
-									makeSoDFile($profile,$t,$t->{'bls'},$t->{'blas'},$t->{'blfs'},$t->{'paths'},$t->{'pathas'},$t->{'pathfs'},$t->{'speed'},$t->{'speed'},"Run",nil,nil,nil,nil,nil,nil,nil,$sssj);
+									makeSoDFile({
+										profile => $profile,
+										t => $t,
+										bl => $t->{'bls'},
+										bla => $t->{'blas'},
+										blf => $t->{'blfs'},
+										path => $t->{'paths'},
+										pathr => $t->{'pathas'},
+										pathf => $t->{'pathfs'},
+										mobile => $t->{'speed'},
+										stationary => $t->{'speed'},
+										modestr => "Run",
+										sssj => $sssj,
+									});
 								}
 								$t->{$SoD->{'Default'}."ModeKey"} = nil;
 							}
@@ -1389,28 +1347,103 @@ sub makebind {
 								$t->{$SoD->{'Default'}."ModeKey"} = $t->{'JumpModeKey'};
 								my $jturnoff;
 								if ($t->{'jump'} eq $t->{'cjump'}) { $jturnoff = {$t->{'jumpifnocj'}} }
-								makeSoDFile($profile,$t,$t->{'blj'},$t->{'blaj'},$t->{'blfj'},$t->{'pathj'},$t->{'pathaj'},$t->{'pathfj'},$t->{'jump'},$t->{'cjmp'},"Jump","Jump",&sodJumpFix,$jturnoff);
+								makeSoDFile({
+									profile => $profile,
+									t => $t,
+									bl => $t->{'blj'},
+									bla => $t->{'blaj'},
+									blf => $t->{'blfj'},
+									path => $t->{'pathj'},
+									pathr => $t->{'pathaj'},
+									pathf => $t->{'pathfj'},
+									mobile => $t->{'jump'},
+									stationary => $t->{'cjmp'},
+									modestr => "Jump",
+									flight => "Jump",
+									fix => &sodJumpFix,
+									turnoff => $jturnoff,
+								});
 								$t->{$SoD->{'Default'}."ModeKey"} = nil;
 							}
 							if ($t->{'canhov'}+$t->{'canfly'}>0) {
 								$t->{$SoD->{'Default'}."ModeKey"} = $t->{'FlyModeKey'};
-								makeSoDFile($profile,$t,$t->{'bla'},$t->{'blaf'},$t->{'blff'},$t->{'patha'},$t->{'pathaf'},$t->{'pathff'},$t->{'flyx'},$t->{'hover'},"Fly","Fly",nil,nil,$t->{'pathbo'},$t->{'pathsd'},$t->{'blbo'},$t->{'blsd'});
+								makeSoDFile({
+									profile => $profile,
+									t => $t,
+									bl => $t->{'blr'},
+									bla => $t->{'blaf'},
+									blf => $t->{'blff'},
+									path => $t->{'pathr'},
+									pathr => $t->{'pathaf'},
+									pathf => $t->{'pathff'},
+									mobile => $t->{'flyx'},
+									stationary => $t->{'hover'},
+									modestr => "Fly",
+									flight => "Fly",
+									pathbo => $t->{'pathbo'},
+									pathsd => $t->{'pathsd'},
+									blbo => $t->{'blbo'},
+									blsd => $t->{'blsd'},
+								});
 								$t->{$SoD->{'Default'}."ModeKey"} = nil;
 							}
 							# if ($t->{'canqfly'}>0) {
 								# $t->{$SoD->{'Default'}."ModeKey"} = $t->{'QFlyModeKey'};
-								# makeSoDFile($profile,$t,$t->{'blq'},$t->{'blaq'},$t->{'blfq'},$t->{'pathq'},$t->{'pathaq'},$t->{'pathfq'},"Quantum Flight","Quantum Flight","QFly","Fly",nil,nil);
+								# makeSoDFile({
+								# 	profile => $profile,
+								# 	t => $t,
+								# 	bl => $t->{'blq'},
+								# 	bla => $t->{'blaq'},
+								# 	blf => $t->{'blfq'},
+								# 	path => $t->{'pathq'},
+								# 	pathr => $t->{'pathaq'},
+								# 	pathf => $t->{'pathfq'},
+								# 	mobile => "Quantum Flight",
+								# 	stationary => "Quantum Flight",
+								# 	modestr => "QFly",
+								# 	flight => "Fly",
+								# });
 								# $t->{$SoD->{'Default'}."ModeKey"} = nil;
 							# }
 							# [[if ($t->{'cangfly'}>0) {
 								$t->{$SoD->{'Default'}."ModeKey"} = $t->{'GFlyModeKey'};
-								makeSoDFile($profile,$t,$t->{'blga'},$t->{'blgaf'},$t->{'blgff'},$t->{'pathga'},$t->{'pathgaf'},$t->{'pathgff'},$t->{'gfly'},$t->{'gfly'},"GFly","GFly",nil,nil,$t->{'pathgbo'},$t->{'pathgsd'},$t->{'blgbo'},$t->{'blgsd'});
+								makeSoDFile({
+									profile => $profile,
+									t => $t,
+									bl => $t->{'blga'},
+									bla => $t->{'blgaf'},
+									blf => $t->{'blgff'},
+									path => $t->{'pathga'},
+									pathr => $t->{'pathgaf'},
+									pathf => $t->{'pathgff'},
+									mobile => $t->{'gfly'},
+									stationary => $t->{'gfly'},
+									modestr => "GFly",
+									flight => "GFly",
+									pathbo => $t->{'pathgbo'},
+									pathsd => $t->{'pathgsd'},
+									blbo => $t->{'blgbo'},
+									blsd => $t->{'blgsd'},
+								});
 								$t->{$SoD->{'Default'}."ModeKey"} = nil;
 							#} ]]
 							if ($SoD->{'Temp'} and $SoD->{'Temp'}->{'Enable'}) {
 								my $trayslot = "1 ".$SoD->{'Temp'}->{'Tray'};
 								$t->{$SoD->{'Default'}."ModeKey"} = $t->{'TempModeKey'};
-								makeSoDFile($profile,$t,$t->{'blt'},$t->{'blat'},$t->{'blft'},$t->{'patht'},$t->{'pathat'},$t->{'pathft'},$trayslot,$trayslot,"Temp","Fly",nil,nil);
+								makeSoDFile({
+									profile => $profile,
+									t => $t,
+									bl => $t->{'blt'},
+									bla => $t->{'blat'},
+									blf => $t->{'blft'},
+									path => $t->{'patht'},
+									pathr => $t->{'pathat'},
+									pathf => $t->{'pathft'},
+									mobile => $trayslot,
+									stationary => $trayslot,
+									modestr => "Temp",
+									flight => "Fly",
+								});
 								$t->{$SoD->{'Default'}."ModeKey"} = nil;
 							}
 						}
@@ -1442,11 +1475,11 @@ sub makebind {
 	if ($SoD->{'TRight'} and uc $SoD->{'TRight'} eq "UNBOUND") { cbWriteBind($resetfile,$SoD->{'TRight'},"+turnright") }
 	
 	if ($SoD->{'Temp'} and $SoD->{'Temp'}->{'Enable'}) {
-		my $temptogglefile1 = cbOpen($t->{'basepath'}."\\temptoggle1.txt","w");
-		my $temptogglefile2 = cbOpen($t->{'basepath'}."\\temptoggle2.txt","w");
-		cbWriteBind($temptogglefile2,$SoD->{'Temp'}->{'TraySwitch'},'-down$$gototray 1'.'$$bindloadfile '.$t->{'basepath'}."\\temptoggle1.txt");
-		cbWriteBind($temptogglefile1,$SoD->{'Temp'}->{'TraySwitch'},'+down$$gototray '.$SoD->{'Temp'}->{'Tray'}.'$$bindloadfile '.$t->{'basepath'}."\\temptoggle2.txt");
-		cbWriteBind($resetfile,$SoD->{'Temp'}->{'TraySwitch'},'+down$$gototray '.$SoD->{'Temp'}->{'Tray'}.'$$bindloadfile '.$t->{'basepath'}."\\temptoggle2.txt");
+		my $temptogglefile1 = cbOpen($Profile::basepath."\\temptoggle1.txt","w");
+		my $temptogglefile2 = cbOpen($Profile::basepath."\\temptoggle2.txt","w");
+		cbWriteBind($temptogglefile2,$SoD->{'Temp'}->{'TraySwitch'},'-down$$gototray 1'.'$$bindloadfile '.$Profile::basepath."\\temptoggle1.txt");
+		cbWriteBind($temptogglefile1,$SoD->{'Temp'}->{'TraySwitch'},'+down$$gototray '.$SoD->{'Temp'}->{'Tray'}.'$$bindloadfile '.$Profile::basepath."\\temptoggle2.txt");
+		cbWriteBind($resetfile,$SoD->{'Temp'}->{'TraySwitch'},'+down$$gototray '.$SoD->{'Temp'}->{'Tray'}.'$$bindloadfile '.$Profile::basepath."\\temptoggle2.txt");
 		close $temptogglefile1;
 		close $temptogglefile2;
 	}
@@ -1476,15 +1509,15 @@ sub makebind {
 	}
 	#  kheldian form support #  create the Nova and Dwarf form support files if enabled.
 	if ($SoD->{'Nova'} and $SoD->{'Nova'}->{'Enable'}) {
-		cbWriteBind($resetfile,$SoD->{'Nova'}->{'ModeKey'},'t $name, Changing to '.$SoD->{'Nova'}->{'Nova'}.' Form$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0'.$t->{'on'}.$SoD->{'Nova'}->{'Nova'}.'$$gototray '.$SoD->{'Nova'}->{'PowerTray'}.'$$bindloadfile '.$t->{'basepath'}."\\nova.txt");
-		my $novafile = cbOpen($t->{'basepath'}."\\nova.txt","w");
+		cbWriteBind($resetfile,$SoD->{'Nova'}->{'ModeKey'},'t $name, Changing to '.$SoD->{'Nova'}->{'Nova'}.' Form$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0'.$t->{'on'}.$SoD->{'Nova'}->{'Nova'}.'$$gototray '.$SoD->{'Nova'}->{'PowerTray'}.'$$bindloadfile '.$Profile::basepath."\\nova.txt");
+		my $novafile = cbOpen($Profile::basepath."\\nova.txt","w");
 		if ($SoD->{'Dwarf'} and $SoD->{'Dwarf'}->{'Enable'}) {
-			cbWriteBind($novafile,$SoD->{'Dwarf'}->{'ModeKey'},'t $name, Changing to '.$SoD->{'Dwarf'}->{'Dwarf'}.' Form$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0'.$t->{'off'}.$SoD->{'Nova'}->{'Nova'}.$t->{'on'}.$SoD->{'Dwarf'}->{'Dwarf'}.'$$gototray '.$SoD->{'Dwarf'}->{'PowerTray'}.'$$bindloadfile '.$t->{'basepath'}."\\dwarf.txt");
+			cbWriteBind($novafile,$SoD->{'Dwarf'}->{'ModeKey'},'t $name, Changing to '.$SoD->{'Dwarf'}->{'Dwarf'}.' Form$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0'.$t->{'off'}.$SoD->{'Nova'}->{'Nova'}.$t->{'on'}.$SoD->{'Dwarf'}->{'Dwarf'}.'$$gototray '.$SoD->{'Dwarf'}->{'PowerTray'}.'$$bindloadfile '.$Profile::basepath."\\dwarf.txt");
 		}
 		$humanBindKey ||= $SoD->{'Nova'}->{'ModeKey'};
 		my $humpower = "";
 		if ($SoD->{'UseHumanFormPower'}) { $humpower = '$$powexectoggleon '.$SoD->{'HumanFormShield'} }
-		cbWriteBind($novafile,$humanBindKey,'t $name, Changing to Human Form, SoD Mode$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleoff '.$SoD->{'Nova'}->{'Nova'}.$humpower.'$$gototray 1$$bindloadfile '.$t->{'basepath'}."\\rese$t->{'txt'}");
+		cbWriteBind($novafile,$humanBindKey,'t $name, Changing to Human Form, SoD Mode$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleoff '.$SoD->{'Nova'}->{'Nova'}.$humpower.'$$gototray 1$$bindloadfile '.$Profile::basepath."\\rese$t->{'txt'}");
 		if ($humanBindKey eq $SoD->{'Nova'}->{'ModeKey'}) { $humanBindKey = nil }
 		if ($novapbind) {
 			cbWriteBind($novafile,$SoD->{'Nova'}->{'ModeKey'},$novapbind);
@@ -1513,19 +1546,19 @@ sub makebind {
 			cbWriteBind($novafile,$SoD->{'TP'}->{'ResetKey'},'nop');
 		}
 		cbWriteBind($novafile,$SoD->{'FollowKey'},"follow");
-		# cbWriteBind($novafile,$SoD->{'ToggleKey'},'t $name, Changing to Human Form, Normal Mode$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleoff '.$SoD->{'Nova'}->{'Nova'}.'$$gototray 1$$bindloadfile '.$t->{'basepath'}."\\rese$t->{'txt'}")
+		# cbWriteBind($novafile,$SoD->{'ToggleKey'},'t $name, Changing to Human Form, Normal Mode$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleoff '.$SoD->{'Nova'}->{'Nova'}.'$$gototray 1$$bindloadfile '.$Profile::basepath."\\rese$t->{'txt'}")
 		close $novafile;
 	}
 	if ($SoD->{'Dwarf'} and $SoD->{'Dwarf'}->{'Enable'}) {
-		cbWriteBind($resetfile,$SoD->{'Dwarf'}->{'ModeKey'},'t $name, Changing to '.$SoD->{'Dwarf'}->{'Dwarf'}.' Form$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleon '.$SoD->{'Dwarf'}->{'Dwarf'}.'$$gototray '.$SoD->{'Dwarf'}->{'PowerTray'}.'$$bindloadfile '.$t->{'basepath'}."\\dwarf.txt");
-		my $dwrffile = cbOpen($t->{'basepath'}."\\dwarf.txt","w");
+		cbWriteBind($resetfile,$SoD->{'Dwarf'}->{'ModeKey'},'t $name, Changing to '.$SoD->{'Dwarf'}->{'Dwarf'}.' Form$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleon '.$SoD->{'Dwarf'}->{'Dwarf'}.'$$gototray '.$SoD->{'Dwarf'}->{'PowerTray'}.'$$bindloadfile '.$Profile::basepath."\\dwarf.txt");
+		my $dwrffile = cbOpen($Profile::basepath."\\dwarf.txt","w");
 		if ($SoD->{'Nova'} and $SoD->{'Nova'}->{'Enable'}) {
-			cbWriteBind($dwrffile,$SoD->{'Nova'}->{'ModeKey'},'t $name, Changing to '.$SoD->{'Nova'}->{'Nova'}.' Form$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleoff '.$SoD->{'Dwarf'}->{'Dwarf'}.'$$powexectoggleon '.$SoD->{'Nova'}->{'Nova'}.'$$gototray '.$SoD->{'Nova'}->{'PowerTray'}.'$$bindloadfile '.$t->{'basepath'}."\\nova.txt");
+			cbWriteBind($dwrffile,$SoD->{'Nova'}->{'ModeKey'},'t $name, Changing to '.$SoD->{'Nova'}->{'Nova'}.' Form$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleoff '.$SoD->{'Dwarf'}->{'Dwarf'}.'$$powexectoggleon '.$SoD->{'Nova'}->{'Nova'}.'$$gototray '.$SoD->{'Nova'}->{'PowerTray'}.'$$bindloadfile '.$Profile::basepath."\\nova.txt");
 		}
 		if (not $humanBindKey) { $humanBindKey = $SoD->{'Dwarf'}->{'ModeKey'} }
 		my $humpower = "";
 		if ($SoD->{'UseHumanFormPower'}) { $humpower = '$$powexectoggleon '.$SoD->{'HumanFormShield'} }
-		cbWriteBind($dwrffile,$humanBindKey,'t $name, Changing to Human Form, SoD Mode$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleoff '.$SoD->{'Dwarf'}->{'Dwarf'}.$humpower.'$$gototray 1$$bindloadfile '.$t->{'basepath'}."\\rese$t->{'txt'}");
+		cbWriteBind($dwrffile,$humanBindKey,'t $name, Changing to Human Form, SoD Mode$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleoff '.$SoD->{'Dwarf'}->{'Dwarf'}.$humpower.'$$gototray 1$$bindloadfile '.$Profile::basepath."\\rese$t->{'txt'}");
 		if ($dwarfpbind) {
 			cbWriteBind($dwrffile,$SoD->{'Dwarf'}->{'ModeKey'},$dwarfpbind);
 		}
@@ -1549,25 +1582,25 @@ sub makebind {
 		}
 		cbWriteBind($dwrffile,$SoD->{'FollowKey'},"follow");
 		if ($SoD->{'TP'} and $SoD->{'TP'}->{'Enable'}) {
-			cbWriteBind($dwrffile,$SoD->{'TP'}->{'ComboKey'},'+down$$'.$dwarfTPPower.$t->{'detaillo'}.$t->{'flycamdist'}.$windowhide.'$$bindloadfile '.$t->{'basepath'}.'\\dtp\\tp_on1.txt');
+			cbWriteBind($dwrffile,$SoD->{'TP'}->{'ComboKey'},'+down$$'.$dwarfTPPower.$t->{'detaillo'}.$t->{'flycamdist'}.$windowhide.'$$bindloadfile '.$Profile::basepath.'\\dtp\\tp_on1.txt');
 			cbWriteBind($dwrffile,$SoD->{'TP'}->{'BindKey'},'nop');
-			cbWriteBind($dwrffile,$SoD->{'TP'}->{'ResetKey'},substr($t->{'detailhi'},2).$t->{'runcamdist'}.$windowshow.'$$bindloadfile '.$t->{'basepath'}.'\\dtp\\tp_off.txt');
+			cbWriteBind($dwrffile,$SoD->{'TP'}->{'ResetKey'},substr($t->{'detailhi'},2).$t->{'runcamdist'}.$windowshow.'$$bindloadfile '.$Profile::basepath.'\\dtp\\tp_off.txt');
 			#  Create tp directory
-			cbMakeDirectory($t->{'basepath'}.'\\dtp');
+			cbMakeDirectory($Profile::basepath.'\\dtp');
 			#  Create tp_off file
-			my $tp_off = cbOpen($t->{'basepath'}.'\\dtp\\tp_off.txt',"w");
-			cbWriteBind($tp_off,$SoD->{'TP'}->{'ComboKey'},'+down$$'.$dwarfTPPower.$t->{'detaillo'}.$t->{'flycamdist'}.$windowhide.'$$bindloadfile '.$t->{'basepath'}.'\\dtp\\tp_on1.txt');
+			my $tp_off = cbOpen($Profile::basepath.'\\dtp\\tp_off.txt',"w");
+			cbWriteBind($tp_off,$SoD->{'TP'}->{'ComboKey'},'+down$$'.$dwarfTPPower.$t->{'detaillo'}.$t->{'flycamdist'}.$windowhide.'$$bindloadfile '.$Profile::basepath.'\\dtp\\tp_on1.txt');
 			cbWriteBind($tp_off,$SoD->{'TP'}->{'BindKey'},'nop');
 			close $tp_off;
-			my $tp_on1 = cbOpen($t->{'basepath'}.'\\dtp\\tp_on1.txt',"w");
-			cbWriteBind($tp_on1,$SoD->{'TP'}->{'ComboKey'},'-down$$powexecunqueue'.$t->{'detailhi'}.$t->{'runcamdist'}.$windowshow.'$$bindloadfile '.$t->{'basepath'}.'\\dtp\\tp_off.txt');
-			cbWriteBind($tp_on1,$SoD->{'TP'}->{'BindKey'},'+down$$bindloadfile '.$t->{'basepath'}.'\\dtp\\tp_on2.txt');
+			my $tp_on1 = cbOpen($Profile::basepath.'\\dtp\\tp_on1.txt',"w");
+			cbWriteBind($tp_on1,$SoD->{'TP'}->{'ComboKey'},'-down$$powexecunqueue'.$t->{'detailhi'}.$t->{'runcamdist'}.$windowshow.'$$bindloadfile '.$Profile::basepath.'\\dtp\\tp_off.txt');
+			cbWriteBind($tp_on1,$SoD->{'TP'}->{'BindKey'},'+down$$bindloadfile '.$Profile::basepath.'\\dtp\\tp_on2.txt');
 			close $tp_on1;
-			my $tp_on2 = cbOpen($t->{'basepath'}.'\\dtp\\tp_on2.txt',"w");
-			cbWriteBind($tp_on2,$SoD->{'TP'}->{'BindKey'},'-down$$'.$dwarfTPPower.'$$bindloadfile '.$t->{'basepath'}.'\\dtp\\tp_on1.txt');
+			my $tp_on2 = cbOpen($Profile::basepath.'\\dtp\\tp_on2.txt',"w");
+			cbWriteBind($tp_on2,$SoD->{'TP'}->{'BindKey'},'-down$$'.$dwarfTPPower.'$$bindloadfile '.$Profile::basepath.'\\dtp\\tp_on1.txt');
 			close $tp_on2;
 		}
-		# cbWriteBind($dwrffile,$SoD->{'ToggleKey'},'t $name, Changing to Human Form, Normal Mode$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleoff '.$SoD->{'Dwarf'}->{'Dwarf'}.'$$gototray 1$$bindloadfile '.$t->{'basepath'}."\\rese$t->{'txt'}");
+		# cbWriteBind($dwrffile,$SoD->{'ToggleKey'},'t $name, Changing to Human Form, Normal Mode$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleoff '.$SoD->{'Dwarf'}->{'Dwarf'}.'$$gototray 1$$bindloadfile '.$Profile::basepath."\\rese$t->{'txt'}");
 		close $dwrffile;
 	}
 
@@ -1589,46 +1622,46 @@ sub makebind {
 	if ($SoD->{'TP'} and $SoD->{'TP'}->{'Enable'} and not ($profile->{'Archetype'} eq "Peacebringer") and $normalTPPower) {
 		my $tphovermodeswitch = "";
 		if ($t->{'tphover'} eq "") {
-			$tphovermodeswitch = $t->{'bla'}."000000.txt";
+			$tphovermodeswitch = $t->{'blr'}."000000.txt";
 		}
-		cbWriteBind($resetfile,$SoD->{'TP'}->{'ComboKey'},'+down$$'.$normalTPPower.$t->{'detaillo'}.$t->{'flycamdist'}.$windowhide.'$$bindloadfile '.$t->{'basepath'}.'\\tp\\tp_on1.txt');
+		cbWriteBind($resetfile,$SoD->{'TP'}->{'ComboKey'},'+down$$'.$normalTPPower.$t->{'detaillo'}.$t->{'flycamdist'}.$windowhide.'$$bindloadfile '.$Profile::basepath.'\\tp\\tp_on1.txt');
 		cbWriteBind($resetfile,$SoD->{'TP'}->{'BindKey'},'nop');
-		cbWriteBind($resetfile,$SoD->{'TP'}->{'ResetKey'},substr($t->{'detailhi'},2).$t->{'runcamdist'}.$windowshow.'$$bindloadfile '.$t->{'basepath'}.'\\tp\\tp_off.txt'.$tphovermodeswitch);
+		cbWriteBind($resetfile,$SoD->{'TP'}->{'ResetKey'},substr($t->{'detailhi'},2).$t->{'runcamdist'}.$windowshow.'$$bindloadfile '.$Profile::basepath.'\\tp\\tp_off.txt'.$tphovermodeswitch);
 		#  Create tp directory
-		cbMakeDirectory($t->{'basepath'}.'\\tp');
+		cbMakeDirectory($Profile::basepath.'\\tp');
 		#  Create tp_off file
-		my $tp_off = cbOpen($t->{'basepath'}.'\\tp\\tp_off.txt',"w");
-		cbWriteBind($tp_off,$SoD->{'TP'}->{'ComboKey'},'+down$$'.$normalTPPower.$t->{'detaillo'}.$t->{'flycamdist'}.$windowhide.'$$bindloadfile '.$t->{'basepath'}.'\\tp\\tp_on1.txt');
+		my $tp_off = cbOpen($Profile::basepath.'\\tp\\tp_off.txt',"w");
+		cbWriteBind($tp_off,$SoD->{'TP'}->{'ComboKey'},'+down$$'.$normalTPPower.$t->{'detaillo'}.$t->{'flycamdist'}.$windowhide.'$$bindloadfile '.$Profile::basepath.'\\tp\\tp_on1.txt');
 		cbWriteBind($tp_off,$SoD->{'TP'}->{'BindKey'},'nop');
 		close $tp_off;
-		my $tp_on1 = cbOpen($t->{'basepath'}.'\\tp\\tp_on1.txt',"w");
+		my $tp_on1 = cbOpen($Profile::basepath.'\\tp\\tp_on1.txt',"w");
 		my $zoomin = $t->{'detailhi'}.$t->{'runcamdist'};
 		if ($t->{'tphover'}) { $zoomin = "" }
-		cbWriteBind($tp_on1,$SoD->{'TP'}->{'ComboKey'},'-down$$powexecunqueue'.$zoomin.$windowshow.'$$bindloadfile '.$t->{'basepath'}.'\\tp\\tp_off.txt'.$tphovermodeswitch);
-		cbWriteBind($tp_on1,$SoD->{'TP'}->{'BindKey'},'+down'.$t->{'tphover'}.'$$bindloadfile '.$t->{'basepath'}.'\\tp\\tp_on2.txt');
+		cbWriteBind($tp_on1,$SoD->{'TP'}->{'ComboKey'},'-down$$powexecunqueue'.$zoomin.$windowshow.'$$bindloadfile '.$Profile::basepath.'\\tp\\tp_off.txt'.$tphovermodeswitch);
+		cbWriteBind($tp_on1,$SoD->{'TP'}->{'BindKey'},'+down'.$t->{'tphover'}.'$$bindloadfile '.$Profile::basepath.'\\tp\\tp_on2.txt');
 		close $tp_on1;
-		my $tp_on2 = cbOpen($t->{'basepath'}.'\\tp\\tp_on2.txt',"w");
-		cbWriteBind($tp_on2,$SoD->{'TP'}->{'BindKey'},'-down$$'.$normalTPPower.'$$bindloadfile '.$t->{'basepath'}.'\\tp\\tp_on1.txt');
+		my $tp_on2 = cbOpen($Profile::basepath.'\\tp\\tp_on2.txt',"w");
+		cbWriteBind($tp_on2,$SoD->{'TP'}->{'BindKey'},'-down$$'.$normalTPPower.'$$bindloadfile '.$Profile::basepath.'\\tp\\tp_on1.txt');
 		close $tp_on2;
 	}
 	if ($SoD->{'TTP'} and $SoD->{'TTP'}->{'Enable'} and not ($profile->{'Archetype'} eq "Peacebringer") and $teamTPPower) {
 		my $tphovermodeswitch = "";
-		cbWriteBind($resetfile,$SoD->{'TTP'}->{'ComboKey'},'+down$$'.$teamTPPower.$t->{'detaillo'}.$t->{'flycamdist'}.$windowhide.'$$bindloadfile '.$t->{'basepath'}.'\\ttp\\ttp_on1.txt');
+		cbWriteBind($resetfile,$SoD->{'TTP'}->{'ComboKey'},'+down$$'.$teamTPPower.$t->{'detaillo'}.$t->{'flycamdist'}.$windowhide.'$$bindloadfile '.$Profile::basepath.'\\ttp\\ttp_on1.txt');
 		cbWriteBind($resetfile,$SoD->{'TTP'}->{'BindKey'},'nop');
-		cbWriteBind($resetfile,$SoD->{'TTP'}->{'ResetKey'},substr($t->{'detailhi'},2).$t->{'runcamdist'}.$windowshow.'$$bindloadfile '.$t->{'basepath'}.'\\ttp\\ttp_off.txt'.$tphovermodeswitch);
+		cbWriteBind($resetfile,$SoD->{'TTP'}->{'ResetKey'},substr($t->{'detailhi'},2).$t->{'runcamdist'}.$windowshow.'$$bindloadfile '.$Profile::basepath.'\\ttp\\ttp_off.txt'.$tphovermodeswitch);
 		#  Create tp directory
-		cbMakeDirectory($t->{'basepath'}.'\\ttp');
+		cbMakeDirectory($Profile::basepath.'\\ttp');
 		#  Create tp_off file
-		my $ttp_off = cbOpen($t->{'basepath'}.'\\ttp\\ttp_off.txt',"w");
-		cbWriteBind($ttp_off,$SoD->{'TTP'}->{'ComboKey'},'+down$$'.$teamTPPower.$t->{'detaillo'}.$t->{'flycamdist'}.$windowhide.'$$bindloadfile '.$t->{'basepath'}.'\\ttp\\ttp_on1.txt');
+		my $ttp_off = cbOpen($Profile::basepath.'\\ttp\\ttp_off.txt',"w");
+		cbWriteBind($ttp_off,$SoD->{'TTP'}->{'ComboKey'},'+down$$'.$teamTPPower.$t->{'detaillo'}.$t->{'flycamdist'}.$windowhide.'$$bindloadfile '.$Profile::basepath.'\\ttp\\ttp_on1.txt');
 		cbWriteBind($ttp_off,$SoD->{'TTP'}->{'BindKey'},'nop');
 		close $ttp_off;
-		my $ttp_on1 = cbOpen($t->{'basepath'}.'\\ttp\\ttp_on1.txt',"w");
-		cbWriteBind($ttp_on1,$SoD->{'TTP'}->{'ComboKey'},'-down$$powexecunqueue'.$t->{'detailhi'}.$t->{'runcamdist'}.$windowshow.'$$bindloadfile '.$t->{'basepath'}.'\\ttp\\ttp_off.txt'.$tphovermodeswitch);
-		cbWriteBind($ttp_on1,$SoD->{'TTP'}->{'BindKey'},'+down'.'$$bindloadfile '.$t->{'basepath'}.'\\ttp\\ttp_on2.txt');
+		my $ttp_on1 = cbOpen($Profile::basepath.'\\ttp\\ttp_on1.txt',"w");
+		cbWriteBind($ttp_on1,$SoD->{'TTP'}->{'ComboKey'},'-down$$powexecunqueue'.$t->{'detailhi'}.$t->{'runcamdist'}.$windowshow.'$$bindloadfile '.$Profile::basepath.'\\ttp\\ttp_off.txt'.$tphovermodeswitch);
+		cbWriteBind($ttp_on1,$SoD->{'TTP'}->{'BindKey'},'+down'.'$$bindloadfile '.$Profile::basepath.'\\ttp\\ttp_on2.txt');
 		close $ttp_on1;
-		my $ttp_on2 = cbOpen($t->{'basepath'}.'\\ttp\\ttp_on2.txt',"w");
-		cbWriteBind($ttp_on2,$SoD->{'TTP'}->{'BindKey'},'-down$$'.$teamTPPower.'$$bindloadfile '.$t->{'basepath'}.'\\ttp\\ttp_on1.txt');
+		my $ttp_on2 = cbOpen($Profile::basepath.'\\ttp\\ttp_on2.txt',"w");
+		cbWriteBind($ttp_on2,$SoD->{'TTP'}->{'BindKey'},'-down$$'.$teamTPPower.'$$bindloadfile '.$Profile::basepath.'\\ttp\\ttp_on1.txt');
 		close $ttp_on2;
 	}
 }
@@ -1879,7 +1912,7 @@ function sodUpKey(t,bl,curfile,SoD,mobile,stationary,flight,autorun,followbl,bo,
 	local toggle=""
 	local toggleon
 	local toggleoff
-	local actkeys = $t->{'tkeys'}
+	local actkeys = $t->{'totalkeys'}
 	if not flight and not $sssj then mobile = nil stationary = nil end
 	if bo == "bo" then upx = "$$up 1" dow = "$$down 0" end
 	if bo == "sd" then upx = "$$up 0" dow = "$$down 1" end
@@ -1890,7 +1923,7 @@ function sodUpKey(t,bl,curfile,SoD,mobile,stationary,flight,autorun,followbl,bo,
 	if flight == "Jump" then
 		dow = "$$down 0"
 		actkeys = $t->{'jkeys'}
-		if $t->{'tkeys'} == 1 and $t->{'space'} == 1 then upx="$$up 0" else upx="$$up 1" end
+		if $t->{'totalkeys'} == 1 and $t->{'space'} == 1 then upx="$$up 0" else upx="$$up 1" end
 		if $t->{'X'} == 1 then upx="$$up 0" end
 	end
 
@@ -1905,7 +1938,7 @@ function sodUpKey(t,bl,curfile,SoD,mobile,stationary,flight,autorun,followbl,bo,
 		toggleon = nil
 	end
 
-	if $t->{'tkeys'} == 1 and $t->{'space'} == 1 then
+	if $t->{'totalkeys'} == 1 and $t->{'space'} == 1 then
 		ml = $t->{'mloff'}
 		if not stationary and mobile eq stationary  then
 			toggleoff = mobile
@@ -1968,7 +2001,7 @@ function sodDownKey(t,bl,curfile,SoD,mobile,stationary,flight,autorun,followbl,b
 	local toggle=""
 	local toggleon
 	local toggleoff
-	local actkeys = $t->{'tkeys'}
+	local actkeys = $t->{'totalkeys'}
 	if not flight then mobile = nil stationary = nil end
 	if bo == "bo" then up = "$$up 1" dowx = "$$down 0" end
 	if bo == "sd" then up = "$$up 0" dowx = "$$down 1" end
@@ -1981,7 +2014,7 @@ function sodDownKey(t,bl,curfile,SoD,mobile,stationary,flight,autorun,followbl,b
 		# if $t->{'cancj'} == 1 then aj=$t->{'cjmp'} end
 		# if $t->{'canjmp'} == 1 then aj=$t->{'jump'} end
 		actkeys = $t->{'jkeys'}
-		if $t->{'X'} == 1 and $t->{'tkeys'} > 1 then up="$$up 1" else up="$$up 0" end
+		if $t->{'X'} == 1 and $t->{'totalkeys'} > 1 then up="$$up 1" else up="$$up 0" end
 	end
 
 	toggleon = mobile
@@ -1995,7 +2028,7 @@ function sodDownKey(t,bl,curfile,SoD,mobile,stationary,flight,autorun,followbl,b
 		toggleon = nil
 	end
 
-	if $t->{'tkeys'} == 1 and $t->{'X'} == 1 then
+	if $t->{'totalkeys'} == 1 and $t->{'X'} == 1 then
 		ml = $t->{'mloff'}
 		if not stationary and mobile eq stationary  then
 			toggleoff = mobile
@@ -2039,7 +2072,7 @@ function sodForwardKey(t,bl,curfile,SoD,mobile,stationary,flight,autorunbl,follo
 	local toggle=""
 	local toggleon
 	local toggleoff
-	local actkeys = $t->{'tkeys'}
+	local actkeys = $t->{'totalkeys'}
 	if bo == "bo" then up = "$$up 1" dow = "$$down 0" end
 	if bo == "sd" then up = "$$up 0" dow = "$$down 1" end
 
@@ -2049,12 +2082,12 @@ function sodForwardKey(t,bl,curfile,SoD,mobile,stationary,flight,autorunbl,follo
 	if flight == "Jump" then
 		dow = "$$down 0"
 		actkeys = $t->{'jkeys'}
-		if $t->{'tkeys'} == 1 and $t->{'W'} == 1 then up="$$up 0" else up="$$up 1" end
+		if $t->{'totalkeys'} == 1 and $t->{'W'} == 1 then up="$$up 0" else up="$$up 1" end
 		if $t->{'X'} == 1 then up="$$up 0" end
 	end
 
 	toggleon = mobile
-	if $t->{'tkeys'} == 0 then
+	if $t->{'totalkeys'} == 0 then
 		ml = $t->{'mlon'}
 		toggleon = mobile
 		if not mobile and mobile eq stationary  then
@@ -2062,7 +2095,7 @@ function sodForwardKey(t,bl,curfile,SoD,mobile,stationary,flight,autorunbl,follo
 		end
 	end
 		
-	if $t->{'tkeys'} == 1 and $t->{'W'} == 1 then
+	if $t->{'totalkeys'} == 1 and $t->{'W'} == 1 then
 		ml = $t->{'mloff'}
 	end
 		
@@ -2074,7 +2107,7 @@ function sodForwardKey(t,bl,curfile,SoD,mobile,stationary,flight,autorunbl,follo
 			toggleon = stationary
 		end
 	else
-		if $t->{'tkeys'} == 1 and $t->{'W'} == 1 then
+		if $t->{'totalkeys'} == 1 and $t->{'W'} == 1 then
 			if not stationary and mobile eq stationary  then
 				toggleoff = mobile
 			end
@@ -2133,7 +2166,7 @@ function sodBackKey(t,bl,curfile,SoD,mobile,stationary,flight,autorunbl,followbl
 	local toggle=""
 	local toggleon
 	local toggleoff
-	local actkeys = $t->{'tkeys'}
+	local actkeys = $t->{'totalkeys'}
 	if bo == "bo" then up = "$$up 1" dow = "$$down 0" end
 	if bo == "sd" then up = "$$up 0" dow = "$$down 1" end
 
@@ -2143,12 +2176,12 @@ function sodBackKey(t,bl,curfile,SoD,mobile,stationary,flight,autorunbl,followbl
 	if flight == "Jump" then
 		dow = "$$down 0"
 		actkeys = $t->{'jkeys'}
-		if $t->{'tkeys'} == 1 and $t->{'S'} == 1 then up="$$up 0" else up="$$up 1" end
+		if $t->{'totalkeys'} == 1 and $t->{'S'} == 1 then up="$$up 0" else up="$$up 1" end
 		if $t->{'X'} == 1 then up="$$up 0" end
 	end
 
 	toggleon = mobile
-	if $t->{'tkeys'} == 0 then
+	if $t->{'totalkeys'} == 0 then
 		ml = $t->{'mlon'}
 		toggleon = mobile
 		if not mobile and mobile eq stationary  then
@@ -2156,7 +2189,7 @@ function sodBackKey(t,bl,curfile,SoD,mobile,stationary,flight,autorunbl,followbl
 		end
 	end
 		
-	if $t->{'tkeys'} == 1 and $t->{'S'} == 1 then
+	if $t->{'totalkeys'} == 1 and $t->{'S'} == 1 then
 		ml = $t->{'mloff'}
 	end
 		
@@ -2168,7 +2201,7 @@ function sodBackKey(t,bl,curfile,SoD,mobile,stationary,flight,autorunbl,followbl
 			toggleon = stationary
 		end
 	else
-		if $t->{'tkeys'} == 1 and $t->{'S'} == 1 then
+		if $t->{'totalkeys'} == 1 and $t->{'S'} == 1 then
 			if not stationary and mobile eq stationary  then
 				toggleoff = mobile
 			end
@@ -2221,7 +2254,7 @@ function sodLeftKey(t,bl,curfile,SoD,mobile,stationary,flight,autorun,followbl,b
 	local toggle=""
 	local toggleon
 	local toggleoff
-	local actkeys = $t->{'tkeys'}
+	local actkeys = $t->{'totalkeys'}
 	if bo == "bo" then up = "$$up 1" dow = "$$down 0" end
 	if bo == "sd" then up = "$$up 0" dow = "$$down 1" end
 
@@ -2231,12 +2264,12 @@ function sodLeftKey(t,bl,curfile,SoD,mobile,stationary,flight,autorun,followbl,b
 	if flight == "Jump" then
 		dow = "$$down 0"
 		actkeys = $t->{'jkeys'}
-		if $t->{'tkeys'} == 1 and $t->{'A'} == 1 then up="$$up 0" else up="$$up 1" end
+		if $t->{'totalkeys'} == 1 and $t->{'A'} == 1 then up="$$up 0" else up="$$up 1" end
 		if $t->{'X'} == 1 then up="$$up 0" end
 	end
 
 	toggleon = mobile
-	if $t->{'tkeys'} == 0 then
+	if $t->{'totalkeys'} == 0 then
 		ml = $t->{'mlon'}
 		toggleon = mobile
 		if not mobile and mobile eq stationary  then
@@ -2244,7 +2277,7 @@ function sodLeftKey(t,bl,curfile,SoD,mobile,stationary,flight,autorun,followbl,b
 		end
 	end
 		
-	if $t->{'tkeys'} == 1 and $t->{'A'} == 1 then
+	if $t->{'totalkeys'} == 1 and $t->{'A'} == 1 then
 		ml = $t->{'mloff'}
 	end
 		
@@ -2256,7 +2289,7 @@ function sodLeftKey(t,bl,curfile,SoD,mobile,stationary,flight,autorun,followbl,b
 			toggleon = stationary
 		end
 	else
-		if $t->{'tkeys'} == 1 and $t->{'A'} == 1 then
+		if $t->{'totalkeys'} == 1 and $t->{'A'} == 1 then
 			if not stationary and mobile eq stationary  then
 				toggleoff = mobile
 			end
@@ -2302,7 +2335,7 @@ function sodRightKey(t,bl,curfile,SoD,mobile,stationary,flight,autorun,followbl,
 	local toggle=""
 	local toggleon
 	local toggleoff
-	local actkeys = $t->{'tkeys'}
+	local actkeys = $t->{'totalkeys'}
 	if bo == "bo" then up = "$$up 1" dow = "$$down 0" end
 	if bo == "sd" then up = "$$up 0" dow = "$$down 1" end
 
@@ -2312,12 +2345,12 @@ function sodRightKey(t,bl,curfile,SoD,mobile,stationary,flight,autorun,followbl,
 	if flight == "Jump" then
 		dow = "$$down 0"
 		actkeys = $t->{'jkeys'}
-		if $t->{'tkeys'} == 1 and $t->{'D'} == 1 then up="$$up 0" else up="$$up 1" end
+		if $t->{'totalkeys'} == 1 and $t->{'D'} == 1 then up="$$up 0" else up="$$up 1" end
 		if $t->{'X'} == 1 then up="$$up 0" end
 	end
 
 	toggleon = mobile
-	if $t->{'tkeys'} == 0 then
+	if $t->{'totalkeys'} == 0 then
 		ml = $t->{'mlon'}
 		toggleon = mobile
 		if not mobile and mobile eq stationary  then
@@ -2325,7 +2358,7 @@ function sodRightKey(t,bl,curfile,SoD,mobile,stationary,flight,autorun,followbl,
 		end
 	end
 		
-	if $t->{'tkeys'} == 1 and $t->{'D'} == 1 then
+	if $t->{'totalkeys'} == 1 and $t->{'D'} == 1 then
 		ml = $t->{'mloff'}
 	end
 		
@@ -2337,7 +2370,7 @@ function sodRightKey(t,bl,curfile,SoD,mobile,stationary,flight,autorun,followbl,
 			toggleon = stationary
 		end
 	else
-		if $t->{'tkeys'} == 1 and $t->{'D'} == 1 then
+		if $t->{'totalkeys'} == 1 and $t->{'D'} == 1 then
 			if not stationary and mobile eq stationary  then
 				toggleoff = mobile
 			end
@@ -2404,7 +2437,7 @@ function sodAutoRunOffKey(t,bl,curfile,SoD,mobile,stationary,flight,$sssj)
 			toggleon=$t->{'mloff'}.actPower(nil,true,stationary,mobile,$toggleoff)
 		end
 	else
-		if $t->{'tkeys'} > 0 then
+		if $t->{'totalkeys'} > 0 then
 			toggleon=$t->{'mlon'}.actPower(nil,true,mobile)
 		else
 			toggleon=$t->{'mloff'}.actPower(nil,true,stationary,mobile)
@@ -2429,7 +2462,7 @@ function sodFollowOffKey(t,bl,curfile,SoD,mobile,stationary,flight)
 			end
 		end
 	else
-		if $t->{'tkeys'}==0 then
+		if $t->{'totalkeys'}==0 then
 			if stationary eq mobile then
 				toggle = actPower(nil,true,stationary,mobile)
 			else
