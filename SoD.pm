@@ -706,239 +706,308 @@ sub makeModeKey {
 	my $fb_on_a = $params->{'fb_on_a'};
 	my $modestr = $params->{'modestr'};
 
-	my ($bindload, $feedback, $filename, $tglfile);
+	my $feedback;
 	my $SoD = $profile->{'SoD'};
 
 	return if (not $t->{$keytype} or $t->{$keytype} eq "UNBOUND");
 
 	my $key = $t->{$keytype};
 
+	# fetch out some bits to make it more compact down there.
+	my $xwsad = XWSAD($t);
+	my $up = $t->{'up'};
+	my $dow = $t->{'dow'};
+	my $for = $t->{'forw'};
+	my $bac = $t->{'bac'};
+	my $lef = $t->{'lef'};
+	my $rig = $t->{'rig'};
+
+	my $blfn = $t->{'blfn'};
+	my $sp = $t->{'space'};
+
+	my $dethi = $t->{'detailhi'};
+	my $detlo = $t->{'detaillo'};
+	my $runcam = $t->{'runcamdist'};
+	my $flycam = $t->{'flycamdist'};
+
+	my $ini = $t->{'ini'};
+
+	# I'm gonna come right out and say that this is stupid
+	my $bl = $t->{'bl'};
+	my $blt = $t->{'blt'};
+	my $bln = $t->{'bln'};
+	my $blan = $t->{'blan'};
+	my $blfn = $t->{'blfn'};
+	my $blft = $t->{'blft'};
+	my $blfr = $t->{'blfr'};
+	my $blfs = $t->{'blfs'};
+	my $blgr = $t->{'blgr'};
+	my $bls = $t->{'bls'};
+	my $blas = $t->{'blas'};
+	my $blj = $t->{'blj'};
+	my $blaj = $t->{'blaj'};
+	my $blfj = $t->{'blfj'};
+	my $blbo = $t->{'blbo'};
+	my $bla = $t->{'bla'};
+	my $blaf = $t->{'blaf'};
+	my $blff = $t->{'blff'};
+	my $blgbo = $t->{'blgbo'};
+	my $blgaf = $t->{'blgaf'};
+	my $blgff = $t->{'blgff'};
+
+	my $sprint = $t->{'sprint'};
+	my $speed = $t->{'speed'};
+	my $flyx = $t->{'flyx'};
+
+	my $pathat = $t->{'pathat'};
+	my $pathan = $t->{'pathan'};
+	my $pathn = $t->{'pathn'};
+	my $pathas = $t->{'pathas'};
+
 	if ($keytype eq 'NonSoDModeKey') {
+
+		my $actpower = actPower_toggle(nil,true,nil,$turnoff);
 
 		if (not $fb and $SoD->{'Feedback'}) { $feedback = '$$t $name, Non-SoD Mode'; }
 
 		if ($bl eq"r") {
-			$bindload = $t->{'bln'}.$t->{'space'} . XWSAD($t) . ".txt";
+			my $bindload = $bln.$sp.$xwsad.".txt";
 
 			if ($fix) {
 				&$fix($profile,$t,$key,&makeNonSoDModeKey,"n",$bl,$curfile,$turnoff,"",$feedback);
 			} else {
-				cbWriteBind($curfile,$key,$t->{'ini'}.actPower_toggle(nil,true,nil,$turnoff).$t->{'up'}.$t->{'dow'}.$t->{'forw'}.$t->{'bac'}.$t->{'lef'}.$t->{'rig'}.$t->{'detailhi'}.$t->{'runcamdist'}.$feedback.$bindload)
+				cbWriteBind($curfile,$key,$ini.$actpower.$up.$dow.$for.$bac.$lef.$rig.$dethi.$runcam.$feedback.$bindload)
 			}
 
 		} elsif ($bl eq"ar") {
 
-			$bindload = $t->{'blan'}.$t->{'space'} . XWSAD($t) . ".txt";
+			my $bindload = $blan.$sp.$xwsad.".txt";
 
 			if ($fix) {
 				&$fix($profile,$t,$key,&makeNonSoDModeKey,"n",$bl,$curfile,$turnoff,"a",$feedback);
 			} else {
-				cbWriteBind($curfile,$key,$t->{'ini'}.actPower_toggle(nil,true,nil,$turnoff).$t->{'detailhi'}.$t->{'runcamdist'}."\$\$up 0".$t->{'dow'}.$t->{'lef'}.$t->{'rig'}.$feedback.$bindload)
+				cbWriteBind($curfile,$key,$ini.$actpower.$dethi.$runcam.'$$up 0'.$dow.$lef.$rig.$feedback.$bindload)
 			}
 		} else {
 
 			if ($fix) {
 				&$fix($profile,$t,$key,&makeNonSoDModeKey,"n",$bl,$curfile,$turnoff,"f",$feedback);
 			} else {
-				cbWriteBind($curfile,$key,$t->{'ini'}.actPower_toggle(nil,true,nil,$turnoff).$t->{'detailhi'}.$t->{'runcamdist'}."\$\$up 0".$feedback.$t->{'blfn'}.$t->{'space'} . XWSAD($t) . ".txt")
+				cbWriteBind($curfile,$key,$ini.$actpower.$dethi.$runcam.'$$up 0'.$feedback.$blfn.$sp.$xwsad.".txt")
 			}
 		}
 		$t->{'ini'} = "";
 	} elsif ($keytype eq 'TempModeKey') {
 
-		if ($SoD->{'Feedback'}) { $feedback="\$\$t \$name, Temp Mode" }
 # TODO TODO TODO wtf is this doing?
 	# local trayslot = {trayslot = "1 ".$SoD->{'Temp'}->{'Tray'}}
 my $trayslot;
 # end TODO TODO TODO
+
+		my $actpower = actPower(nil,true,$trayslot,$turnoff);
+
+		if ($SoD->{'Feedback'}) { $feedback='$$t $name, Temp Mode' }
+
 		if ($bl eq"r") {
-			$bindload = $t->{'blt'}.$t->{'space'} . XWSAD($t) . ".txt";
-			cbWriteBind($curfile,$key,$t->{'ini'}.actPower(nil,true,$trayslot,$turnoff).$t->{'up'}.$t->{'dow'}.$t->{'forw'}.$t->{'bac'}.$t->{'lef'}.$t->{'rig'}.$t->{'detaillo'}.$t->{'flycamdist'}.$feedback.$bindload);
+			my $bindload = $blt.$sp.$xwsad.".txt";
+			cbWriteBind($curfile,$key,$ini.$actpower.$up.$dow.$for.$bac.$lef.$rig.$detlo.$flycam.$feedback.$bindload);
 		} elsif ($bl eq"ar") {
-			$bindload = $t->{'pathat'}.$t->{'space'} . XWSAD($t) . ".txt";
-			my $bl2 = $t->{'pathat'}.$t->{'space'} . XWSAD($t) . "_$t->{'txt'}";
-			my $tglfile = cbOpen($bl2,"w");
-			cbWriteToggleBind($curfile,$tglfile,$key,$t->{'ini'}.actPower(nil,true,$trayslot,$turnoff).$t->{'detaillo'}.$t->{'flycamdist'}."\$\$up 0".$t->{'dow'}.$t->{'lef'}.$t->{'rig'},$feedback,$bindload,$bl2);
-			close $tglfile;
+			my $bindload = $pathat.$sp.$xwsad.".txt";
+			my $bl2 = $pathat.$sp.$xwsad."_$t->{'txt'}";
+			my $togglefile = cbOpen($bl2,"w");
+			cbWriteToggleBind($curfile,$togglefile,$key,$ini.$actpower.$detlo.$flycam.'$$up 0'.$dow.$lef.$rig,$feedback,$bindload,$bl2);
+			close $togglefile;
 		} else {
-			cbWriteBind($curfile,$key,$t->{'ini'}.actPower(nil,true,$trayslot,$turnoff).$t->{'detaillo'}.$t->{'flycamdist'}."\$\$up 0".$feedback.$t->{'blft'}.$t->{'space'} . XWSAD($t) . ".txt");
+			cbWriteBind($curfile,$key,$ini.$actpower.$detlo.$flycam.'$$up 0'.$feedback.$blft.$sp.$xwsad.".txt");
 		}
 	} elsif ($keytype eq 'QFlyModeKey') {
 
+		my $actpower = actPower_toggle(nil,true,"Quantum Flight",$turnoff);
+
 		if ($modestr eq "NonSoD") { cbWriteBind($curfile,$t->{'QFlyModeKey'},"powexecname Quantum Flight"); return; }
 
-		if ($SoD->{'Feedback'}) { $feedback="\$\$t \$name, QFlight Mode" }
+		if ($SoD->{'Feedback'}) { $feedback='$$t $name, QFlight Mode'; }
 		if ($bl eq "r") {
-			$bindload = $t->{'pathn'}.$t->{'space'} . XWSAD($t) . ".txt";
-			my $bl2 = $t->{'pathn'}.$t->{'space'} . XWSAD($t) . "_q.txt";
-			my $tglfile = cbOpen($bl2,"w");
+			my $bindload = $pathn.$sp.$xwsad.".txt";
+			my $bl2 = $pathn.$sp.$xwsad."_q.txt";
+			my $togglefile = cbOpen($bl2,"w");
 			my $tray;
-			if ($modestr eq "Nova" or $modestr eq "Dwarf") { $tray = "\$\$gototray 1" }
-			cbWriteToggleBind($curfile,$tglfile,$key,$t->{'ini'}.actPower_toggle(nil,true,"Quantum Flight",$turnoff).$tray.$t->{'up'}.$t->{'dow'}.$t->{'forw'}.$t->{'bac'}.$t->{'lef'}.$t->{'rig'}.$t->{'detaillo'}.$t->{'flycamdist'},$feedback,$bindload,$bl2);
-			close $tglfile;
+			if ($modestr eq "Nova" or $modestr eq "Dwarf") { $tray = '$$gototray 1'; }
+			cbWriteToggleBind($curfile,$togglefile,$key,$ini.$actpower.$tray.$up.$dow.$for.$bac.$lef.$rig.$detlo.$flycam,$feedback,$bindload,$bl2);
+			close $togglefile;
 		} elsif ($bl eq "ar") {
-			$bindload = $t->{'pathan'}.$t->{'space'} . XWSAD($t) . ".txt";
-			my $bl2 = $t->{'pathan'}.$t->{'space'} . XWSAD($t) . "_q.txt";
-			my $tglfile = cbOpen($bl2,"w");
-			cbWriteToggleBind($curfile,$tglfile,$key,$t->{'ini'}.actPower_toggle(nil,true,"Quantum Flight",$turnoff).$t->{'detaillo'}.$t->{'flycamdist'}."\$\$up 0".$t->{'dow'}.$t->{'lef'}.$t->{'rig'},$feedback,$bindload,$bl2);
-			close $tglfile;
+			my $bindload = $pathan.$sp.$xwsad.".txt";
+			my $bl2 = $pathan.$sp.$xwsad."_q.txt";
+			my $togglefile = cbOpen($bl2,"w");
+			cbWriteToggleBind($curfile,$togglefile,$key,$ini.$actpower.$detlo.$flycam.'$$up 0'.$dow.$lef.$rig,$feedback,$bindload,$bl2);
+			close $togglefile;
 		} else {
-			# $bindload = $t->{'pathfn'}.$t->{'space'} . XWSAD($t) . ".txt";
-			# my $bl2 = $t->{'pathfn'}.$t->{'space'} . XWSAD($t) . "_q.txt";
-			# my $tglfile = cbOpen($bl2,"w");
-			cbWriteBind($curfile,$t->{'QFlyModeKey'},$t->{'ini'}.actPower_toggle(nil,true,"Quantum Flight",$turnoff).$t->{'detaillo'}.$t->{'flycamdist'}."\$\$up 0".$feedback.$t->{'blfn'}.$t->{'space'} . XWSAD($t) . ".txt");
-			# close $tglfile;
+			# my $bindload = $pathfn.$sp.$xwsad.".txt";
+			# my $bl2 = $pathfn.$sp.$xwsad."_q.txt";
+			# my $togglefile = cbOpen($bl2,"w");
+			cbWriteBind($curfile,$t->{'QFlyModeKey'},$ini.$actpower.$detlo.$flycam.'$$up 0'.$feedback.$blfn.$sp.$xwsad.".txt");
+			# close $togglefile;
 		}
 	} elsif ($keytype eq 'BaseModeKey') {
 
-		if (not $fb and $SoD->{'Feedback'}) { $feedback="\$\$t \$name, Sprint-SoD Mode" }
+		my $actpower = actPower_toggle(true,true,$sprint,$turnoff);
+
+		if (not $fb and $SoD->{'Feedback'}) { $feedback='$$t $name, Sprint-SoD Mode' }
 		if ($bl eq "r") {
-			$bindload = $t->{'bl'}.$t->{'space'} . XWSAD($t) . ".txt";
+			my $bindload = $bl.$sp.$xwsad.".txt";
 			my $turnon;
-			# if ($t->{'horizkeys'} > 0) { $turnon = "+down".string.sub($t->{'on'},3,string.len($t->{'on'})).$t->{'sprint'}.$turnoff } else { $turnon = "+down" }
-			if ($t->{'horizkeys'} > 0) { $turnon = actPower_toggle(true,true,$t->{'sprint'},$turnoff) } else { $turnon = actPower_toggle(true,true,nil,$turnoff) }
+			# if ($t->{'horizkeys'} > 0) { $turnon = "+down".string.sub($t->{'on'},3,string.len($t->{'on'})).$sprint.$turnoff } else { $turnon = "+down" }
+			if ($t->{'horizkeys'} <= 0) { $actpower = actPower_toggle(true,true,nil,$turnoff) }
 			if ($fix) {
 				&$fix($profile,$t,$key,&makeBaseModeKey,"r",$bl,$curfile,$turnoff,"",$feedback);
 			} else {
-				cbWriteBind($curfile,$key,$t->{'ini'}.$turnon.$t->{'up'}.$t->{'dow'}.$t->{'forw'}.$t->{'bac'}.$t->{'lef'}.$t->{'rig'}.$t->{'detailhi'}.$t->{'runcamdist'}.$feedback.$bindload);
+				cbWriteBind($curfile,$key,$ini.$actpower.$up.$dow.$for.$bac.$lef.$rig.$dethi.$runcam.$feedback.$bindload);
 			}
 		} elsif ($bl eq "ar") {
-			$bindload = $t->{'blgr'}.$t->{'space'} . XWSAD($t) . ".txt";
+			my $bindload = $blgr.$sp.$xwsad.".txt";
 			if ($fix) {
 				&$fix($profile,$t,$key,&makeBaseModeKey,"r",$bl,$curfile,$turnoff,"a",$feedback);
 			} else {
-				cbWriteBind($curfile,$key,$t->{'ini'}.actPower_toggle(true,true,$t->{'sprint'},$turnoff).$t->{'detailhi'}.$t->{'runcamdist'}."\$\$up 0".$t->{'dow'}.$t->{'lef'}.$t->{'rig'}.$feedback.$bindload);
+				cbWriteBind($curfile,$key,$ini.$actpower.$dethi.$runcam.'$$up 0'.$dow.$lef.$rig.$feedback.$bindload);
 			}
 		} else {
 			if ($fix) {
 				&$fix($profile,$t,$key,&makeBaseModeKey,"r",$bl,$curfile,$turnoff,"f",$feedback);
 			} else {
-				cbWriteBind($curfile,$key,$t->{'ini'}.actPower_toggle(true,true,$t->{'sprint'},$turnoff).$t->{'detailhi'}.$t->{'runcamdist'}."\$\$up 0".$feedback.$t->{'blfr'}.$t->{'space'} . XWSAD($t) . ".txt");
+				cbWriteBind($curfile,$key,$ini.$actpower.$dethi.$runcam.'$$up 0'.$feedback.$blfr.$sp.$xwsad.".txt");
 			}
 		}
 	} elsif ($keytype eq 'RunModeKey') {
 
-		if (not $fb and $SoD->{'Feedback'}) { $feedback="\$\$t \$name, Superspeed Mode" }
+		my $actpower = actPower_toggle(true,true,$speed,$turnoff);
+
+		if (not $fb and $SoD->{'Feedback'}) { $feedback='$$t $name, Superspeed Mode' }
 		if ($t->{'canss'} > 0) {
 			if ($bl eq "s") {
-				$bindload = $t->{'bls'}.$t->{'space'} . XWSAD($t) . ".txt";
+				my $bindload = $bls.$sp.$xwsad.".txt";
 				if ($fix) {
 					&$fix($profile,$t,$key,&makeRunModeKey,"s",$bl,$curfile,$turnoff,"",$feedback);
 				} else {
-					cbWriteBind($curfile,$key,$t->{'ini'}.actPower_toggle(true,true,$t->{'speed'},$turnoff).$t->{'up'}.$t->{'dow'}.$t->{'forw'}.$t->{'bac'}.$t->{'lef'}.$t->{'rig'}.$t->{'detaillo'}.$t->{'flycamdist'}.$feedback.$bindload);
+					cbWriteBind($curfile,$key,$ini.$actpower.$up.$dow.$for.$bac.$lef.$rig.$detlo.$flycam.$feedback.$bindload);
 				}
 			} elsif ($bl eq "as") {
-				$bindload = $t->{'blas'}.$t->{'space'} . XWSAD($t) . ".txt";
+				my $bindload = $blas.$sp.$xwsad.".txt";
 				if ($fix) {
 					&$fix($profile,$t,$key,&makeRunModeKey,"s",$bl,$curfile,$turnoff,"a",$feedback);
 				} elsif ($feedback == "") {
-					cbWriteBind($curfile,$key,$t->{'ini'}.actPower_toggle(true,true,$t->{'speed'},$turnoff).$t->{'up'}.$t->{'dow'}.$t->{'lef'}.$t->{'rig'}.$t->{'detaillo'}.$t->{'flycamdist'}.$feedback.$bindload);
+					cbWriteBind($curfile,$key,$ini.$actpower.$up.$dow.$lef.$rig.$detlo.$flycam.$feedback.$bindload);
 				} else {
-					$bindload = $t->{'pathas'}.$t->{'space'} . XWSAD($t) . ".txt";
-					my $bl2=$t->{'pathas'}.$t->{'space'} . XWSAD($t) . "_s.txt";
-					my $tglfile = cbOpen($bl2,"w");
-					cbWriteToggleBind($curfile,$tglfile,$t->{'RunModeKey'},$t->{'ini'}.actPower_toggle(true,true,$t->{'speed'},$turnoff).$t->{'up'}.$t->{'dow'}.$t->{'lef'}.$t->{'rig'}.$t->{'detaillo'}.$t->{'flycamdist'},$feedback,$bindload,$bl2);
-					close $tglfile;
+					my $bindload = $pathas.$sp.$xwsad.".txt";
+					my $bl2 = $pathas.$sp.$xwsad."_s.txt";
+					my $togglefile = cbOpen($bl2,"w");
+					cbWriteToggleBind($curfile,$togglefile,$t->{'RunModeKey'},$ini.$actpower.$up.$dow.$lef.$rig.$detlo.$flycam,$feedback,$bindload,$bl2);
+					close $togglefile;
 				}
 			} else {
 				if ($fix) {
 					&$fix($profile,$t,$key,&makeRunModeKey,"s",$bl,$curfile,$turnoff,"f",$feedback);
 				} else {
-					cbWriteBind($curfile,$key,$t->{'ini'}.actPower_toggle(true,true,$t->{'speed'},$turnoff).'$$up 0'.$t->{'detaillo'}.$t->{'flycamdist'}.$feedback.$t->{'blfs'}.$t->{'space'} . XWSAD($t) . ".txt");
+					cbWriteBind($curfile,$key,$ini.$actpower.'$$up 0'.$detlo.$flycam.$feedback.$blfs.$sp.$xwsad.".txt");
 				}
 			}
 		}
 	} elsif ($keytype eq 'JumpModeKey') {
 
+		my $actpower = actPower(nil,true,$t->{'jump'},$turnoff).'$$up 1';
+
 		if ($t->{'canjmp'} > 0 and not $SoD->{'Jump'}->{'Simple'}) {
 
-			if ($SoD->{'Feedback'}) { $feedback="\$\$t \$name, Superjump Mode" }
+			if ($SoD->{'Feedback'}) { $feedback='$$t $name, Superjump Mode' }
 			if ($bl eq "j") {
-				$bindload = $t->{'blj'}.$t->{'space'} . XWSAD($t) . ".txt";
+				my $bindload = $blj.$sp.$xwsad.".txt";
 				my $a;
-				if (($t->{'horizkeys'} + $t->{'space'}) > 0) { $a = actPower(nil,true,$t->{'jump'},$turnoff)."\$\$up 1" } else { $a = actPower(nil,true,$t->{'cjmp'},$turnoff) }
-				$filename = $fbl.$t->{'space'} . XWSAD($t) . "j.txt";
-				$tglfile = cbOpen($filename,"w");
-				cbWriteBind($tglfile,$key,'-down'.$a.$t->{'detaillo'}.$t->{'flycamdist'}.$bindload);
-				close $tglfile;
+				if (($t->{'horizkeys'} + $sp) <= 0) { $actpower = actPower(nil,true,$t->{'cjmp'},$turnoff) }
+				my $filename = $fbl.$sp.$xwsad."j.txt";
+				my $togglefile = cbOpen($fbl.$sp.$xwsad."j.txt","w");
+				cbWriteBind($togglefile,$key,'-down'.$actpower.$detlo.$flycam.$bindload);
+				close $togglefile;
 				cbWriteBind($curfile,$key,'+down'.$feedback.'$$bindloadfile '.$filename);
 			} elsif ($bl eq "aj") {
-				$bindload = $t->{'blaj'}.$t->{'space'} . XWSAD($t) . ".txt";
-				$filename = $fbl.$t->{'space'} . XWSAD($t) . "j.txt";
-				$tglfile = cbOpen($filename,"w");
-				cbWriteBind($tglfile,$key,'-down'.actPower(nil,true,$t->{'jump'},$turnoff)."\$\$up 1".$t->{'detaillo'}.$t->{'flycamdist'}.$t->{'dow'}.$t->{'lef'}.$t->{'rig'}.$bindload);
-				close $tglfile;
-				cbWriteBind($curfile,$key,'+down'.$feedback.'\$\$bindloadfile '.$filename);
+				my $bindload = $blaj.$sp.$xwsad.".txt";
+				my $filename = $fbl.$sp.$xwsad."j.txt";
+				my $togglefile = cbOpen($filename,"w");
+				cbWriteBind($togglefile,$key,'-down'.$actpower.$detlo.$flycam.$dow.$lef.$rig.$bindload);
+				close $togglefile;
+				cbWriteBind($curfile,$key,'+down'.$feedback.'$$bindloadfile '.$filename);
 			} else {
-				$filename = $fbl.$t->{'space'} . XWSAD($t) . "j.txt";
-				$tglfile = cbOpen($filename,"w");
-				cbWriteBind($tglfile,$key,'-down'.actPower(nil,true,$t->{'jump'},$turnoff)."\$\$up 1".$t->{'detaillo'}.$t->{'flycamdist'}.$t->{'blfj'}.$t->{'space'} . XWSAD($t) . ".txt");
-				close $tglfile;
+				my $filename = $fbl.$sp.$xwsad."j.txt";
+				my $togglefile = cbOpen($filename,"w");
+				cbWriteBind($togglefile,$key,'-down'.$actpower.$detlo.$flycam.$blfj.$sp.$xwsad.".txt");
+				close $togglefile;
 				cbWriteBind($curfile,$key,'+down'.$feedback.'$$bindloadfile '.$filename);
 			}
 		}
 	} elsif ($keytype eq 'FlyModeKey') {
 
+		my $actpower = actPower_toggle(true,true,$flyx,$turnoff);
+
 		if (not $t->{'FlyModeKey'}) { error("invalid Fly Mode Key",2) }
 
-		if (not $fb and $SoD->{'Feedback'}) { $feedback="\$\$t \$name, Flight Mode" }
+		if (not $fb and $SoD->{'Feedback'}) { $feedback='$$t $name, Flight Mode' }
 		if ($t->{'canhov'}+$t->{'canfly'} > 0) {
 			if ($bl eq "bo") {
-				$bindload = $t->{'blbo'}.$t->{'space'} . XWSAD($t) . ".txt";
+				my $bindload = $blbo.$sp.$xwsad.".txt";
 				if ($fix) {
 					&$fix($profile,$t,$key,&makeFlyModeKey,"f",$bl,$curfile,$turnoff,"",$feedback);
 				} else {
-					cbWriteBind($curfile,$key,"+down\$\$".actPower_toggle(true,true,$t->{'flyx'},$turnoff)."\$\$up 1\$\$down 0".$t->{'forw'}.$t->{'bac'}.$t->{'lef'}.$t->{'rig'}.$t->{'detaillo'}.$t->{'flycamdist'}.$feedback.$bindload);
+					cbWriteBind($curfile,$key,'+down$$'.$actpower.'$$up 1$$down 0'.$for.$bac.$lef.$rig.$detlo.$flycam.$feedback.$bindload);
 				}
 			} elsif ($bl eq "a") {
 				if (not $fb_on_a) { $feedback = "" }
-				$bindload = $t->{'bla'}.$t->{'space'} . XWSAD($t) . ".txt";
-				if ($t->{'tkeys'}==0) { $turnon=$t->{'hover'} } else { $turnon=$t->{'flyx'} }
+				my $bindload = $bla.$sp.$xwsad.".txt";
+				if ($t->{'tkeys'}==0) { $actpower = actPower_toggle(true,true,$t->{'hover'},$turnoff); }
 				if ($fix) {
 					&$fix($profile,$t,$key,&makeFlyModeKey,"f",$bl,$curfile,$turnoff,"",$feedback);
 				} else {
-					cbWriteBind($curfile,$key,$t->{'ini'}.actPower_toggle(true,true,$turnon,$turnoff).$t->{'up'}.$t->{'dow'}.$t->{'lef'}.$t->{'rig'}.$t->{'detaillo'}.$t->{'flycamdist'}.$feedback.$bindload);
+					cbWriteBind($curfile,$key,$ini.$actpower.$up.$dow.$lef.$rig.$detlo.$flycam.$feedback.$bindload);
 				}
 			} elsif ($bl eq "af") {
-				$bindload = $t->{'blaf'}.$t->{'space'} . XWSAD($t) . ".txt";
+				my $bindload = $blaf.$sp.$xwsad.".txt";
 				if ($fix) {
 					&$fix($profile,$t,$key,&makeFlyModeKey,"f",$bl,$curfile,$turnoff,"a",$feedback);
 				} else {
-					cbWriteBind($curfile,$key,$t->{'ini'}.actPower_toggle(true,true,$t->{'flyx'},$turnoff).$t->{'detaillo'}.$t->{'flycamdist'}.$t->{'dow'}.$t->{'lef'}.$t->{'rig'}.$feedback.$bindload);
+					cbWriteBind($curfile,$key,$ini.$actpower.$detlo.$flycam.$dow.$lef.$rig.$feedback.$bindload);
 				}
 			} else {
 				if ($fix) {
 					&$fix($profile,$t,$key,&makeFlyModeKey,"f",$bl,$curfile,$turnoff,"f",$feedback);
 				} else {
-					cbWriteBind($curfile,$key,$t->{'ini'}.actPower_toggle(true,true,$t->{'flyx'},$turnoff).$t->{'up'}.$t->{'dow'}.$t->{'forw'}.$t->{'bac'}.$t->{'lef'}.$t->{'rig'}.$t->{'detaillo'}.$t->{'flycamdist'}.$feedback.$t->{'blff'}.$t->{'space'} . XWSAD($t) . ".txt");
+					cbWriteBind($curfile,$key,$ini.$actpower.$up.$dow.$for.$bac.$lef.$rig.$detlo.$flycam.$feedback.$blff.$sp.$xwsad.".txt");
 				}
 			}
 		}
 	} elsif ($keytype eq 'GFlyModeKey') {
 
+		my $actpower = actPower_toggle(nil,true,$t->{'gfly'},$turnoff);
+
 		if ($t->{'cangfly'} > 0) {
 			if ($bl eq "gbo") {
-				$bindload = $t->{'blgbo'}.$t->{'space'} . XWSAD($t) . ".txt";
+				my $bindload = $blgbo.$sp.$xwsad.".txt";
 				if ($fix) {
 					&$fix($profile,$t,$key,&makeGFlyModeKey,"gf",$bl,$curfile,$turnoff,"");
 				} else {
-					cbWriteBind($curfile,$key,$t->{'ini'}.'$$up 1$$down 0'.actPower_toggle(nil,true,$t->{'gfly'},$turnoff).$t->{'forw'}.$t->{'bac'}.$t->{'lef'}.$t->{'rig'}.$t->{'detaillo'}.$t->{'flycamdist'}.$bindload);
+					cbWriteBind($curfile,$key,$ini.'$$up 1$$down 0'.$actpower.$for.$bac.$lef.$rig.$detlo.$flycam.$bindload);
 				}
 			} elsif ($bl eq "gaf") {
-				$bindload = $t->{'blgaf'}.$t->{'space'} . XWSAD($t) . ".txt";
+				my $bindload = $blgaf.$sp.$xwsad.".txt";
 				if ($fix) {
 					&$fix($profile,$t,$key,&makeGFlyModeKey,"gf",$bl,$curfile,$turnoff,"a");
 				} else {
-					cbWriteBind($curfile,$key,$t->{'ini'}.$t->{'detaillo'}.$t->{'flycamdist'}.$t->{'up'}.$t->{'dow'}.$t->{'lef'}.$t->{'rig'}.$bindload);
+					cbWriteBind($curfile,$key,$ini.$detlo.$flycam.$up.$dow.$lef.$rig.$bindload);
 				}
 			} else {
 				if ($fix) {
 					&$fix($profile,$t,$key,&makeGFlyModeKey,"gf",$bl,$curfile,$turnoff,"f");
 				} else {
 					if ($bl eq "gf") {
-						cbWriteBind($curfile,$key,$t->{'ini'}.actPower_toggle(true,true,$t->{'gfly'},$turnoff).$t->{'detaillo'}.$t->{'flycamdist'}.$t->{'blgff'}.$t->{'space'} . XWSAD($t) . ".txt");
+						cbWriteBind($curfile,$key,$ini.$actpower.$detlo.$flycam.$blgff.$sp.$xwsad.".txt");
 					} else {
-						cbWriteBind($curfile,$key,$t->{'ini'}.$t->{'detaillo'}.$t->{'flycamdist'}.$t->{'blgff'}.$t->{'space'} . XWSAD($t) . ".txt");
+						cbWriteBind($curfile,$key,$ini.$detlo.$flycam.$blgff.$sp.$xwsad.".txt");
 					}
 				}
 			}
