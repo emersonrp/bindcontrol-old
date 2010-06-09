@@ -7,6 +7,8 @@ use About;
 use ProfileTabs;
 use StdDefault;
 
+use PowerBindCmds;
+
 use BCConstants;
 
 my $app = BCApp->new();
