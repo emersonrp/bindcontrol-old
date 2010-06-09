@@ -12,6 +12,7 @@ use GameData;
 use Profile;
 
 use General;
+use InspirationPopper;
 use Mastermind;
 use SoD;
 
