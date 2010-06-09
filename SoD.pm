@@ -808,7 +808,7 @@ sub makeModeKey {
 		my $trayslot = "1 ".$SoD->{'Temp'}->{'Tray'};
 		my $actpower = actPower(nil,true,$trayslot,$turnoff);
 
-		if ($SoD->{'Feedback'}) { $feedback='$$t $name, Temp Mode' }
+		if ($SoD->{'Feedback'}) { $feedback = '$$t $name, Temp Mode' }
 
 		if ($bl eq"r") {
 			my $bindload = $blt.$txtend;
@@ -828,7 +828,7 @@ sub makeModeKey {
 
 		if ($modestr eq "NonSoD") { Utility::WriteBind($curfile,$t->{'QFlyModeKey'},"powexecname Quantum Flight"); return; }
 
-		if ($SoD->{'Feedback'}) { $feedback='$$t $name, QFlight Mode'; }
+		if ($SoD->{'Feedback'}) { $feedback = '$$t $name, QFlight Mode'; }
 
 		if ($bl eq "r") {
 			my $bindload =   $pathn.$txtend;
@@ -854,7 +854,7 @@ sub makeModeKey {
 
 		my $actpower = actPower_toggle(true,true,$sprint,$turnoff);
 
-		if (not $fb and $SoD->{'Feedback'}) { $feedback='$$t $name, Sprint-SoD Mode' }
+		if (not $fb and $SoD->{'Feedback'}) { $feedback = '$$t $name, Sprint-SoD Mode' }
 		if ($bl eq "r") {
 			my $bindload = $bl.$txtend;
 			my $turnon;
@@ -883,7 +883,7 @@ sub makeModeKey {
 
 		my $actpower = actPower_toggle(true,true,$speed,$turnoff);
 
-		if (not $fb and $SoD->{'Feedback'}) { $feedback='$$t $name, Superspeed Mode' }
+		if (not $fb and $SoD->{'Feedback'}) { $feedback = '$$t $name, Superspeed Mode' }
 		if ($t->{'canss'} > 0) {
 			if ($bl eq "s") {
 				my $bindload = $bls.$txtend;
@@ -919,7 +919,7 @@ sub makeModeKey {
 
 		if ($t->{'canjmp'} > 0 and not $SoD->{'Jump'}->{'Simple'}) {
 
-			if ($SoD->{'Feedback'}) { $feedback='$$t $name, Superjump Mode' }
+			if ($SoD->{'Feedback'}) { $feedback = '$$t $name, Superjump Mode' }
 			if ($bl eq "j") {
 				my $bindload = $blj.$txtend;
 				my $a;
@@ -950,7 +950,7 @@ sub makeModeKey {
 
 		if (not $t->{'FlyModeKey'}) { error("invalid Fly Mode Key",2) }
 
-		if (not $fb and $SoD->{'Feedback'}) { $feedback='$$t $name, Flight Mode' }
+		if (not $fb and $SoD->{'Feedback'}) { $feedback = '$$t $name, Flight Mode' }
 		if ($t->{'canhov'}+$t->{'canfly'} > 0) {
 			if ($bl eq "bo") {
 				my $bindload = $blbo.$txtend;
@@ -1177,8 +1177,8 @@ sub makebind {
 
 	}
 
-	# my $turn="+zoomin$$-zoomin"  # a non functioning bind used only to activate the keydown/keyup functions of +commands;
-	$t->{'turn'}="+down";  # a non functioning bind used only to activate the keydown/keyup functions of +commands;
+	# my $turn = "+zoomin$$-zoomin"  # a non functioning bind used only to activate the keydown/keyup functions of +commands;
+	$t->{'turn'} = "+down";  # a non functioning bind used only to activate the keydown/keyup functions of +commands;
 	
 	if ($SoD->{'Base'}) {
 		cbMakeDirectory($t->{'subdirr'});
@@ -1692,8 +1692,8 @@ sub sodUpKey {
 
 	if (not $flight and not $sssj) { undef $mobile; undef $stationary; }
 
-	if ($bo == "bo") { $upx = '$$up 1'; $dow = '$$down 0'; }
-	if ($bo == "sd") { $upx = '$$up 0'; $dow = '$$down 1'; }
+	if ($bo eq "bo") { $upx = '$$up 1'; $dow = '$$down 0'; }
+	if ($bo eq "sd") { $upx = '$$up 0'; $dow = '$$down 1'; }
 	
 	undef $mobile     if $mobile     eq "Group Fly";
 	undef $stationary if $stationary eq "Group Fly";
@@ -1701,8 +1701,8 @@ sub sodUpKey {
 	if ($flight eq "Jump") {
 		$dow = '$$down 0';
 		$actkeys = $t->{'jkeys'};
-		if ($t->{'totalkeys'} == 1 and $t->{'space'} == 1) { $upx='$$up 0' } else { $upx='$$up 1' }
-		if ($t->{'X'} == 1)                                { $upx='$$up 0' }
+		if ($t->{'totalkeys'} == 1 and $t->{'space'} == 1) { $upx = '$$up 0' } else { $upx = '$$up 1' }
+		if ($t->{'X'} == 1)                                { $upx = '$$up 0' }
 	}
 
 	$toggleon = $mobile;
@@ -1763,9 +1763,484 @@ sub sodUpKey {
 	}
 }
 
+sub sodDownKey {
+	my ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,$autorun,$followbl,$bo,$sssj) = @_;
+	my  $ml; # , aj
+	my ($up, $dowx, $forw, $bac, $lef, $rig) = ($t->{'up'}, $t->{'dowx'}, $t->{'forw'}, $t->{'bac'}, $t->{'lef'}, $t->{'rig'});
+	my ($toggle, $toggleon, $toggleoff);
+	my $actkeys = $t->{'totalkeys'};
+
+	if (not $flight) { undef $mobile; undef $stationary; }
+	if ($bo eq 'bo') { $up = '$$up 1'; $dowx = '$$down 0'; }
+	if ($bo eq 'sd') { $up = '$$up 0'; $dowx = '$$down 1'; }
+
+	if ($mobile     eq 'Group Fly') { undef $mobile; }
+	if ($stationary eq 'Group Fly') { undef $stationary; }
+
+	if ($flight eq 'Jump') {
+		$dowx = '$$down 0';
+		# if ($t->{'cancj'}  == 1) { $aj = $t->{'cjmp'}; }
+		# if ($t->{'canjmp'} == 1) { $aj = $t->{'jump'}; }
+		$actkeys = $t->{'jkeys'};
+		if ($t->{'X'} == 1 and $t->{'totalkeys'} > 1) { $up = '$$up 1' } else { $up = '$$up 0'; }
+	}
+
+	$toggleon = $mobile;
+	if ($actkeys == 0) {
+		$ml = $t->{'mlon'};
+		$toggleon = $mobile;
+		if (not ($mobile and $mobile eq $stationary)) {
+			$toggleoff = $stationary;
+		}
+	} else {
+		undef $toggleon;
+	}
+
+	if ($t->{'totalkeys'} == 1 and $t->{'X'} == 1) {
+		$ml = $t->{'mloff'};
+		if (not ($stationary and $mobile eq $stationary)) {
+			$toggleoff = $mobile;
+		}
+		$toggleon = $stationary;
+	} else {
+		undef $toggleoff;
+	}
+	
+	if ($toggleon or $toggleoff) {
+		$toggle = actPower(nil,true,$toggleon,$toggleoff)
+	}
+
+	my $bindload = $bl.$t->{'space'}.(1-$t->{'X'}).$t->{'W'}.$t->{'S'}.$t->{'A'}.$t->{'D'}.".txt";
+
+	my $ini = ($t->{'X'} == 1) ? '-down' : '+down';
+
+	if ($followbl) {
+		my $move;
+		if ($t->{'X'} != 1) {
+			$bindload = $followbl.$t->{'space'}."1".$t->{'W'}.$t->{'S'}.$t->{'A'}.$t->{'D'}.".txt";
+			$move = $up.$dowx.$forw.$bac.$lef.$rig;
+		}
+		Utility::WriteBind($curfile,$SoD->{'Down'},$ini.$move.$bindload);
+	} elsif (not $autorun) {
+		Utility::WriteBind($curfile,$SoD->{'Down'},$ini.$up.$dowx.$forw.$bac.$lef.$rig.$ml.$toggle.$bindload);
+	} else {
+		Utility::WriteBind($curfile,$SoD->{'Down'},$ini.$up.$dowx.'$$backward 0'.$lef.$rig.$t->{'mlon'}.$bindload);
+	}
+}
+###### HERE!
+
+
+sub sodForwardKey {
+	my ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,$autorunbl,$followbl,$bo,$sssj) = @_;
+	my ($up, $dow, $forx, $bac, $lef, $rig) = ($t->{'up'}, $t->{'dow'}, $t->{'forx'}, $t->{'bac'}, $t->{'lef'}, $t->{'rig'});
+	my ($ml, $toggle, $toggleon, $toggleoff);
+	my $actkeys = $t->{'totalkeys'};
+	if ($bo eq "bo") { $up = '$$up 1'; $dow = '$$down 0' }
+	if ($bo eq "sd") { $up = '$$up 0'; $dow = '$$down 1' }
+
+	if ($mobile     eq 'Group Fly') { undef $mobile; }
+	if ($stationary eq 'Group Fly') { undef $stationary; }
+
+	if ($flight eq "Jump") { 
+		$dow = '$$down 0';
+		$actkeys = $t->{'jkeys'};
+		if (
+			($t->{'totalkeys'} == 1 and $t->{'W'} == 1)
+				or
+			($t->{'X'} == 1)
+			)
+		 { $up = '$$up 0'; } else { $up = '$$up 1'; }
+	}
+
+	$toggleon = $mobile;
+	if ($t->{'totalkeys'} == 0) { 
+		$ml = $t->{'mlon'};
+		if (not ($mobile and $mobile eq $stationary)) { 
+			$toggleoff = $stationary;
+		}
+	}
+		
+	if ($t->{'totalkeys'} == 1 and $t->{'W'} == 1) { 
+		$ml = $t->{'mloff'};
+	}
+		
+	if (not $flight) { 
+		if ($t->{'horizkeys'} == 1 and $t->{'W'} == 1) { 
+			if (not ($stationary and $mobile eq $stationary)) {
+				$toggleoff = $mobile;
+			}
+			$toggleon = $stationary;
+		}
+	} else {
+		if ($t->{'totalkeys'} == 1 and $t->{'W'} == 1) { 
+			if (not ($stationary and $mobile eq $stationary)) {
+				$toggleoff = $mobile;
+			}
+			$toggleon = $stationary;
+		}
+	}
+
+	if ($sssj and $t->{'space'} == 1) { #  if (we are jumping with SS+SJ mode enabled
+		$toggleon = $sssj;
+		$toggleoff = $mobile;
+	}
+	
+	if ($toggleon or $toggleoff) { 
+		$toggle = actPower(nil,true,$toggleon,$toggleoff);
+	}
+
+	my $bindload = $bl.$t->{'space'}.$t->{'X'}.(1-$t->{'W'}).$t->{'S'}.$t->{'A'}.$t->{'D'}.".txt";
+
+	my $ini = "+down";
+	if ($t->{'W'} == 1) { 
+		$ini = "-down";
+	}
+
+	if ($followbl) { 
+		my $move;
+		if ($t->{'W'} == 1) { 
+			$move = $ini;
+		} else {
+			$bindload = $followbl.$t->{'space'}.$t->{'X'}.(1-$t->{'W'}).$t->{'S'}.$t->{'A'}.$t->{'D'}.".txt";
+			$move = $ini.$up.$dow.$forx.$bac.$lef.$rig;
+		}
+		Utility::WriteBind($curfile,$SoD->{'Forward'},$move.$bindload);
+		if ($SoD->{'MouseChord'}) { 
+			if ($t->{'W'} == 1) { $move = $ini.$up.$dow.$forx.$bac.$rig.$lef }
+			Utility::WriteBind($curfile,'mousechord',$move.$bindload);
+		}
+	} elsif (not $autorunbl) { 
+		Utility::WriteBind($curfile,$SoD->{'Forward'},$ini.$up.$dow.$forx.$bac.$lef.$rig.$ml.$toggle.$bindload);
+		if ($SoD->{'MouseChord'}) { 
+			Utility::WriteBind($curfile,'mousechord',$ini.$up.$dow.$forx.$bac.$rig.$lef.$ml.$toggle.$bindload);
+		}
+	} else {
+		if ($t->{'W'} == 1) { 
+			$bindload = $autorunbl.$t->{'space'}.$t->{'X'}.(1-$t->{'W'}).$t->{'S'}.$t->{'A'}.$t->{'D'}.".txt";
+		}
+		Utility::WriteBind($curfile,$SoD->{'Forward'},$ini.$up.$dow.'$$forward 1$$backward 0'.$lef.$rig.$t->{'mlon'}.$bindload);
+		if ($SoD->{'MouseChord'}) { 
+			Utility::WriteBind($curfile,'mousechord',$ini.$up.$dow.'$$forward 1$$backward 0'.$rig.$lef.$t->{'mlon'}.$bindload);
+		}
+	}
+}
+
+sub sodBackKey {
+	my ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,$autorunbl,$followbl,$bo,$sssj) = @_;
+	my $ml;
+	my ($up, $dow, $forw, $bacx, $lef, $rig) = ($t->{'up'}, $t->{'dow'}, $t->{'forw'}, $t->{'bacx'}, $t->{'lef'}, $t->{'rig'});
+	my ($toggle, $toggleon, $toggleoff);
+	my $actkeys = $t->{'totalkeys'};
+	if ($bo eq "bo") { $up = '$$up 1'; $dow = '$$down 0' }
+	if ($bo eq "sd") { $up = '$$up 0'; $dow = '$$down 1' }
+
+	if ($mobile     eq 'Group Fly') { undef $mobile; }
+	if ($stationary eq 'Group Fly') { undef $stationary; }
+
+	if ($flight eq "Jump") { 
+		$dow = '$$down 0';
+		$actkeys = $t->{'jkeys'};
+		if ($t->{'totalkeys'} == 1 and $t->{'S'} == 1) { $up = '$$up 0' } else { $up = '$$up 1' }
+		if ($t->{'X'} == 1) { $up = '$$up 0' }
+	}
+
+	$toggleon = $mobile;
+	if ($t->{'totalkeys'} == 0) { 
+		$ml = $t->{'mlon'};
+		$toggleon = $mobile;
+		if (not ($mobile and $mobile eq $stationary)) {
+			$toggleoff = $stationary;
+		}
+	}
+		
+	if ($t->{'totalkeys'} == 1 and $t->{'S'} == 1) { 
+		$ml = $t->{'mloff'};
+	}
+		
+	if (not $flight) { 
+		if ($t->{'horizkeys'} == 1 and $t->{'S'} == 1) { 
+			if (not ($stationary and $mobile eq $stationary)) {
+				$toggleoff = $mobile;
+			}
+			$toggleon = $stationary;
+		}
+	} else {
+		if ($t->{'totalkeys'} == 1 and $t->{'S'} == 1) { 
+			if (not ($stationary and $mobile eq $stationary)) {
+				$toggleoff = $mobile;
+			}
+			$toggleon = $stationary;
+		}
+	}
+
+	if ($sssj and $t->{'space'} == 1) { #  if (we are jumping with SS+SJ mode enabled
+		$toggleon = $sssj;
+		$toggleoff = $mobile;
+	}
+	
+	if ($toggleon or $toggleoff) { 
+		$toggle = actPower(nil,true,$toggleon,$toggleoff);
+	}
+
+	my $bindload = $bl.$t->{'space'}.$t->{'X'}.$t->{'W'}.(1-$t->{'S'}).$t->{'A'}.$t->{'D'}.".txt";
+
+	my $ini = ($t->{'S'} == 1) ? "-down" : "+down";
+
+	my $move;
+	if ($followbl) { 
+		if ($t->{'S'} == 1) { 
+			$move = $ini;
+		} else {
+			$bindload = $followbl.$t->{'space'}.$t->{'X'}.$t->{'W'}.(1-$t->{'S'}).$t->{'A'}.$t->{'D'}.".txt";
+			$move = $ini.$up.$dow.$forw.$bacx.$lef.$rig;
+		}
+		Utility::WriteBind($curfile,$SoD->{'Back'},$move.$bindload);
+	} elsif (not $autorunbl) { 
+		Utility::WriteBind($curfile,$SoD->{'Back'},$ini.$up.$dow.$forw.$bacx.$lef.$rig.$ml.$toggle.$bindload);
+	} else {
+		if ($t->{'S'} == 1) { 
+			$move = '$$forward 1$$backward 0';
+		} else {
+			$move = '$$forward 0$$backward 1';
+			$bindload = $autorunbl.$t->{'space'}.$t->{'X'}.$t->{'W'}.(1-$t->{'S'}).$t->{'A'}.$t->{'D'}.".txt";
+		}
+		Utility::WriteBind($curfile,$SoD->{'Back'},$ini.$up.$dow.$move.$lef.$rig.$t->{'mlon'}.$bindload);
+	}
+}
+
+sub sodLeftKey {
+	my ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,$autorun,$followbl,$bo,$sssj) = @_;
+	my $ml;
+	my ($up, $dow, $forw, $bac, $lefx, $rig) = ($t->{'up'}, $t->{'dow'}, $t->{'forw'}, $t->{'bac'}, $t->{'lefx'}, $t->{'rig'});
+	my ($toggle, $toggleon, $toggleoff);
+	my $actkeys = $t->{'totalkeys'};
+	if ($bo eq "bo") { $up = '$$up 1'; $dow = '$$down 0' }
+	if ($bo eq "sd") { $up = '$$up 0'; $dow = '$$down 1' }
+
+	if ($mobile     eq 'Group Fly') { undef $mobile; }
+	if ($stationary eq 'Group Fly') { undef $stationary; }
+
+	if ($flight eq "Jump") { 
+		$dow = '$$down 0';
+		$actkeys = $t->{'jkeys'};
+		if ($t->{'totalkeys'} == 1 and $t->{'A'} == 1) { $up = '$$up 0' } else { $up = '$$up 1' }
+		if ($t->{'X'} == 1) { $up = '$$up 0' }
+	}
+
+	$toggleon = $mobile;
+	if ($t->{'totalkeys'} == 0) { 
+		$ml = $t->{'mlon'};
+		$toggleon = $mobile;
+		if (not $mobile and $mobile eq $stationary ) { 
+			$toggleoff = $stationary;
+		}
+	}
+		
+	if ($t->{'totalkeys'} == 1 and $t->{'A'} == 1) { 
+		$ml = $t->{'mloff'};
+	}
+		
+	if (not $flight) { 
+		if ($t->{'horizkeys'} == 1 and $t->{'A'} == 1) { 
+			if (not ($stationary and $mobile eq $stationary)) {
+				$toggleoff = $mobile;
+			}
+			$toggleon = $stationary;
+		}
+	} else {
+		if ($t->{'totalkeys'} == 1 and $t->{'A'} == 1) { 
+			if (not ($stationary and $mobile eq $stationary)) {
+				$toggleoff = $mobile;
+			}
+			$toggleon = $stationary;
+		}
+	}
+
+	if ($sssj and $t->{'space'} == 1) { #  if (we are jumping with SS+SJ mode enabled
+		$toggleon = $sssj;
+		$toggleoff = $mobile;
+	}
+	
+	if ($toggleon or $toggleoff) { 
+		$toggle = actPower(nil,true,$toggleon,$toggleoff);
+	}
+
+	my $bindload = $bl.$t->{'space'}.$t->{'X'}.$t->{'W'}.$t->{'S'}.(1-$t->{'A'}).$t->{'D'}.".txt";
+
+	my $ini = "+down";
+	if ($t->{'A'} == 1) { 
+		$ini = "-down";
+	}
+
+	my $move;
+	if ($followbl) { 
+		if ($t->{'A'} == 1) { 
+			$move = $ini;
+		} else {
+			$bindload = $followbl.$t->{'space'}.$t->{'X'}.$t->{'W'}.$t->{'S'}.(1-$t->{'A'}).$t->{'D'}.".txt";
+			$move = $ini.$up.$dow.$forw.$bac.$lefx.$rig;
+		}
+		Utility::WriteBind($curfile,$SoD->{'Left'},$move.$bindload);
+	} elsif (not $autorun) { 
+		Utility::WriteBind($curfile,$SoD->{'Left'},$ini.$up.$dow.$forw.$bac.$lefx.$rig.$ml.$toggle.$bindload);
+	} else {
+		Utility::WriteBind($curfile,$SoD->{'Left'},$ini.$up.$dow.'$$backward 0'.$lefx.$rig.$t->{'mlon'}.$bindload);
+	}
+}
+
+sub sodRightKey {
+	my ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,$autorun,$followbl,$bo,$sssj) = @_;
+	my $ml;
+	my ($up, $dow, $forw, $bac, $lef, $rigx) = ($t->{'up'}, $t->{'dow'}, $t->{'forw'}, $t->{'bac'}, $t->{'lef'}, $t->{'rigx'});
+	my ($toggle, $toggleon, $toggleoff);
+	my $actkeys = $t->{'totalkeys'};
+	if ($bo eq "bo") { $up = '$$up 1'; $dow = '$$down 0' }
+	if ($bo eq "sd") { $up = '$$up 0'; $dow = '$$down 1' }
+
+	if ($mobile     eq 'Group Fly') { undef $mobile; }
+	if ($stationary eq 'Group Fly') { undef $stationary; }
+
+	if ($flight eq "Jump") { 
+		$dow = '$$down 0';
+		$actkeys = $t->{'jkeys'};
+		if ($t->{'totalkeys'} == 1 and $t->{'D'} == 1) { $up = '$$up 0' } else { $up = '$$up 1' }
+		if ($t->{'X'} == 1) { $up = '$$up 0' }
+	}
+
+	$toggleon = $mobile;
+	if ($t->{'totalkeys'} == 0) { 
+		$ml = $t->{'mlon'};
+		$toggleon = $mobile;
+		if (not $mobile and $mobile eq $stationary ) { 
+			$toggleoff = $stationary;
+		}
+	}
+		
+	if ($t->{'totalkeys'} == 1 and $t->{'D'} == 1) { 
+		$ml = $t->{'mloff'};
+	}
+		
+	if (not $flight) { 
+		if ($t->{'horizkeys'} == 1 and $t->{'D'} == 1) { 
+			if (not ($stationary and $mobile eq $stationary)) {
+				$toggleoff = $mobile;
+			}
+			$toggleon = $stationary;
+		}
+	} else {
+		if ($t->{'totalkeys'} == 1 and $t->{'D'} == 1) { 
+			if (not ($stationary and $mobile eq $stationary)) {
+				$toggleoff = $mobile;
+			}
+			$toggleon = $stationary;
+		}
+	}
+
+	if ($sssj and $t->{'space'} == 1) { #  if (we are jumping with SS+SJ mode enabled
+		$toggleon = $sssj;
+		$toggleoff = $mobile;
+	}
+	
+	if ($toggleon or $toggleoff) { 
+		$toggle = actPower(nil,true,$toggleon,$toggleoff);
+	}
+
+	my $bindload = $bl.$t->{'space'}.$t->{'X'}.$t->{'W'}.$t->{'S'}.$t->{'A'}.(1-$t->{'D'}).".txt";
+
+	my $ini = "+down";
+	if ($t->{'D'} == 1) { 
+		$ini = "-down";
+	}
+
+	if ($followbl) { 
+		my $move;
+		if ($t->{'D'} == 1) { 
+			$move = $ini;
+		} else {
+			$bindload = $followbl.$t->{'space'}.$t->{'X'}.$t->{'W'}.$t->{'S'}.$t->{'A'}.(1-$t->{'D'}).".txt";
+			$move = $ini.$up.$dow.$forw.$bac.$lef.$rigx;
+		}
+		Utility::WriteBind($curfile,$SoD->{'Right'},$move.$bindload);
+	} elsif (not $autorun) { 
+		Utility::WriteBind($curfile,$SoD->{'Right'},$ini.$up.$dow.$forw.$bac.$lef.$rigx.$ml.$toggle.$bindload);
+	} else {
+		Utility::WriteBind($curfile,$SoD->{'Right'},$ini.$up.$dow.'$$forward 1$$backward 0'.$lef.$rigx.$t->{'mlon'}.$bindload);
+	}
+}
+
+sub sodAutoRunKey {
+	my ($t,$bl,$curfile,$SoD,$mobile,$sssj) = @_;
+	my $bindload = $bl.$t->{'space'}.$t->{'X'}.$t->{'W'}.$t->{'S'}.$t->{'A'}.$t->{'D'}.".txt";
+	if ($sssj and $t->{'space'} == 1) { 
+		Utility::WriteBind($curfile,$SoD->{'AutoRunKey'},'forward 1$$backward 0'.$t->{'up'}.$t->{'dow'}.$t->{'lef'}.$t->{'rig'}.$t->{'mlon'}.actPower(nil,true,$sssj,$mobile).$bindload);
+	} else {
+		Utility::WriteBind($curfile,$SoD->{'AutoRunKey'},'forward 1$$backward 0'.$t->{'up'}.$t->{'dow'}.$t->{'lef'}.$t->{'rig'}.$t->{'mlon'}.actPower(nil,true,$mobile).$bindload);
+	}
+}
+
+sub sodAutoRunOffKey {
+	my ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,$sssj) = @_;
+	my ($toggle, $toggleon, $toggleoff);
+	if (not $flight and not $sssj) { 
+		if ($t->{'horizkeys'} > 0) { 
+			$toggleon = $t->{'mlon'}.actPower(nil,true,$mobile);
+		} else {
+			$toggleon = $t->{'mloff'}.actPower(nil,true,$stationary,$mobile);
+		}
+	} elsif ($sssj) { 
+		if ($t->{'horizkeys'} > 0 or $t->{'space'} == 1) { 
+			$toggleon = $t->{'mlon'}.actPower(nil,true,$mobile,$toggleoff);
+		} else {
+			$toggleon = $t->{'mloff'}.actPower(nil,true,$stationary,$mobile,$toggleoff);
+		}
+	} else {
+		if ($t->{'totalkeys'} > 0) { 
+			$toggleon = $t->{'mlon'}.actPower(nil,true,$mobile);
+		} else {
+			$toggleon = $t->{'mloff'}.actPower(nil,true,$stationary,$mobile);
+		}
+	}
+	my $bindload = $bl.$t->{'space'}.$t->{'X'}.$t->{'W'}.$t->{'S'}.$t->{'A'}.$t->{'D'}.".txt";
+	Utility::WriteBind($curfile,$SoD->{'AutoRunKey'},$t->{'up'}.$t->{'dow'}.$t->{'forw'}.$t->{'bac'}.$t->{'lef'}.$t->{'rig'}.$toggleon.$bindload);
+}
+
+sub sodFollowKey {
+	my ($t,$bl,$curfile,$SoD,$mobile) = @_;
+	Utility::WriteBind($curfile,$SoD->{'FollowKey'},'follow'.actPower(nil,true,$mobile).$bl.$t->{'space'}.$t->{'X'}.$t->{'W'}.$t->{'S'}.$t->{'A'}.$t->{'D'}.'.txt');
+}
+
+sub sodFollowOffKey {
+	my ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight) = @_;
+	my ($toggle);
+	if (not $flight) { 
+		if ($t->{'horizkeys'} == 0) { 
+			if ($stationary eq $mobile) { 
+				$toggle = actPower(nil,true,$stationary,$mobile);
+			} else {
+				$toggle = actPower(nil,true,$stationary);
+			}
+		}
+	} else {
+		if ($t->{'totalkeys'} == 0) { 
+			if ($stationary eq $mobile) { 
+				$toggle = actPower(nil,true,$stationary,$mobile);
+			} else {
+				$toggle = actPower(nil,true,$stationary);
+			}
+		}
+	}
+	Utility::WriteBind($curfile,$SoD->{'FollowKey'},"follow".$toggle.$t->{'up'}.$t->{'dow'}.$t->{'forw'}.$t->{'bac'}.$t->{'lef'}.$t->{'rig'}.$bl.$t->{'space'}.$t->{'X'}.$t->{'W'}.$t->{'S'}.$t->{'A'}.$t->{'D'}.".txt");
+}
 
 1;
 __DATA__
+
+
+function module.bindisused(profile)
+	if $profile->{'SoD'} == nil then return nil end
+	return profile.$SoD->{'enable'}
+end
+
 function module.findconflicts(profile)
 	local SoD = $profile->{'SoD'}
 	cbCheckConflict(SoD,"Up","Up Key")
@@ -1980,487 +2455,3 @@ function sodSetDownFix(profile,$t,key,makeModeKey,suffix,bl,curfile,$turnoff,aut
 	Utility::WriteBind(curfile,key,'+down'.feedback.'$$bindloadfile '.filename)
 end
 
-function sodDownKey(t,bl,curfile,SoD,mobile,stationary,flight,autorun,followbl,bo,$sssj)
-	local ml# , aj
-	local up, dowx, forw, bac, lef, rig = $t->{'up'}, $t->{'dowx'}, $t->{'forw'}, $t->{'bac'}, $t->{'lef'}, $t->{'rig'}
-	local toggle=""
-	local toggleon
-	local toggleoff
-	local actkeys = $t->{'totalkeys'}
-	if not flight then mobile = nil stationary = nil end
-	if bo == "bo" then up = "$$up 1" dowx = "$$down 0" end
-	if bo == "sd" then up = "$$up 0" dowx = "$$down 1" end
-
-	if mobile == "Group Fly" then mobile = nil end
-	if stationary == "Group Fly" then stationary = nil end
-
-	if flight == "Jump" then
-		dowx = "$$down 0"
-		# if $t->{'cancj'} == 1 then aj=$t->{'cjmp'} end
-		# if $t->{'canjmp'} == 1 then aj=$t->{'jump'} end
-		actkeys = $t->{'jkeys'}
-		if $t->{'X'} == 1 and $t->{'totalkeys'} > 1 then up="$$up 1" else up="$$up 0" end
-	end
-
-	toggleon = mobile
-	if actkeys == 0 then
-		ml = $t->{'mlon'}
-		toggleon = mobile
-		if not mobile and mobile eq stationary then
-			toggleoff = stationary
-		end
-	else
-		toggleon = nil
-	end
-
-	if $t->{'totalkeys'} == 1 and $t->{'X'} == 1 then
-		ml = $t->{'mloff'}
-		if not stationary and mobile eq stationary  then
-			toggleoff = mobile
-		end
-		toggleon = stationary
-	else
-		toggleoff = nil
-	end
-	
-	if toggleon or toggleoff then
-		toggle = actPower(nil,true,$toggleon,$toggleoff)
-	end
-
-	bindload = bl.$t->{'space'}.(1-$t->{'X'}).$t->{'W'}.$t->{'S'}.$t->{'A'}.$t->{'D'}.".txt"
-	ml = ml or ""
-
-	local ini = "+down"
-	if $t->{'X'} == 1 then
-		ini = "-down"
-	end
-
-	if followbl then
-		local move
-		if $t->{'X'}==1 then
-			move = ""
-		else
-			bindload = followbl.$t->{'space'}."1".$t->{'W'}.$t->{'S'}.$t->{'A'}.$t->{'D'}.".txt"
-			move = up.dowx.forw.bac.lef.rig
-		end
-		Utility::WriteBind(curfile,$SoD->{'Down'},ini.move.bindload)
-	elseif not autorun then
-		Utility::WriteBind(curfile,$SoD->{'Down'},ini.up.dowx.forw.bac.lef.rig.ml.toggle.bindload)
-	else
-		Utility::WriteBind(curfile,$SoD->{'Down'},ini.up.dowx."$$backward 0".lef.rig.$t->{'mlon'}.bindload)
-	end
-end
-
-function sodForwardKey(t,bl,curfile,SoD,mobile,stationary,flight,autorunbl,followbl,bo,$sssj)
-	local ml
-	local up, dow, forx, bac, lef, rig = $t->{'up'}, $t->{'dow'}, $t->{'forx'}, $t->{'bac'}, $t->{'lef'}, $t->{'rig'}
-	local toggle=""
-	local toggleon
-	local toggleoff
-	local actkeys = $t->{'totalkeys'}
-	if bo == "bo" then up = "$$up 1" dow = "$$down 0" end
-	if bo == "sd" then up = "$$up 0" dow = "$$down 1" end
-
-	if mobile == "Group Fly" then mobile = nil end
-	if stationary == "Group Fly" then stationary = nil end
-
-	if flight == "Jump" then
-		dow = "$$down 0"
-		actkeys = $t->{'jkeys'}
-		if $t->{'totalkeys'} == 1 and $t->{'W'} == 1 then up="$$up 0" else up="$$up 1" end
-		if $t->{'X'} == 1 then up="$$up 0" end
-	end
-
-	toggleon = mobile
-	if $t->{'totalkeys'} == 0 then
-		ml = $t->{'mlon'}
-		toggleon = mobile
-		if not mobile and mobile eq stationary  then
-			toggleoff = stationary
-		end
-	end
-		
-	if $t->{'totalkeys'} == 1 and $t->{'W'} == 1 then
-		ml = $t->{'mloff'}
-	end
-		
-	if not flight then
-		if $t->{'horizkeys'} == 1 and $t->{'W'} == 1 then
-			if not stationary and mobile eq stationary  then
-				toggleoff = mobile
-			end
-			toggleon = stationary
-		end
-	else
-		if $t->{'totalkeys'} == 1 and $t->{'W'} == 1 then
-			if not stationary and mobile eq stationary  then
-				toggleoff = mobile
-			end
-			toggleon = stationary
-		end
-	end
-
-	if $sssj and $t->{'space'} == 1 then #  if we are jumping with SS+SJ mode enabled
-		toggleon = $sssj
-		toggleoff = mobile
-	end
-	
-	if toggleon or toggleoff then
-		toggle = actPower(nil,true,$toggleon,$toggleoff)
-	end
-
-	bindload = bl.$t->{'space'}.$t->{'X'}.(1-$t->{'W'}).$t->{'S'}.$t->{'A'}.$t->{'D'}.".txt"
-	ml = ml or ""
-
-	local ini = "+down"
-	if $t->{'W'} == 1 then
-		ini = "-down"
-	end
-
-	if followbl then
-		if $t->{'W'}==1 then
-			move = ini
-		else
-			bindload = followbl.$t->{'space'}.$t->{'X'}.(1-$t->{'W'}).$t->{'S'}.$t->{'A'}.$t->{'D'}.".txt"
-			move = ini.up.dow.forx.bac.lef.rig
-		end
-		Utility::WriteBind(curfile,$SoD->{'Forward'},move.bindload)
-		if $SoD->{'MouseChord'} then
-			if $t->{'W'}eq1 then move = ini.up.dow.forx.bac.rig.lef end
-			Utility::WriteBind(curfile,'mousechord',move.bindload)
-		end
-	elseif not autorunbl then
-		Utility::WriteBind(curfile,$SoD->{'Forward'},ini.up.dow.forx.bac.lef.rig.ml.toggle.bindload)
-		if $SoD->{'MouseChord'} then
-			Utility::WriteBind(curfile,'mousechord',ini.up.dow.forx.bac.rig.lef.ml.toggle.bindload)
-		end
-	else
-		if $t->{'W'} eq 1 then
-			bindload = autorunbl.$t->{'space'}.$t->{'X'}.(1-$t->{'W'}).$t->{'S'}.$t->{'A'}.$t->{'D'}.".txt"
-		end
-		Utility::WriteBind(curfile,$SoD->{'Forward'},ini.up.dow.'$$forward 1$$backward 0'.lef.rig.$t->{'mlon'}.bindload)
-		if $SoD->{'MouseChord'} then
-			Utility::WriteBind(curfile,'mousechord',ini.up.dow.'$$forward 1$$backward 0'.rig.lef.$t->{'mlon'}.bindload)
-		end
-	end
-end
-
-function sodBackKey(t,bl,curfile,SoD,mobile,stationary,flight,autorunbl,followbl,bo,$sssj)
-	local ml
-	local up, dow, forw, bacx, lef, rig = $t->{'up'}, $t->{'dow'}, $t->{'forw'}, $t->{'bacx'}, $t->{'lef'}, $t->{'rig'}
-	local toggle=""
-	local toggleon
-	local toggleoff
-	local actkeys = $t->{'totalkeys'}
-	if bo == "bo" then up = "$$up 1" dow = "$$down 0" end
-	if bo == "sd" then up = "$$up 0" dow = "$$down 1" end
-
-	if mobile == "Group Fly" then mobile = nil end
-	if stationary == "Group Fly" then stationary = nil end
-
-	if flight == "Jump" then
-		dow = "$$down 0"
-		actkeys = $t->{'jkeys'}
-		if $t->{'totalkeys'} == 1 and $t->{'S'} == 1 then up="$$up 0" else up="$$up 1" end
-		if $t->{'X'} == 1 then up="$$up 0" end
-	end
-
-	toggleon = mobile
-	if $t->{'totalkeys'} == 0 then
-		ml = $t->{'mlon'}
-		toggleon = mobile
-		if not mobile and mobile eq stationary  then
-			toggleoff = stationary
-		end
-	end
-		
-	if $t->{'totalkeys'} == 1 and $t->{'S'} == 1 then
-		ml = $t->{'mloff'}
-	end
-		
-	if not flight then
-		if $t->{'horizkeys'} == 1 and $t->{'S'} == 1 then
-			if not stationary and mobile eq stationary  then
-				toggleoff = mobile
-			end
-			toggleon = stationary
-		end
-	else
-		if $t->{'totalkeys'} == 1 and $t->{'S'} == 1 then
-			if not stationary and mobile eq stationary  then
-				toggleoff = mobile
-			end
-			toggleon = stationary
-		end
-	end
-
-	if $sssj and $t->{'space'} == 1 then #  if we are jumping with SS+SJ mode enabled
-		toggleon = $sssj
-		toggleoff = mobile
-	end
-	
-	if toggleon or toggleoff then
-		toggle = actPower(nil,true,$toggleon,$toggleoff)
-	end
-
-	bindload = bl.$t->{'space'}.$t->{'X'}.$t->{'W'}.(1-$t->{'S'}).$t->{'A'}.$t->{'D'}.".txt"
-	ml = ml or ""
-
-	local ini = "+down"
-	if $t->{'S'} == 1 then
-		ini = "-down"
-	end
-
-	if followbl then
-		if $t->{'S'}==1 then
-			move = ini
-		else
-			bindload = followbl.$t->{'space'}.$t->{'X'}.$t->{'W'}.(1-$t->{'S'}).$t->{'A'}.$t->{'D'}.".txt"
-			move = ini.up.dow.forw.bacx.lef.rig
-		end
-		Utility::WriteBind(curfile,$SoD->{'Back'},move.bindload)
-	elseif not autorunbl then
-		Utility::WriteBind(curfile,$SoD->{'Back'},ini.up.dow.forw.bacx.lef.rig.ml.toggle.bindload)
-	else
-		local move
-		if $t->{'S'}==1 then
-			move = "$$forward 1$$backward 0"
-		else
-			move = "$$forward 0$$backward 1"
-			bindload = autorunbl.$t->{'space'}.$t->{'X'}.$t->{'W'}.(1-$t->{'S'}).$t->{'A'}.$t->{'D'}.".txt"
-		end
-		Utility::WriteBind(curfile,$SoD->{'Back'},ini.up.dow.move.lef.rig.$t->{'mlon'}.bindload)
-	end
-end
-
-function sodLeftKey(t,bl,curfile,SoD,mobile,stationary,flight,autorun,followbl,bo,$sssj)
-	local ml
-	local up, dow, forw, bac, lefx, rig = $t->{'up'}, $t->{'dow'}, $t->{'forw'}, $t->{'bac'}, $t->{'lefx'}, $t->{'rig'}
-	local toggle=""
-	local toggleon
-	local toggleoff
-	local actkeys = $t->{'totalkeys'}
-	if bo == "bo" then up = "$$up 1" dow = "$$down 0" end
-	if bo == "sd" then up = "$$up 0" dow = "$$down 1" end
-
-	if mobile == "Group Fly" then mobile = nil end
-	if stationary == "Group Fly" then stationary = nil end
-
-	if flight == "Jump" then
-		dow = "$$down 0"
-		actkeys = $t->{'jkeys'}
-		if $t->{'totalkeys'} == 1 and $t->{'A'} == 1 then up="$$up 0" else up="$$up 1" end
-		if $t->{'X'} == 1 then up="$$up 0" end
-	end
-
-	toggleon = mobile
-	if $t->{'totalkeys'} == 0 then
-		ml = $t->{'mlon'}
-		toggleon = mobile
-		if not mobile and mobile eq stationary  then
-			toggleoff = stationary
-		end
-	end
-		
-	if $t->{'totalkeys'} == 1 and $t->{'A'} == 1 then
-		ml = $t->{'mloff'}
-	end
-		
-	if not flight then
-		if $t->{'horizkeys'} == 1 and $t->{'A'} == 1 then
-			if not stationary and mobile eq stationary  then
-				toggleoff = mobile
-			end
-			toggleon = stationary
-		end
-	else
-		if $t->{'totalkeys'} == 1 and $t->{'A'} == 1 then
-			if not stationary and mobile eq stationary  then
-				toggleoff = mobile
-			end
-			toggleon = stationary
-		end
-	end
-
-	if $sssj and $t->{'space'} == 1 then #  if we are jumping with SS+SJ mode enabled
-		toggleon = $sssj
-		toggleoff = mobile
-	end
-	
-	if toggleon or toggleoff then
-		toggle = actPower(nil,true,$toggleon,$toggleoff)
-	end
-
-	bindload = bl.$t->{'space'}.$t->{'X'}.$t->{'W'}.$t->{'S'}.(1-$t->{'A'}).$t->{'D'}.".txt"
-	ml = ml or ""
-
-	local ini = "+down"
-	if $t->{'A'} == 1 then
-		ini = "-down"
-	end
-
-	if followbl then
-		if $t->{'A'}==1 then
-			move = ini
-		else
-			bindload = followbl.$t->{'space'}.$t->{'X'}.$t->{'W'}.$t->{'S'}.(1-$t->{'A'}).$t->{'D'}.".txt"
-			move = ini.up.dow.forw.bac.lefx.rig
-		end
-		Utility::WriteBind(curfile,$SoD->{'Left'},move.bindload)
-	elseif not autorun then
-		Utility::WriteBind(curfile,$SoD->{'Left'},ini.up.dow.forw.bac.lefx.rig.ml.toggle.bindload)
-	else
-		Utility::WriteBind(curfile,$SoD->{'Left'},ini.up.dow."$$backward 0".lefx.rig.$t->{'mlon'}.bindload)
-	end
-end
-
-function sodRightKey(t,bl,curfile,SoD,mobile,stationary,flight,autorun,followbl,bo,$sssj)
-	local ml
-	local up, dow, forw, bac, lef, rigx = $t->{'up'}, $t->{'dow'}, $t->{'forw'}, $t->{'bac'}, $t->{'lef'}, $t->{'rigx'}
-	local toggle=""
-	local toggleon
-	local toggleoff
-	local actkeys = $t->{'totalkeys'}
-	if bo == "bo" then up = "$$up 1" dow = "$$down 0" end
-	if bo == "sd" then up = "$$up 0" dow = "$$down 1" end
-
-	if mobile == "Group Fly" then mobile = nil end
-	if stationary == "Group Fly" then stationary = nil end
-
-	if flight == "Jump" then
-		dow = "$$down 0"
-		actkeys = $t->{'jkeys'}
-		if $t->{'totalkeys'} == 1 and $t->{'D'} == 1 then up="$$up 0" else up="$$up 1" end
-		if $t->{'X'} == 1 then up="$$up 0" end
-	end
-
-	toggleon = mobile
-	if $t->{'totalkeys'} == 0 then
-		ml = $t->{'mlon'}
-		toggleon = mobile
-		if not mobile and mobile eq stationary  then
-			toggleoff = stationary
-		end
-	end
-		
-	if $t->{'totalkeys'} == 1 and $t->{'D'} == 1 then
-		ml = $t->{'mloff'}
-	end
-		
-	if not flight then
-		if $t->{'horizkeys'} == 1 and $t->{'D'} == 1 then
-			if not stationary and mobile eq stationary  then
-				toggleoff = mobile
-			end
-			toggleon = stationary
-		end
-	else
-		if $t->{'totalkeys'} == 1 and $t->{'D'} == 1 then
-			if not stationary and mobile eq stationary  then
-				toggleoff = mobile
-			end
-			toggleon = stationary
-		end
-	end
-
-	if $sssj and $t->{'space'} == 1 then #  if we are jumping with SS+SJ mode enabled
-		toggleon = $sssj
-		toggleoff = mobile
-	end
-	
-	if toggleon or toggleoff then
-		toggle = actPower(nil,true,$toggleon,$toggleoff)
-	end
-
-	bindload = bl.$t->{'space'}.$t->{'X'}.$t->{'W'}.$t->{'S'}.$t->{'A'}.(1-$t->{'D'}).".txt"
-	ml = ml or ""
-
-	local ini = "+down"
-	if $t->{'D'} == 1 then
-		ini = "-down"
-	end
-
-	if followbl then
-		if $t->{'D'}==1 then
-			move = ini
-		else
-			bindload = followbl.$t->{'space'}.$t->{'X'}.$t->{'W'}.$t->{'S'}.$t->{'A'}.(1-$t->{'D'}).".txt"
-			move = ini.up.dow.forw.bac.lef.rigx
-		end
-		Utility::WriteBind(curfile,$SoD->{'Right'},move.bindload)
-	elseif not autorun then
-		Utility::WriteBind(curfile,$SoD->{'Right'},ini.up.dow.forw.bac.lef.rigx.ml.toggle.bindload)
-	else
-		Utility::WriteBind(curfile,$SoD->{'Right'},ini.up.dow."$$forward 1$$backward 0".lef.rigx.$t->{'mlon'}.bindload)
-	end
-end
-
-function sodAutoRunKey(t,bl,curfile,SoD,mobile,$sssj)
-	local bindload
-	bindload = bl.$t->{'space'}.$t->{'X'}.$t->{'W'}.$t->{'S'}.$t->{'A'}.$t->{'D'}.".txt"
-	if $sssj and $t->{'space'} == 1 then
-		Utility::WriteBind(curfile,$SoD->{'AutoRunKey'},'forward 1$$backward 0'.$t->{'up'}.$t->{'dow'}.$t->{'lef'}.$t->{'rig'}.$t->{'mlon'}.actPower(nil,true,$sssj,mobile).bindload)
-	else
-		Utility::WriteBind(curfile,$SoD->{'AutoRunKey'},'forward 1$$backward 0'.$t->{'up'}.$t->{'dow'}.$t->{'lef'}.$t->{'rig'}.$t->{'mlon'}.actPower(nil,true,mobile).bindload)
-	end
-end
-
-function sodAutoRunOffKey(t,bl,curfile,SoD,mobile,stationary,flight,$sssj)
-	local toggleon=""
-	local toggleoff
-	if $sssj and $t->{'space'} == 1 then toggleoff = mobile mobile = $sssj end
-	if not flight and not $sssj then
-		if $t->{'horizkeys'} > 0 then
-			toggleon=$t->{'mlon'}.actPower(nil,true,mobile)
-		else
-			toggleon=$t->{'mloff'}.actPower(nil,true,stationary,mobile)
-		end
-	elseif $sssj then
-		if $t->{'horizkeys'} > 0 or $t->{'space'} == 1 then
-			toggleon=$t->{'mlon'}.actPower(nil,true,mobile,$toggleoff)
-		else
-			toggleon=$t->{'mloff'}.actPower(nil,true,stationary,mobile,$toggleoff)
-		end
-	else
-		if $t->{'totalkeys'} > 0 then
-			toggleon=$t->{'mlon'}.actPower(nil,true,mobile)
-		else
-			toggleon=$t->{'mloff'}.actPower(nil,true,stationary,mobile)
-		end
-	end
-	bindload = bl.$t->{'space'}.$t->{'X'}.$t->{'W'}.$t->{'S'}.$t->{'A'}.$t->{'D'}.".txt"
-	Utility::WriteBind(curfile,$SoD->{'AutoRunKey'},$t->{'up'}.$t->{'dow'}.$t->{'forw'}.$t->{'bac'}.$t->{'lef'}.$t->{'rig'}.toggleon.bindload)
-end
-
-function sodFollowKey(t,bl,curfile,SoD,mobile)
-	Utility::WriteBind(curfile,$SoD->{'FollowKey'},'follow'.actPower(nil,true,mobile).bl.$t->{'space'}.$t->{'X'}.$t->{'W'}.$t->{'S'}.$t->{'A'}.$t->{'D'}.'.txt')
-end
-
-function sodFollowOffKey(t,bl,curfile,SoD,mobile,stationary,flight)
-	local toggle = ""
-	if not flight then
-		if $t->{'horizkeys'}==0 then
-			if stationary eq mobile then
-				toggle = actPower(nil,true,stationary,mobile)
-			else
-				toggle = actPower(nil,true,stationary)
-			end
-		end
-	else
-		if $t->{'totalkeys'}==0 then
-			if stationary eq mobile then
-				toggle = actPower(nil,true,stationary,mobile)
-			else
-				toggle = actPower(nil,true,stationary)
-			end
-		end
-	end
-	Utility::WriteBind(curfile,$SoD->{'FollowKey'},"follow".toggle.$t->{'up'}.$t->{'dow'}.$t->{'forw'}.$t->{'bac'}.$t->{'lef'}.$t->{'rig'}.bl.$t->{'space'}.$t->{'X'}.$t->{'W'}.$t->{'S'}.$t->{'A'}.$t->{'D'}.".txt")
-end
-
-function module.bindisused(profile)
-	if $profile->{'SoD'} == nil then return nil end
-	return profile.$SoD->{'enable'}
-end
-
-1;
