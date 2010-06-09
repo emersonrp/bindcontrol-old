@@ -7,6 +7,7 @@ use About;
 use ProfileTabs;
 use StdDefault;
 
+use Powerbinder;
 use PowerBindCmds;
 
 use BCConstants;
