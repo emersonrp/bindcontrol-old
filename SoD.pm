@@ -2232,226 +2232,231 @@ sub sodFollowOffKey {
 	Utility::WriteBind($curfile,$SoD->{'FollowKey'},"follow".$toggle.$t->{'up'}.$t->{'dow'}.$t->{'forw'}.$t->{'bac'}.$t->{'lef'}.$t->{'rig'}.$bl.$t->{'space'}.$t->{'X'}.$t->{'W'}.$t->{'S'}.$t->{'A'}.$t->{'D'}.".txt");
 }
 
-1;
-__DATA__
+sub bindisused { 
+	my ($profile) = @_;
+	return if not defined $profile->{'SoD'};
+	my $SoD = $profile->{'SoD'};
+	return $profile->{$SoD->{'enable'}};
+}
 
+sub findconflicts {
+	my ($profile) = @_;
+	my $SoD = $profile->{'SoD'};
+	cbCheckConflict($SoD,"Up","Up Key");
+	cbCheckConflict($SoD,"Down","Down Key");
+	cbCheckConflict($SoD,"Forward","Forward Key");
+	cbCheckConflict($SoD,"Back","Back Key");
+	cbCheckConflict($SoD,"Left","Strafe Left Key");
+	cbCheckConflict($SoD,"Right","Strafe Right Key");
+	cbCheckConflict($SoD,"TLeft","Turn Left Key");
+	cbCheckConflict($SoD,"TRight","Turn Right Key");
+	cbCheckConflict($SoD,"AutoRunKey","AutoRun Key");
+	cbCheckConflict($SoD,"FollowKey","Follow Key");
 
-function module.bindisused(profile)
-	if $profile->{'SoD'} == nil then return nil end
-	return profile.$SoD->{'enable'}
-end
-
-function module.findconflicts(profile)
-	local SoD = $profile->{'SoD'}
-	cbCheckConflict(SoD,"Up","Up Key")
-	cbCheckConflict(SoD,"Down","Down Key")
-	cbCheckConflict(SoD,"Forward","Forward Key")
-	cbCheckConflict(SoD,"Back","Back Key")
-	cbCheckConflict(SoD,"Left","Strafe Left Key")
-	cbCheckConflict(SoD,"Right","Strafe Right Key")
-	cbCheckConflict(SoD,"TLeft","Turn Left Key")
-	cbCheckConflict(SoD,"TRight","Turn Right Key")
-	cbCheckConflict(SoD,"AutoRunKey","AutoRun Key")
-	cbCheckConflict(SoD,"FollowKey","Follow Key")
-	if ($SoD->{'NonSoD'}) { cbCheckConflict(SoD,"NonSoDModeKey","NonSoD Key") }
-	if ($SoD->{'Base'}) { cbCheckConflict(SoD,"BaseModeKey","Sprint Mode Key") }
-	if ($SoD->{'SS'}->{'SS'}) { cbCheckConflict(SoD,"RunModeKey","Speed Mode Key") }
-	if ($SoD->{'Jump'}->{'CJ'} or $SoD->{'Jump'}->{'SJ'}) { cbCheckConflict(SoD,"JumpModeKey","Jump Mode Key") }
-	if ($SoD->{'Fly'}->{'Hover'} or $SoD->{'Fly'}->{'Fly'}) { cbCheckConflict(SoD,"FlyModeKey","Fly Mode Key") }
-	if ($SoD->{'Fly'}->{'QFly'} and ($profile->{'archetype'} eq "Peacebringer")) { cbCheckConflict(SoD,"QFlyModeKey","Q.Fly Mode Key") }
+	if ($SoD->{'NonSoD'})          { cbCheckConflict($SoD,"NonSoDModeKey","NonSoD Key") }
+	if ($SoD->{'Base'})            { cbCheckConflict($SoD,"BaseModeKey","Sprint Mode Key") }
+	if ($SoD->{'SS'}->{'SS'})      { cbCheckConflict($SoD,"RunModeKey","Speed Mode Key") }
+	if ($SoD->{'Jump'}->{'CJ'}
+		or $SoD->{'Jump'}->{'SJ'}) { cbCheckConflict($SoD,"JumpModeKey","Jump Mode Key") }
+	if ($SoD->{'Fly'}->{'Hover'}
+		or $SoD->{'Fly'}->{'Fly'}) { cbCheckConflict($SoD,"FlyModeKey","Fly Mode Key") }
+	if ($SoD->{'Fly'}->{'QFly'}
+		and ($profile->{'archetype'} eq "Peacebringer")) { cbCheckConflict($SoD,"QFlyModeKey","Q.Fly Mode Key") }
 	if ($SoD->{'TP'} and $SoD->{'TP'}->{'Enable'}) {
-		cbCheckConflict($SoD->{'TP'},"ComboKey","TP ComboKey")
-		cbCheckConflict($SoD->{'TP'},"ResetKey","TP ResetKey")
-		local TPQuestion = "Teleport Bind"
+		cbCheckConflict($SoD->{'TP'},"ComboKey","TP ComboKey");
+		cbCheckConflict($SoD->{'TP'},"ResetKey","TP ResetKey");
+
+		my $TPQuestion = "Teleport Bind";
 		if ($profile->{'archetype'} eq "Peacebringer") {
-			TPQuestion = "Dwarf Step Bind"
+			$TPQuestion = "Dwarf Step Bind"
 		 } elsif ($profile->{'archetype'} eq "Warshade") {
-			TPQuestion = "Shd/Dwf Step Bind"
+			$TPQuestion = "Shd/Dwf Step Bind"
 		}
-		cbCheckConflict($SoD->{'TP'},"BindKey",TPQuestion)
+		cbCheckConflict($SoD->{'TP'},"BindKey",$TPQuestion)
 	}
-	if ($SoD->{'Fly'}->{'GFly'}) { cbCheckConflict(SoD,"GFlyModeKey","Group Fly Key") }
+	if ($SoD->{'Fly'}->{'GFly'}) { cbCheckConflict($SoD,"GFlyModeKey","Group Fly Key"); }
 	if ($SoD->{'TTP'} and $SoD->{'TTP'}->{'Enable'}) {
-		cbCheckConflict($SoD->{'TTP'},"ComboKey","TTP ComboKey")
-		cbCheckConflict($SoD->{'TTP'},"ResetKey","TTP ResetKey")
-		cbCheckConflict($SoD->{'TTP'},"BindKey","Team TP Bind")
+		cbCheckConflict($SoD->{'TTP'},"ComboKey","TTP ComboKey");
+		cbCheckConflict($SoD->{'TTP'},"ResetKey","TTP ResetKey");
+		cbCheckConflict($SoD->{'TTP'},"BindKey","Team TP Bind");
 	}
 	if ($SoD->{'Temp'} and $SoD->{'Temp'}->{'Enable'}) {
-		cbCheckConflict(SoD,"TempModeKey","Temp Mode Key")
-		cbCheckConflict($SoD->{'Temp'},"TraySwitch","Tray Toggle Key")
+		cbCheckConflict($SoD,"TempModeKey","Temp Mode Key");
+		cbCheckConflict($SoD->{'Temp'},"TraySwitch","Tray Toggle Key");
 	}
-	if ($profile->{'archetype'} eq "Peacebringer") or ($profile->{'archetype'} eq "Warshade")) {
-		if ($Nova and $Nova->{'Enable'}) { cbCheckConflict($Nova,"ModeKey","Nova Form Bind") }
+
+# XXX XXX XXX
+my ($Nova, $Dwarf);  # where are these supposed to come from?
+# XXX XXX XXX
+
+	if (($profile->{'archetype'} eq "Peacebringer") or ($profile->{'archetype'} eq "Warshade")) {
+		if ($Nova  and $Nova-> {'Enable'}) { cbCheckConflict($Nova,"ModeKey", "Nova Form Bind") }
 		if ($Dwarf and $Dwarf->{'Enable'}) { cbCheckConflict($Dwarf,"ModeKey","Dwarf Form Bind") }
 	}
-end
-
-
+}
 
 #  toggleon variation
-function actPower_toggle(start,unq,on,..)
-	local s = ""
-	local traytest = ""
-	if type(on) == "table" then
+sub actPower_toggle {
+	my ($start,$unq,$on,%rest) = @_;
+	my ($s, $traytest,$unq);
+	if (ref $on) {
 		#  deal with power slot stuff..
-		traytest = on.trayslot
-	end
-	unq = nil
-	local offpower = {}
-	for i,v in ipairs(arg) do
-		if type(v) == "table" then
-			for j,w in ipairs(v) do
-				if not (w == "") and not (w == on) and not offpower[w] then
-					if type(w) == "table" then
-						if w.trayslot eq traytest then
-							s = s."$$powexectray ".w.trayslot
-							unq = true
-						end
-					else
-						offpower[w] = true
-						s = s."$$powexectoggleoff ".w
-					end
-				end
-			end
-			if v.trayslot and v.trayslot eq traytest then
-				s = s."$$powexectray ".v.trayslot
-				unq = true
-			end
-		else
-			if not (v == "") and not (w == on) and not offpower[v] then
-				offpower[v] = true
-				s = s."$$powexectoggleoff ".v
-			end
-		end
-	end
-	if unq and not (s == "") then
-		s = s."$$powexecunqueue"
-	end
+		$traytest = $on->{'trayslot'};
+	}
+	my $offpower = {};
+	while (my ($i,$v) = each %rest) {
+		if (ref $v) {
+			while (my ($j, $w) = each %$v) {
+				if ($w and $w ne 'on' and not $offpower->{$w}) {
+					if (ref $w) {
+						if ($w->{'trayslot'} eq $traytest) {
+							$s .= '$$powexectray '.$w->{'trayslot'};
+							$unq = true
+						}
+					} else {
+						$offpower->{'w'} = true;
+						$s .= '$$powexectoggleoff ' . $w
+					}
+				}
+			}
+			if ($v->{'trayslo'} and $v->{'trayslot'} eq $traytest) {
+				$s = $s . '$$powexectray ' . $v->{'trayslot'};
+				$unq = true;
+			}
+		} else {
+			if ($v and ($v ne 'on') and not $offpower->{$v}) {
+				$offpower->{$v} = true;
+				$s .= '$$powexectoggleoff ' . $v;
+			}
+		}
+	}
+	if ($unq and $s) {
+		$s .= '$$powexecunqueue';
+	}
 	# if start then s = string.sub(s,3,string.len(s)) end
-	if on and not (on == "") then
-		if type(on) == "table" then
+	if ($on) {
+		if (ref $on) {
 			#  deal with power slot stuff..
-			s = s."$$powexectray ".on.trayslot."$$powexectray ".on.trayslot
-		else
-			s = s."$$powexectoggleon ".on
-		end
-	end
-	return s
-end
+			$s .= '$$powexectray '.$on->{'trayslot'}.'$$powexectray '.$on->{'trayslot'};
+		} else {
+			$s .= '$$powexectoggleon '.$on;
+		}
+	}
+	return $s;
+}
 
-
-
-function actPower_name(start,unq,on,..)
-	local s = ""
-	local traytest = ""
-	if type(on) == "table" then
+sub actPower_name {
+	my ($start,$unq,$on,%rest) = @_;
+	my ($s, $traytest);
+	if (ref $on) {
 		#  deal with power slot stuff..
-		traytest = on.trayslot
-	end
-	for i,v in ipairs(arg) do
-		if type(v) == "string" then
-			if not (v == "") and v eq on then
-				s = s."$$powexecname ".v
-			end
-		elseif type(v) == "table" then
-			for j,w in ipairs(v) do
-				if not (w == "") and w eq on then
-					if type(w) == "table" then
-						if w.trayslot eq traytest then
-							s = s."$$powexectray ".w.trayslot
-						end
-					else
-						s = s."$$powexecname ".w
-					end
-				end
-			end
-			if v.trayslot and v.trayslot eq traytest then
-				s = s."$$powexectray ".v.trayslot
-			end
-		end
-	end
-	if unq and not (s == "") then
-		s = s."$$powexecunqueue"
-	end
-	if type(on)=="boolean" then error("boolean",2) end
-	if on and on eq "" then
-		if type(on) == "table" then
+		$traytest = $on->{'trayslot'};
+	}
+	while (my (undef,$v) = each %rest) {
+		if (!ref $v) {
+			if ($v and $v ne 'on') {
+				$s .= '$$powexecname ' . $v;
+			}
+		} else { # $v is a ref
+			while (my (undef, $w) = each %$v) {
+				if ($w and $w ne 'on') {
+					if (ref $w) {
+						if ($w->{'trayslot'} eq $traytest) {
+							$s .= '$$powexectray ' . $w->{'trayslot'};
+						}
+					} else {
+						$s .= '$$powexecname ' . $w;
+					}
+				}
+			}
+			if ($v->{'trayslot'} and $v->{'trayslot'} eq $traytest) {
+				$s .= '$$powexectray ' . $v->{'trayslot'};
+			}
+		}
+	}
+	if ($unq and $s) {
+		$s .= '$$powexecunqueue';
+	}
+
+	if ($on and $on ne "") {
+		if (ref $on) {
 			#  deal with power slot stuff..
-			s = s."$$powexectray ".on.trayslot."$$powexectray ".on.trayslot
-		else
-			s = s."$$powexecname ".on."$$powexecname ".on
-		end
-	end
-	if start then s = string.sub(s,3,string.len(s)) end
-	return s
-end
+			$s .= '$$powexectray ' . $on->{'trayslot'} . '$$powexectray ' . $on->{'trayslot'};
+		} else {
+			$s .= '$$powexecname ' . $on . '$$powexecname ' . $on;
+		}
+	}
+	if ($start) { $s = substr $s, 2; }
+	return $s;
+}
 
 #  updated hybrid binds can reduce the space used in SoD Bindfiles by more than 40KB per SoD mode generated
-function actPower_hybrid(start,unq,on,..)
-	local s = ""
-	local traytest = ""
-	if type(on) == "table" then
+sub actPower_hybrid {
+	my ($start,$unq,$on,%rest) = @_;
+	my ($s, $traytest);
+	if (ref $on) {
 		#  deal with power slot stuff..
-		traytest = on.trayslot
-	end
-	for i,v in ipairs(arg) do
-		if type(v) == "string" then
-			if not (v == "") and v eq on then
-				s = s."$$powexecname ".v
-			end
-		elseif type(v) == "table" then
-			for j,w in ipairs(v) do
-				if not (w == "") and w eq on then
-					if type(w) == "table" then
-						if w.trayslot eq traytest then
-							s = s."$$powexectray ".w.trayslot
-						end
-					else
-						s = s."$$powexecname ".w
-					end
-				end
-			end
-			if v.trayslot and v.trayslot eq traytest then
-				s = s."$$powexectray ".v.trayslot
-			end
-		end
-	end
-	if unq and not (s == "") then
-		s = s."$$powexecunqueue"
-	end
-	if type(on)=="boolean" then error("boolean",2) end
-	if on and on eq "" then
-		if type(on) == "table" then
+		$traytest = $on->{'trayslot'};
+	}
+	while (my (undef, $v) = each %rest) {
+		if (!ref $v) {
+			if ($v eq 'on') {
+				$s .= '$$powexecname ' . $v;
+			}
+		 } else {
+			while (my (undef, $w) = each %$v) {
+				if ($w and $w ne 'on') {
+					if (ref $w) {
+						if ($w->{'trayslot'} eq $traytest) {
+							$s .= '$$powexectray ' . $w->{'trayslot'};
+						}
+					 } else {
+						$s .= '$$powexecname ' . $w;
+					}
+				}
+			}
+			if ($v->{'trayslot'} eq $traytest) {
+				$s .= '$$powexectray ' . $v->{'trayslot'};
+			}
+		}
+	}
+	if ($unq and $s) { $s .= '$$powexecunqueue'; }
+
+	if ($on) {
+		if (ref $on) {
 			#  deal with power slot stuff..
-			s = s."$$powexectray ".on.trayslot."$$powexectray ".on.trayslot
-		else
-			s = s."$$powexectoggleon ".on
-		end
-	end
-	if start then s = string.sub(s,3,string.len(s)) end
-	return s
-end
+			$s .= '$$powexectray ' . $on->{'trayslot'} . '$$powexectray ' . $on->{'trayslot'};
+		 } else {
+			$s .= '$$powexectoggleon ' . $on;
+		}
+	}
+	if ($start) { $s = substr $s, 2; }
+	return $s;
+}
 
-local actPower = actPower_name
-# local actPower = actPower_toggle
-function sodJumpFix(profile,$t,key,makeModeKey,suffix,bl,curfile,$turnoff,autofollowmode,feedback)
-	local filename=t["path".autofollowmode."j"].$t->{'space'}.$t->{'X'}.$t->{'W'}.$t->{'S'}.$t->{'A'}.$t->{'D'}.suffix.".txt"
-	local tglfile = cbOpen(filename,"w")
-	$t->{'ini'} = "-down$$"
-	makeModeKey(profile,$t,bl,$tglfile,$turnoff,nil,$true)
-	tglfile:close()
-	Utility::WriteBind(curfile,key,"+down".feedback.actPower(nil,true,$t->{'cjmp'}).'$$bindloadfile '.filename)
-end
+# local actPower = actPower_name;
+# # local actPower = actPower_toggle
+sub sodJumpFix {
+	my ($profile,$t,$key,$makeModeKey,$suffix,$bl,$curfile,$turnoff,$autofollowmode,$feedback) = @_;
 
-function sodSetDownFix(profile,$t,key,makeModeKey,suffix,bl,curfile,$turnoff,autofollowmode,feedback)
-	local pathsuffix = "f"
-	if autofollowmode == "" then pathsuffix = "a" end
+	my $filename = $t->{"path".$autofollowmode."j"}.$t->{'space'}.$t->{'X'}.$t->{'W'}.$t->{'S'}.$t->{'A'}.$t->{'D'}.$suffix.".txt";
+	my $tglfile = cbOpen($filename,"w");
+	$t->{'ini'} = '-down$$';
+	makeModeKey($profile,$t,$bl,$tglfile,$turnoff,nil,true);
+	close $tglfile;
+	Utility::WriteBind($curfile,$key,"+down".$feedback.actPower(nil,true,$t->{'cjmp'}).'$$bindloadfile '.$filename);
+}
+
+sub sodSetDownFix {
+	my ($profile,$t,$key,$makeModeKey,$suffix,$bl,$curfile,$turnoff,$autofollowmode,$feedback) = @_;
+	my $pathsuffix = $autofollowmode ? 'f' : 'a';
 	# iupMessage("",tostring($t->{'space'}).tostring($t->{'X'}).tostring($t->{'W'}).tostring($t->{'S'}).tostring($t->{'A'}).tostring($t->{'D'}).tostring("path".autofollowmode.pathsuffix).tostring(suffix))
-	local filename=t["path".autofollowmode.pathsuffix].$t->{'space'}.$t->{'X'}.$t->{'W'}.$t->{'S'}.$t->{'A'}.$t->{'D'}.suffix.".txt"
-	local tglfile = cbOpen(filename,"w")
-	$t->{'ini'} = "-down$$"
-	makeModeKey(profile,$t,bl,$tglfile,$turnoff,nil,true)
-	tglfile:close()
-	Utility::WriteBind(curfile,key,'+down'.feedback.'$$bindloadfile '.filename)
-end
+	my $filename = $t->{"path".$autofollowmode.$pathsuffix}.$t->{'space'}.$t->{'X'}.$t->{'W'}.$t->{'S'}.$t->{'A'}.$t->{'D'}.$suffix.".txt";
+	my $tglfile = cbOpen($filename,"w");
+	$t->{'ini'} = "-down$$";
+	makeModeKey($profile,$t,$bl,$tglfile,$turnoff,nil,true);
+	close $tglfile;
+	Utility::WriteBind($curfile,$key,'+down'.$feedback.'$$bindloadfile '.$filename);
+}
 
+1;
