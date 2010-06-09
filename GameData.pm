@@ -2499,4 +2499,67 @@ our $MiscPowers = {
 	},
 };
 
+################# TODO Do we need these separately, or can they be deduced from the above?
+
+
+our $ATPrimaries = {
+	{"Archery","Assault Rifle","Electrical Blast","Energy Blast","Fire Blast","Ice Blast","Sonic Attack","Psychic Blast"},
+	{"Dark Melee","Electric Melee","Energy Melee","Fiery Melee","Stone Melee","Super Strength","War Mace","Battle Axe","Dual Blades"},
+	{"Earth Control","Fire Control","Gravity Control","Ice Control","Illusion Control","Mind Control","Plant Control"},
+	{"Assault Rifle","Dark Blast","Energy Blast","Fire Blast","Ice Blast","Radiation Blast","Sonic Attack","Electrical Blast"},
+	{"Dark Miasma","Empathy","Force Field","Kinetics","Radiation Emission","Sonic Resonance","Storm Summoning","Trick Arrow","Cold Domination"},
+	{"Fire Control","Gravity Control","Ice Control","Mind Control","Plant Control","Earth Control"},
+	{"Mercenaries","Necromancy","Ninjas","Robotics","Thugs"},
+	{"Luminous Blast"},
+	{"Broad Sword","Claws","Dark Melee","Katana","Martial Arts","Spines","Dual Blades","Fiery Melee"},
+	{"Claws","Dark Melee","Energy Melee","Martial Arts","Ninja Blade","Spines","Dual Blades","Electical Melee"},
+	{"Fiery Aura","Ice Armor","Invulnerability","Stone Armor","Willpower","Dark Armor"},
+	{"Umbral Blast"}
+};
+
+our $ATSecondaries = {
+	{"Devices","Electricity Manipulation","Energy Manipulation","Fire Manipulation","Ice Manipulation","Mental Manipulation"},
+	{"Dark Armor","Electric Armor","Energy Aura","Fiery Aura","Invulnerability","Stone Armor","Super Reflexes","Willpower"},
+	{"Empathy","Force Field","Kinetics","Radiation Emission","Sonic Resonance","Storm Summoning","Trick Arrow","Pain Domination","Thermal Radiation"},
+	{"Cold Domination","Dark Miasma","Kinetics","Radiation Emission","Sonic Resonance","Thermal Radiation","Traps"},
+	{"Archery","Dark Blast","Electrical Blast","Energy Blast","Psychic Blast","Radiation Blast","Sonic Attack","Ice Blast"},
+	{"Energy Assault","Fiery Assault","Icy Assault","Psionic Assault","Thorny Assault","Electricity Assault"},
+	{"Dark Miasma","Force Field","Poison","Traps","Trick Arrow","Pain Domination","Storm Summoning"},
+	{"Luminous Aura"},
+	{"Dark Armor","Invulnerability","Regeneration","Super Reflexes","Willpower","Fiery Aura"},
+	{"Dark Armor","Energy Aura","Ninjitsu","Regeneration","Super Reflexes","Willpower","Electric Armor"},
+	{"Battle Axe","Energy Melee","Fiery Melee","Ice Melee","Stone Melee","Super Strength","War Mace","Dark Melee","Dual Blades"},
+	{"Umbral Aura"}
+};
+
+our $ATEpics = {
+	{"Cold Mastery","Electric Mastery","Flame Mastery","Force Mastery","Munitions Mastery"},
+	{"Mace Mastery","Leviathan Mastery","Soul Mastery","Mu Mastery"},
+	{"Fire Mastery","Ice Mastery","Primal Forces","Psionic Mastery","Stone Mastery"},
+	{"Mace Mastery","Leviathan Mastery","Soul Mastery","Mu Mastery"},
+	{"Dark Mastery","Electricity Mastery","Power Mastery","Psychic Mastery"},
+	{"Mace Mastery","Leviathan Mastery","Soul Mastery","Mu Mastery"},
+	{"Mace Mastery","Leviathan Mastery","Soul Mastery","Mu Mastery"},
+	{"Peacebringer Inherents"},
+	{"Body Mastery","Darkness Mastery","Weapon Mastery"},
+	{"Mace Mastery","Leviathan Mastery","Soul Mastery","Mu Mastery"},
+	{"Arctic Mastery","Earth Mastery","Energy Mastery","Pyre Mastery"},
+	{"Warshade Inherents"}
+};
+
+our $ATGeneral = {
+	{"None","Concealment","Fighting","Fitness","Flight","Leadership","Leaping","Medicine","Presence","Speed","Teleportation"},
+	{"None","Concealment","Fighting","Fitness","Flight","Leadership","Leaping","Medicine","Presence","Speed","Teleportation"},
+	{"None","Concealment","Fighting","Fitness","Flight","Leadership","Leaping","Medicine","Presence","Speed","Teleportation"},
+	{"None","Concealment","Fighting","Fitness","Flight","Leadership","Leaping","Medicine","Presence","Speed","Teleportation"},
+	{"None","Concealment","Fighting","Fitness","Flight","Leadership","Leaping","Medicine","Presence","Speed","Teleportation"},
+	{"None","Concealment","Fighting","Fitness","Flight","Leadership","Leaping","Medicine","Presence","Speed","Teleportation"},
+	{"None","Concealment","Fighting","Fitness","Flight","Leadership","Leaping","Medicine","Presence","Speed","Teleportation"},
+	{"None","Concealment","Fighting","Fitness","Leadership","Leaping","Medicine","Presence","Speed"},
+	{"None","Concealment","Fighting","Fitness","Flight","Leadership","Leaping","Medicine","Presence","Speed","Teleportation"},
+	{"None","Concealment","Fighting","Fitness","Flight","Leadership","Leaping","Medicine","Presence","Speed","Teleportation"},
+	{"None","Concealment","Fighting","Fitness","Flight","Leadership","Leaping","Medicine","Presence","Speed","Teleportation"},
+	{"None","Concealment","Fighting","Fitness","Leadership","Leaping","Medicine","Presence","Speed"},
+};
+
 1;
