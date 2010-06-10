@@ -144,5 +144,4 @@ sub bindisused {
 	return (scalar @{$profile->{'sbinds'}} > 0);
 }
 
-# cbAddModule(module,"Simple Binds","General")
 1;

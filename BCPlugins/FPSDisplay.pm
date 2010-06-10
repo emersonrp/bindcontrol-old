@@ -47,6 +47,4 @@ sub bindisused {
 	return $profile->{'fps'} ? $profile->{'fps'}->{'enable'} : undef;
 }
 
-# cbAddModule(module,"FPS Display Toggle","Net")
-
 1;

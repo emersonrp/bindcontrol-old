@@ -9,13 +9,8 @@ sub new {
 	return bless {}, $class;
 }
 
-# override this in your own plugin
-sub init {
-	my $self = shift;
-	print STDERR "new $self here\n";
-}
-
-# ditto
+# plugins will want to override this method.
+# it needs to return a wxPanel to pack into a notebook tab, and the title of the tab
 sub tab {
 	my ($self, $parent) = @_;
 

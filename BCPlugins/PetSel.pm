@@ -68,8 +68,8 @@ sub makebind {
 	my $petsel = $profile->{'petsel'};
 	cbMakeDirectory("$profile->{'base'}\\petsel");
 	ts2CreateSet($profile->{'petsel'},1,0,$profile->{'resetfile'});
-	for my $size (1,8) {
-		for my $sel (0, $size) {
+	for my $size (1..8) {
+		for my $sel (0..$size) {
 			my $file = cbOpen("$profile.base\\petsel\\$size$sel.txt",'w');
 			ts2CreateSet($profile,$petsel,$size,$sel,$file);
 			close $file;
@@ -92,5 +92,3 @@ sub bindisused {
 }
 
 1;
-
-# cbAddModule(module,"Single Key Pet Selector","Mastermind");
