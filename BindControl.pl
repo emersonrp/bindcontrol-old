@@ -1,7 +1,7 @@
 use strict;
 
-use Wx::Perl::Packager;
 use Data::Dumper;
+use Wx::Perl::Packager;
 
 use About;
 use ProfileTabs;
@@ -9,6 +9,8 @@ use StdDefault;
 
 use Powerbinder;
 use PowerBindCmds;
+
+use BCPlugins;
 
 use BCConstants;
 

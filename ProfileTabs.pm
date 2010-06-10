@@ -12,11 +12,11 @@ use GameData;
 use Profile;
 use General;
 
-use BCModules::InspirationPopper;
-use BCModules::Mastermind;
-use BCModules::PetSel;
-use BCModules::SimpleBinds;
-use BCModules::SoD;
+# use BCModules::InspirationPopper;
+# use BCModules::Mastermind;
+# use BCModules::PetSel;
+# use BCModules::SimpleBinds;
+# use BCModules::SoD;
 
 
 use base 'Wx::Notebook';
