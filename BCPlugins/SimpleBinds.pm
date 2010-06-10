@@ -3,6 +3,7 @@
 use strict;
 
 package BCPlugins::SimpleBinds;
+use parent "BCPlugins";
 
 sub addSBind {
 #	my (sbinds,n,profile) #  this returns an IUP vbox/hbox to be inserted into the SBind Dialog box

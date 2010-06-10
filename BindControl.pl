@@ -3,6 +3,8 @@ use strict;
 use Data::Dumper;
 use Wx::Perl::Packager;
 
+use BCConstants;
+
 use About;
 use ProfileTabs;
 use StdDefault;
@@ -10,14 +12,7 @@ use StdDefault;
 use Powerbinder;
 use PowerBindCmds;
 
-use BCPlugins;
-
-use BCConstants;
-
-my $app = BCApp->new();
-$app->MainLoop;
-
-
+BCApp->new->MainLoop;
 
 ###################
 # Application class
@@ -27,6 +22,7 @@ use base 'Wx::App';
 
 sub OnInit{
 	my $self = shift;
+
 	my $frame = BCMainWindow->new;
 	$frame->Show(1);
 	$self->SetTopWindow($frame);
@@ -50,6 +46,8 @@ use Wx::Event qw(
 
 use base 'Wx::Frame';
 
+use Module::Pluggable require => 1, search_path => 'BCPlugins';
+
 sub new {
 
     my $class = shift;
@@ -62,6 +60,11 @@ sub new {
         [-1 ,-1],      # Use a default size
         # optionally specify a window style here
     );
+
+	for my $plugin ($self->plugins) {
+		my $new = "${plugin}::new";
+		$self->$new;
+	}
 
     # "Profile" Menu
 	my $ProfMenu = Wx::Menu->new();
@@ -128,7 +131,6 @@ sub newProfileWindow {
 		$oldpanel->Destroy();
 	}
 
-
 	my $panel = Wx::Panel->new(
 		$self,
 		PANEL_PROFILETABS,
@@ -138,7 +140,7 @@ sub newProfileWindow {
 	);
 	my $sizer = Wx::BoxSizer->new(Wx::wxVERTICAL);
 
-	my $profileTabs = ProfileTabs->new($panel);
+	my $profileTabs = ProfileTabs->new($panel, $self);
 
 	$sizer->Add ($profileTabs, 1, wxEXPAND | wxALL, 3);
 	$panel->SetSizerAndFit($sizer);

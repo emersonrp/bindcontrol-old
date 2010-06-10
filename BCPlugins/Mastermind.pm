@@ -3,7 +3,7 @@
 use strict;
 
 package BCPlugins::Mastermind;
-
+use parent "BCPlugins";
 
 sub bindsettings {
 	my ($profile) = @_;

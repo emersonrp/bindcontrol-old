@@ -3,6 +3,7 @@
 use strict;
 
 package BCPlugins::FPSDisplay;
+use parent "BCPlugins";
 
 sub bindsettings {
 	my ($profile) = @_;
@@ -13,7 +14,7 @@ sub bindsettings {
 			bindkey => "P",
 		};
 		$profile->{'fps'} = $fps;
-	;
+	}
 	if ($fps->{'dialog'}) {
 #		fps.dialog:show()
 	} else {

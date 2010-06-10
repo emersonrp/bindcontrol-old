@@ -1,8 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
-
 package BCPlugins::InspirationPopper;
+
+use strict;
+use parent "BCPlugins";
 
 sub bindsettings {
 	my ($profile) = @_;

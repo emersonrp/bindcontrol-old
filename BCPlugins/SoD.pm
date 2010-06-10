@@ -3,6 +3,7 @@
 use strict;
 
 package BCPlugins::SoD;
+use parent "BCPlugins";
 
 use BCConstants;
 use Utility;
@@ -81,27 +82,25 @@ use constant KHELD_DWARF_POWERTRAY => 345;
 use constant KHELD_HUMAN_KEY => 346;
 use constant KHELD_HUMAN_POWERTRAY => 347;
 
-use base 'Wx::Panel';
+sub tab {
+	my ($self, $parentwindow) = @_;
 
-sub new {
-	my ($class, $parentwindow) = @_;
-
-	my $self = $class->SUPER::new($parentwindow);
+	my $tab = Wx::Panel->new($parentwindow);
 
 	my $topSizer = Wx::FlexGridSizer->new(0,1,3,3);
 
 	$topSizer->Add(
-		Wx::CheckBox->new( $self, USE_SOD, "Enable Speed On Demand Binds" ),
+		Wx::CheckBox->new( $tab, USE_SOD, "Enable Speed On Demand Binds" ),
 		0,
 		wxALL,
 		10,
 	);
 
-	$self->SetSizer($topSizer);
+	$tab->SetSizer($topSizer);
 
-	EVT_CHECKBOX( $self, USE_SOD, \&FillSoDPanel );
+	EVT_CHECKBOX( $tab, USE_SOD, \&FillSoDPanel );
 
-	return $self;
+	return ($tab, "Speed On Demand");
 }
 
 # is this gonna be right?  scope the various panels here.
