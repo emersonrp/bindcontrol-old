@@ -10,11 +10,13 @@ use Wx::Event qw( EVT_COMBOBOX );
 use BCConstants;
 use GameData;
 use Profile;
-
 use General;
-use InspirationPopper;
-use Mastermind;
-use SoD;
+
+use BCModules::InspirationPopper;
+use BCModules::Mastermind;
+use BCModules::PetSel;
+use BCModules::SimpleBinds;
+use BCModules::SoD;
 
 
 use base 'Wx::Notebook';
@@ -28,8 +30,10 @@ sub new {
 	my $GeneralPanel = General->new($self);
 	$self->AddPage($GeneralPanel, "General");
 
+	# TODO -- iterate modules here, adding pages as they request it.
+
 	# SoD setup
-	my $SpeedOnDemandPanel = SoD->new($self);
+	my $SpeedOnDemandPanel = BCModules::SoD->new($self);
 	$self->AddPage($SpeedOnDemandPanel, "Speed On Demand");
 
 	# Util:  Inspiration, Team target
