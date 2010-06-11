@@ -83,9 +83,9 @@ use constant KHELD_HUMAN_KEY => 346;
 use constant KHELD_HUMAN_POWERTRAY => 347;
 
 sub tab {
-	my ($self, $parentwindow) = @_;
+	my ($self, $parent) = @_;
 
-	my $tab = Wx::Panel->new($parentwindow);
+	my $tab = Wx::Panel->new($parent);
 
 	my $topSizer = Wx::FlexGridSizer->new(0,1,3,3);
 

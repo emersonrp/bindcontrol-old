@@ -117,8 +117,12 @@ sub new {
 	# and apply it before ->Show()
 
 # TODO TODO TODO -- remove this once we actually start making and saving profiles
-newProfileWindow($self);
+	my $sizer = Wx::BoxSizer->new(Wx::wxVERTICAL);
+	my $profWindow = newProfileWindow($self);
+	$sizer->Add($profWindow, 1, wxEXPAND |  wxALL, 3);
+	$self->SetSizerAndFit($sizer);
 # TODO TODO TODO
+
 
 
 	return $self;
@@ -144,6 +148,8 @@ sub newProfileWindow {
 
 	$sizer->Add ($profileTabs, 1, wxEXPAND | wxALL, 3);
 	$panel->SetSizerAndFit($sizer);
+
+	return $panel;
 
 }
 
