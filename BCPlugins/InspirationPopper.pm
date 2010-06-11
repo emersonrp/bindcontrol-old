@@ -111,16 +111,16 @@ sub makebind {
 
 	for my $Insp (sort keys %GameData::Inspirations) {
 
-		my $forwardOrder = join '$$', map { "inspexecname $_" },         @{$GameData::Inspirations{$Insp}};
-		my $reverseOrder = join '$$', map { "inspexecname $_" }, reverse @{$GameData::Inspirations{$Insp}};
+		my $forwardOrder = join '$$', map { "inspexecname $_" }         @{$GameData::Inspirations{$Insp}};
+		my $reverseOrder = join '$$', map { "inspexecname $_" } reverse @{$GameData::Inspirations{$Insp}};
 
-		if ($InspPop->{'Feedback'} {
-			$forwardOrder = cbChatColorOutput($InspPop->{"${Insp}Colors"}    . $Insp . '$$' . $forwardOrder;
-			$reverseOrder = cbChatColorOutput($InspPop->{"Rev${Insp}Colors"} . $Insp . '$$' . $reverseOrder;
+		if ($InspPop->{'Feedback'}) {
+			$forwardOrder = cbChatColorOutput($InspPop->{"${Insp}Colors"})    . $Insp . '$$' . $forwardOrder;
+			$reverseOrder = cbChatColorOutput($InspPop->{"Rev${Insp}Colors"}) . $Insp . '$$' . $reverseOrder;
 		}
 
 		cbWriteBind($resetfile, $InspPop->{"${Insp}Key"},    $forwardOrder) if $InspPop->{'Enable'};
-		cbWriteBind($resetfile, $InspPop->{"$Rev{Insp}Key"}, $reverseOrder) if $InspPop->{'Reverse'};
+		cbWriteBind($resetfile, $InspPop->{"Rev${Insp}Key"}, $reverseOrder) if $InspPop->{'Reverse'};
 	}
 }
 

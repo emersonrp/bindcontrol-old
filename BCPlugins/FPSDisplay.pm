@@ -5,46 +5,62 @@ use strict;
 package BCPlugins::FPSDisplay;
 use parent "BCPlugins";
 
-sub bindsettings {
-	my ($profile) = @_;
-	my $fps = $profile->{'fps'};
-	unless ($fps) {
-		$fps = {
-			enable => undef,
-			bindkey => "P",
+use Wx qw( wxDefaultSize wxDefaultPosition wxID_OK wxID_CANCEL wxID_YES wxID_ANY );
+use Wx qw( wxVERTICAL wxHORIZONTAL wxALL wxLEFT wxRIGHT wxTOP wxBOTTOM wxCENTER wxEXPAND );
+use Wx qw( wxALIGN_RIGHT wxALIGN_BOTTOM wxALIGN_CENTER wxALIGN_CENTER_VERTICAL wxALIGN_CENTER_HORIZONTAL )    ;
+
+use Utility qw(id);
+
+
+
+sub tab {
+
+	my ($self, $parent) = @_;
+
+	my $profile = $Profile::current;
+	my $FPS = $profile->{'FPS'};
+	unless ($FPS) {
+		$FPS = {
+			Enable => undef,
+			Bindkey => "P",
 		};
-		$profile->{'fps'} = $fps;
+		$profile->{'FPS'} = $FPS;
 	}
-	if ($fps->{'dialog'}) {
-#		fps.dialog:show()
-	} else {
-#		cbToolTip("Check this to enable a Frame Per Second and Network Usage Graph Toggle Bind")
-#		local fpsenable = cbCheckBox("Enable FPS and Netgraph Toggle Bind?",fps.enable,cbCheckBoxCB(profile,fps,"enable"))
-#		cbToolTip("Choose the Key Combo to toggle the FPS and Netgraph displays")
-#		local bindhbox = cbBindBox("Bindkey",fps,"bindkey","FPS Display Toggle",profile)
-#		local expimpbtn = cbImportExportButtons(profile,"fps",module.bindsettings,100,nil,100,nil)
-#
-#		local typdlg = iup.dialog{iup.vbox{fpsenable,bindhbox,expimpbtn};title = "Net : FPS Display Toggle",maxbox="NO",resize="NO",mdichild="YES",mdiclient=mdiClient}
-#		cbShowDialog(typdlg,218,10,profile,function(self) fps.dialog = nil end)
-#		fps.dialog = typdlg
-	}
+	my $tab = Wx::Panel->new($parent);
+
+	my $sizer = Wx::BoxSizer->new(wxVERTICAL);
+
+	my $useCB = Wx::CheckBox->new( $tab, id('EnableFPSBind'), 'Enable FPS Binds');
+	$useCB->SetToolTip(Wx::ToolTip->new('Check this to enable the FPS and Netgraph Toggle Binds'));
+	$sizer->Add($useCB, 0, wxALL);
+
+	my $minisizer = Wx::FlexGridSizer->new(0,2,5,5);
+	$minisizer->Add( Wx::StaticText->new($tab, -1, 'Toggle FPS/Netgraph'), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
+	$minisizer->Add( Wx::Button->    new($tab, id('FPSKeySelect'), $FPS->{'Bindkey'}));
+
+	$sizer->Add($minisizer);
+
+	$tab->SetSizerAndFit($sizer);
+
+	return ($tab, 'FPS / Netgraph');
 }
+
 
 sub makebind {
 	my ($profile) = @_;
-	my $fps = $profile->{'fps'};
-	cbWriteBind($profile->{'resetfile'},$fps->{'bindkey'},'++showfps$$++netgraph');
+	my $FPS = $profile->{'FPS'};
+	cbWriteBind($profile->{'resetfile'},$FPS->{'Bindkey'},'++showfps$$++netgraph');
 }
 
 sub findconflicts {
 	my ($profile) = @_;
-	my $fps = $profile->{'fps'};
-	cbCheckConflict($fps,"bindkey","FPS Display Toggle")
+	my $FPS = $profile->{'FPS'};
+	cbCheckConflict($FPS,"Bindkey","FPS Display Toggle")
 }
 
 sub bindisused {
 	my ($profile) = @_;
-	return $profile->{'fps'} ? $profile->{'fps'}->{'enable'} : undef;
+	return $profile->{'FPS'} ? $profile->{'FPS'}->{'Enable'} : undef;
 }
 
 1;
