@@ -11,46 +11,97 @@ use Wx qw( wxALIGN_RIGHT wxALIGN_BOTTOM wxALIGN_CENTER wxALIGN_CENTER_VERTICAL w
 use Wx qw( wxCB_READONLY );
 
 
-sub bindsettings {
-	my ($profile) = @_;
-	my $petaction = $profile->{'petaction'};
-	if (not defined $petaction) {
-		$petaction = {
-			enable => undef,
-			primnumber => 1,
-			primary => "Mercenaries",
-		};
-		$profile->{'petaction'} = $petaction;
-	}
-	$petaction->{'selbgm'} ||= "UNBOUND";
-	$petaction->{'saybg'} ||= "Bodyguarding.";
-	$petaction->{'sayallmethod'} ||= ($petaction->{'selmethod'} or 3);
-	$petaction->{'sayminmethod'} ||= ($petaction->{'selmethod'} or 3);
-	$petaction->{'sayltsmethod'} ||= ($petaction->{'selmethod'} or 3);
-	$petaction->{'saybosmethod'} ||= ($petaction->{'selmethod'} or 3);
-	$petaction->{'saybgmethod'}  ||= ($petaction->{'selmethod'} or 3);
-	$petaction->{'saynbgmethod'} ||= ($petaction->{'selmethod'} or 3);
-	$petaction->{'sayaggmethod'} ||= ($petaction->{'cmdmethod'} or 3);
-	$petaction->{'saydefmethod'} ||= ($petaction->{'cmdmethod'} or 3);
-	$petaction->{'saypasmethod'} ||= ($petaction->{'cmdmethod'} or 3);
-	$petaction->{'sayatkmethod'} ||= ($petaction->{'cmdmethod'} or 3);
-	$petaction->{'sayfolmethod'} ||= ($petaction->{'cmdmethod'} or 3);
-	$petaction->{'saystymethod'} ||= ($petaction->{'cmdmethod'} or 3);
-	$petaction->{'saygomethod'}  ||= ($petaction->{'cmdmethod'} or 3);
-	if ($profile->{'archetype'} eq "Mastermind") {
-		# TODO "GameData::ATPrimaries" can probably be replaced with nice hashes.
-		$petaction->{'primary'} = $Gamedata::ATPrimaries[$profile->{'atnumber'}][$profile->{'primaryset'}];
-		$petaction->{'primnumber'} = $profile->{'primaryset'};
-	} else {
-		$petaction->{'primary'} = "Mercenaries";
-	}
-}
-
 sub tab {
 
 	my ($self, $parent) = @_;
 
 	my $profile = $Profile::current;
+	my $MMP = $profile->{'MastermindPets'};
+
+	unless ($MMP) {
+		$MMP = {
+			Enable => undef,
+
+			PetSelectAll => 'LALT-V',
+			PetSelectAllResponse => 'Orders?',
+			PetSelectAllResponseMethod => 'Petsay',
+
+			PetSelectMinions => 'LALT-Z',
+			PetSelectMinionsResponse => 'Orders?',
+			PetSelectMinionsResponseMethod => 'Petsay',
+
+			PetSelectLieutenants => 'LALT-X',
+			PetSelectLieutenantsResponse => 'Orders?',
+			PetSelectLieutenantsResponseMethod => 'Petsay',
+
+			PetSelectBoss => 'LALT-C',
+			PetSelectBossResponse => 'Orders?',
+			PetSelectBossResponseMethod => 'Petsay',
+
+			PetBodyguard => 'LALT-G',
+			PetBodyguardResponse => 'Bodyguarding.',
+			PetBodyguardResponseMethod => 'Petsay',
+
+			PetAggressive => 'LALT-A',
+			PetAggressiveResponse => 'Kill On Sight.',
+			PetAggressiveResponseMethod => 'Petsay',
+
+			PetDefensive => 'LALT-S',
+			PetDefensiveResponse => 'Return Fire Only.',
+			PetDefensiveResponseMethod => 'Petsay',
+
+			PetPassive => 'LALT-D',
+			PetPassiveResponse => 'At Ease.',
+			PetPassiveResponseMethod => 'Petsay',
+
+			PetAttack => 'LALT-Q',
+			PetAttackResponse => 'Open Fire!',
+			PetAttackResponseMethod => 'Petsay',
+
+			PetFollow => 'LALT-W',
+			PetFollowResponse => 'Falling In.',
+			PetFollowResponseMethod => 'Petsay',
+
+			PetStay => 'LALT-E',
+			PetStayResponse => 'Holding This Position',
+			PetStayResponseMethod => 'Petsay',
+
+			PetGoto => 'LALT-LBUTTON',
+			PetGotoResponse => 'Moving To Checkpoint.',
+			PetGotoResponseMethod => 'Petsay',
+
+			PetBodyguardMode => 1,
+			PetBodyguardAttack => '',
+			PetBodyguardGoto => '',
+
+			PetChatToggle => 'LALT-M',
+			PetSelect1 => 'F1',
+			PetSelect2 => 'F2',
+			PetSelect3 => 'F3',
+			PetSelect4 => 'F4',
+			PetSelect5 => 'F5',
+			PetSelect6 => 'F6',
+
+			Pet1Name => 'Crow T Robot',
+			Pet2Name => 'Tom Servo',
+			Pet3Name => 'Cambot',
+			Pet4Name => 'Gypsy',
+			Pet5Name => 'Mike',
+			Pet6Name => 'Joel',
+
+			Pet2Bodyguard => 1,
+			Pet5Bodyguard => 1,
+
+		};
+		$profile->{'MastermindPets'} = $MMP;
+	}
+	if ($profile->{'Archetype'} eq "Mastermind") {
+		# TODO "GameData::ATPrimaries" can probably be replaced with nice hashes.
+		$MMP->{'Primary'} = $Gamedata::ATPrimaries[$profile->{'atnumber'}][$profile->{'primaryset'}];
+		$MMP->{'Primnumber'} = $profile->{'primaryset'};
+	} else {
+		$MMP->{'Primary'} = "Mercenaries";
+	}
 
 	my $tab = Wx::Panel->new($parent);
 
@@ -65,7 +116,7 @@ sub tab {
 # individual "Bodyguard" checkboxes checked.
 	my $bgCB = Wx::CheckBox->new( $tab, -1, 'Enable Bodyguard Mode Binds');
 	$bgCB->SetToolTip(Wx::ToolTip->new('Check this to enable the Bodyguard Mode Binds'));
-	$bgCB->SetValue($profile->{'PetBodyguardMode'});
+	$bgCB->SetValue($MMP->{'PetBodyguardMode'});
 	$sizer->Add($bgCB, 0, wxALL);
 
 	$sizer->AddSpacer(10);
@@ -75,14 +126,15 @@ sub tab {
 	my $PetCommandKeyRows = Wx::FlexGridSizer->new(0,5,2,2);
 	for my $k (getPetCommandKeyDefinitions()) {
 
-		my $basename = $k->{'basename'};  # all of the fieldnames we look up in the profile are based on this value
+		my $basename = $k->{'basename'};  # all of the fieldnames we look up in the MMP are based on this value
 
 		my $al = Wx::StaticText->new($tab, -1, $k->{'label'});
-		my $ab = Wx::Button->    new($tab, $basename, $profile->{$basename});
+		my $ab = Wx::Button->    new($tab, $basename, $MMP->{$basename});
 
 		my $cl = Wx::StaticText->new($tab, -1, "Response to $k->{'label'}");
-		my $cm = Wx::ComboBox->  new($tab, "${basename}RespPicker", $profile->{"${basename}ResponseMethod"}, wxDefaultPosition, wxDefaultSize, $ChatOptions, wxCB_READONLY);
-		my $cr = Wx::TextCtrl->  new($tab, "${basename}Response",   $profile->{"${basename}Response"});
+		my $cm = Wx::ComboBox->  new($tab, "${basename}RespPicker", $MMP->{"${basename}ResponseMethod"},
+				wxDefaultPosition, wxDefaultSize, $ChatOptions, wxCB_READONLY);
+		my $cr = Wx::TextCtrl->  new($tab, "${basename}Response",   $MMP->{"${basename}Response"});
 
 		my $tip = $k->{'tooltipdetail'};
 		$ab->SetToolTip( Wx::ToolTip->new("Choose the key combo that will $tip"));
@@ -93,7 +145,7 @@ sub tab {
 		$PetCommandKeyRows->Add($ab, 0, wxEXPAND);
 		$PetCommandKeyRows->Add($cl, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
 		$PetCommandKeyRows->Add($cm);
-		$PetCommandKeyRows->Add($cr);
+		$PetCommandKeyRows->Add($cr, 0, wxEXPAND);
 
 	}
 	$sizer->Add($PetCommandKeyRows);
@@ -106,14 +158,14 @@ sub tab {
 	my $PetNames = Wx::FlexGridSizer->new(0,5,5,5);
 	for my $PetID (1..6) {
 
-		my $pn = Wx::TextCtrl->new($tab,  "Pet${PetID}Name", $profile->{"Pet${PetID}Name"});
+		my $pn = Wx::TextCtrl->new($tab,  "Pet${PetID}Name", $MMP->{"Pet${PetID}Name"});
 		$pn->SetToolTip( Wx::ToolTip->new("Specify Pet ${PetID}'s Name for individual selection") );
 
 		my $cb = Wx::CheckBox->new($tab, "Pet${PetID}Bodyguard", "Bodyguard" );
-		$cb->SetValue($profile->{"Pet${PetID}Bodyguard"});
+		$cb->SetValue($MMP->{"Pet${PetID}Bodyguard"});
 		$cb->SetToolTip( Wx::ToolTip->new("Select whether pet $PetID acts as Bodyguard") );
 
-		my $bn = Wx::Button->    new($tab, "PetSelect$PetID", $profile->{"PetSelect$PetID"});
+		my $bn = Wx::Button->    new($tab, "PetSelect$PetID", $MMP->{"PetSelect$PetID"});
 		$bn->SetToolTip( Wx::ToolTip->new("Choose the Key Combo to Select Pet $PetID"));
 
 		$PetNames->Add( Wx::StaticText->new($tab, -1, "Pet ${PetID}'s Name"), 0, wxALIGN_CENTER_VERTICAL);

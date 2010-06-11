@@ -2562,4 +2562,14 @@ our $ATGeneral = {
 	{"None","Concealment","Fighting","Fitness","Leadership","Leaping","Medicine","Presence","Speed"},
 };
 
+our %Inspirations = (
+	Accuracy => ['Insight','Keen Insight','Uncanny Insight'],
+	Health   => ['Respite','Dramatic Improvement','Resurgance'],
+	Damage   => ['Enrage','Focused Rage','Righteous Rage'],
+	Endurance => ['Catch a Breath','Take a Breather','Second Wind'],
+	Defense => ['Luck','Good Luck','Phenominal Luck'],
+	BreakFree => ['Break Free','Emerge','Escape'],
+	ResistDamage => ['Sturdy','Rugged','Robust'],
+);
+
 1;

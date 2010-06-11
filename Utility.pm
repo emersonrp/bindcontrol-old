@@ -1,9 +1,18 @@
 package Utility;
 
 use strict;
+use parent 'Exporter';
 
+our @EXPORT_OK = qw( id );
 
 my ($resetfile1, $resetfile2, $resetkey, $numbinds);
+
+my (%ids, $nextID);
+sub id {
+	my $control = shift;
+	$ids{$control} ||= ++$nextID;
+	return $ids{$control};
+}
 
 sub WriteBind {
 	my ($file,$key,$bindtext) = @_;
@@ -33,6 +42,26 @@ sub WriteBind {
 	# TODO TODO TODO
 	# table.insert(file.binds,{key=key,s=s})
 	$numbinds++;
+}
+
+sub ColorDefault {
+	{
+		border => {
+			r => 0,
+			g => 0,
+			b => 0,
+		},
+		foreground => {
+			r => 0,
+			g => 0,
+			b => 0,
+		},
+		background => {
+			r => 255,
+			g => 255,
+			b => 255,
+		},
+	}
 }
 
 
@@ -904,26 +933,6 @@ function buildColorImage(r,g,b)
 		{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 }, 
 		colors = { r.." "..g.." "..b }
 	}
-end
-
-function cbChatColorInit(t)
-	if not t then
-		t = {}
-		t.enable = nil
-		t.border = {}
-		t.border.r = 0
-		t.border.g = 0
-		t.border.b = 0
-		t.fgcolor = {}
-		t.fgcolor.r = 0
-		t.fgcolor.g = 0
-		t.fgcolor.b = 0
-		t.bgcolor = {}
-		t.bgcolor.r = 255
-		t.bgcolor.g = 255
-		t.bgcolor.b = 255
-	end
-	return t
 end
 
 function cbChatColorOutput(t)
