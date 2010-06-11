@@ -2,15 +2,31 @@ package Profile;
 use strict;
 
 # TODO - make this be like blaster/fire or something adequately generic.
-our $defaults = {
+our $default = {
 	Archetype => 'Scrapper',
 	Origin => "Magic",
 	Primary => 'Martial Arts',
 	Secondary => 'Super Reflexes',
 	Epic => 'Weapon Mastery',
+
+# Mastermind Binds
+	PetSelectAll => 'LALT-V',
+	PetSelectMinion => 'LALT-Z',
+	PetSelectLieutenant => 'LALT-X',
+	PetSelectBoss => 'LALT-C',
+	PetBodyguard => 'LALT-G',
+	PetAggressive => 'LALT-A',
+	PetDefensive => 'LALT-S',
+	PetPassive => 'LALT-D',
+	PetAttack => 'LALT-Q',
+	PetFollow => 'LALT-W',
+	PetStay => 'LALT-E',
+	PetGoto => 'LALT-LBUTTON',
 };
 
-our $current = {};
+# TODO TODO TODO XXX -- eventually "current" should be loaded from a file or something
+our $current = $default;
+# TODO TODO TODO XXX -- eventually "current" should be loaded from a file or something
 
 sub pickArchetype {
 	my ($self, $event) = @_;

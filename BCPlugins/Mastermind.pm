@@ -79,23 +79,8 @@ sub tab {
 
 	my ($self, $parent) = @_;
 
-# XXX this needs to get passed around for realz
-my $profile = {
-	PetSelectAll => 'LALT-V',
-	PetSelectMinion => 'LALT-Z',
-	PetSelectLieutenant => 'LALT-X',
-	PetSelectBoss => 'LALT-C',
-	PetBodyguard => 'LALT-G',
-	PetAggressive => 'LALT-A',
-	PetDefensive => 'LALT-S',
-	PetPassive => 'LALT-D',
-	PetAttack => 'LALT-Q',
-	PetFollow => 'LALT-W',
-	PetStay => 'LALT-E',
-	PetGoto => 'LALT-LBUTTON',
-};
-# XXX this needs to get passed around for realz
-
+	my $profile = $Profile::current || $Profile::default;
+print STDERR Data::Dumper::Dumper $profile;
 	my $tab = Wx::Panel->new($parent);
 
 	my $sizer = Wx::BoxSizer->new(wxVERTICAL);

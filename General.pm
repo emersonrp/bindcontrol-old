@@ -18,11 +18,11 @@ sub new {
 	my ($class, $parentwindow) = @_;
 
 	my $self = $class->SUPER::new($parentwindow);
- 
-	my $a = ($Profile::current->{'Archetype'} ||= $Profile::defaults->{'Archetype'});
-	my $o = ($Profile::current->{'Origin'}    ||= $Profile::defaults->{'Origin'});
-	my $p = ($Profile::current->{'Primary'}   ||= $Profile::defaults->{'Primary'});
-	my $s = ($Profile::current->{'Secondary'} ||= $Profile::defaults->{'Secondary'});
+
+	my $a = $Profile::current->{'Archetype'};
+	my $o = $Profile::current->{'Origin'};
+	my $p = $Profile::current->{'Primary'};
+	my $s = $Profile::current->{'Secondary'};
  
 	my $topSizer = Wx::FlexGridSizer->new(0,3,5,5);
 
