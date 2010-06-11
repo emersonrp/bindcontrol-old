@@ -56,22 +56,13 @@ sub tab {
 
 	my $sizer = Wx::BoxSizer->new(wxVERTICAL);
 
-	$sizer->Add(
-		Wx::StaticText->new(
-			$tab, -1,
-			"The Original Mastermind Control Binds\n" .
-			"were created in CoV Beta by Khaiba\n" .
-			"a.k.a. Sandolphan\n" .
-			"Bodyguard code inspired directly from\n" .
-			"Sandolphan's Bodyguard binds.\n" .
-			"Thugs added by Konoko!\n"), 0, wxALL, 5
-	);
-
 	my $useCB = Wx::CheckBox->new( $tab, -1, 'Enable Mastermind Pet Binds');
 	$useCB->SetToolTip(Wx::ToolTip->new('Check this to enable the Mastermind Pet Action Binds'));
 	$sizer->Add($useCB, 0, wxALL);
 
 # TODO - add checkbox handler to hide/show (enable/disable?) the bodyguard options
+# TODO -- actually, automagically enable/disable these depending on whether any pets have their
+# individual "Bodyguard" checkboxes checked.
 	my $bgCB = Wx::CheckBox->new( $tab, -1, 'Enable Bodyguard Mode Binds');
 	$bgCB->SetToolTip(Wx::ToolTip->new('Check this to enable the Bodyguard Mode Binds'));
 	$bgCB->SetValue($profile->{'PetBodyguardMode'});
@@ -114,18 +105,36 @@ sub tab {
 	# active, or whether we have names, or whatever
 	my $PetNames = Wx::FlexGridSizer->new(0,5,5,5);
 	for my $PetID (1..6) {
-		my $cb = Wx::CheckBox->  new($tab, "Pet${PetID}Bodyguard", "Bodyguard" );
-		$cb->SetValue($profile->{"Pet${PetID}Bodyguard"});
 
-		$PetNames->Add( Wx::StaticText->new($tab, -1, "Pet ${PetID}'s Name"),
-			0, wxALIGN_CENTER_VERTICAL);
-		$PetNames->Add( Wx::TextCtrl->  new($tab, "Pet${PetID}Name", $profile->{"Pet${PetID}Name"}));
+		my $pn = Wx::TextCtrl->new($tab,  "Pet${PetID}Name", $profile->{"Pet${PetID}Name"});
+		$pn->SetToolTip( Wx::ToolTip->new("Specify Pet ${PetID}'s Name for individual selection") );
+
+		my $cb = Wx::CheckBox->new($tab, "Pet${PetID}Bodyguard", "Bodyguard" );
+		$cb->SetValue($profile->{"Pet${PetID}Bodyguard"});
+		$cb->SetToolTip( Wx::ToolTip->new("Select whether pet $PetID acts as Bodyguard") );
+
+		my $bn = Wx::Button->    new($tab, "PetSelect$PetID", $profile->{"PetSelect$PetID"});
+		$bn->SetToolTip( Wx::ToolTip->new("Choose the Key Combo to Select Pet $PetID"));
+
+		$PetNames->Add( Wx::StaticText->new($tab, -1, "Pet ${PetID}'s Name"), 0, wxALIGN_CENTER_VERTICAL);
+		$PetNames->Add( $pn );
 		$PetNames->Add( $cb, 0, wxALIGN_CENTER_VERTICAL);
-		$PetNames->Add( Wx::StaticText->new($tab, -1, "Select Pet $PetID"),
-			0, wxALIGN_CENTER_VERTICAL);
-		$PetNames->Add( Wx::Button->    new($tab, "PetSelect$PetID", $profile->{"PetSelect$PetID"}));
+		$PetNames->Add( Wx::StaticText->new($tab, -1, "Select Pet $PetID"), 0, wxALIGN_CENTER_VERTICAL);
+		$PetNames->Add( $bn );
 	}
 	$sizer->Add($PetNames);
+
+# TODO -- add this stuff to a single "Credits" tab somewhere kthx
+	$sizer->Add(
+		Wx::StaticText->new(
+			$tab, -1,
+			"The Original Mastermind Control Binds\n" .
+			"were created in CoV Beta by Khaiba\n" .
+			"a.k.a. Sandolphan\n" .
+			"Bodyguard code inspired directly from\n" .
+			"Sandolphan's Bodyguard binds.\n" .
+			"Thugs added by Konoko!\n"), 0, wxALL, 5
+	);
 
 	$tab->SetSizerAndFit($sizer);
 
