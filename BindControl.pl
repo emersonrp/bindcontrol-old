@@ -1,9 +1,10 @@
+#!/usr/bin/perl
+
 use strict;
+require 5.012;
 
 use Data::Dumper;
 use Wx::Perl::Packager;
-
-use BCConstants;
 
 use About;
 use ProfileTabs;
@@ -46,6 +47,7 @@ use Wx::Event qw(
 
 use base 'Wx::Frame';
 
+use Utility qw(id);
 use Module::Pluggable require => 1, search_path => 'BCPlugins';
 
 sub new {
@@ -69,29 +71,29 @@ sub new {
     # "Profile" Menu
 	my $ProfMenu = Wx::Menu->new();
 
-	$ProfMenu->Append(MENUITEM_NEWPROF, "New Profile...", "Create a new profile");
-	$ProfMenu->Append(MENUITEM_LOADPROF, "Load Profile...", "Load an existing profile");
-	$ProfMenu->Append(MENUITEM_SAVEPROF, "Save Profile", "Save the current profile");
+	$ProfMenu->Append(id('MENUITEM_NEWPROF'), "New Profile...", "Create a new profile");
+	$ProfMenu->Append(id('MENUITEM_LOADPROF'), "Load Profile...", "Load an existing profile");
+	$ProfMenu->Append(id('MENUITEM_SAVEPROF'), "Save Profile", "Save the current profile");
 	$ProfMenu->AppendSeparator();
-	$ProfMenu->Append(MENUITEM_PREFS, "Preferences...", "Edit Preferences");
-	$ProfMenu->Append(MENUITEM_EXIT, "Exit", "Exit $0");
+	$ProfMenu->Append(id('MENUITEM_PREFS'), "Preferences...", "Edit Preferences");
+	$ProfMenu->Append(id('MENUITEM_EXIT'), "Exit", "Exit $0");
 
-	$ProfMenu->Enable(MENUITEM_SAVEPROF, 0);
-	$ProfMenu->Enable(MENUITEM_LOADPROF, 0);
-	$ProfMenu->Enable(MENUITEM_SAVEPROF, 0);
-	$ProfMenu->Enable(MENUITEM_PREFS, 0);
+	$ProfMenu->Enable(id('MENUITEM_SAVEPROF'), 0);
+	$ProfMenu->Enable(id('MENUITEM_LOADPROF'), 0);
+	$ProfMenu->Enable(id('MENUITEM_SAVEPROF'), 0);
+	$ProfMenu->Enable(id('MENUITEM_PREFS'), 0);
 
 	# "Help" Menu
 	my $HelpMenu = Wx::Menu->new();
 
-	$HelpMenu->Append(MENUITEM_MANUAL,"Manual","User's Manual");
-	$HelpMenu->Append(MENUITEM_FAQ,"FAQ","Frequently Asked Questions");
-	$HelpMenu->Append(MENUITEM_LICENSE,"License Info","");
-	$HelpMenu->Append(MENUITEM_ABOUT,"About","About");
+	$HelpMenu->Append(id('MENUITEM_MANUAL'),"Manual","User's Manual");
+	$HelpMenu->Append(id('MENUITEM_FAQ'),"FAQ","Frequently Asked Questions");
+	$HelpMenu->Append(id('MENUITEM_LICENSE'),"License Info","");
+	$HelpMenu->Append(id('MENUITEM_ABOUT'),"About","About");
 
-	$HelpMenu->Enable(MENUITEM_MANUAL, 0);
-	$HelpMenu->Enable(MENUITEM_FAQ, 0);
-	$HelpMenu->Enable(MENUITEM_LICENSE, 0);
+	$HelpMenu->Enable(id('MENUITEM_MANUAL'), 0);
+	$HelpMenu->Enable(id('MENUITEM_FAQ'), 0);
+	$HelpMenu->Enable(id('MENUITEM_LICENSE'), 0);
 
 	# cram the separate menus into a menubar
 	my $MenuBar = Wx::MenuBar->new();
@@ -102,15 +104,15 @@ sub new {
 	$self->SetMenuBar($MenuBar);
 
 	# MENUBAR EVENTS
-	EVT_MENU( $self, MENUITEM_NEWPROF, \&newProfileWindow );
-	EVT_MENU( $self, MENUITEM_LOADPROF, sub {return 1;} );
-	EVT_MENU( $self, MENUITEM_SAVEPROF, sub {return 1;} );
-	EVT_MENU( $self, MENUITEM_PREFS, sub {return 1;} );
-	EVT_MENU( $self, MENUITEM_EXIT, sub {shift->Close(1)} );
-	EVT_MENU( $self, MENUITEM_MANUAL, sub {return 1;} );
-	EVT_MENU( $self, MENUITEM_FAQ, sub {return 1;} );
-	EVT_MENU( $self, MENUITEM_LICENSE, sub {return 1;} );
-	EVT_MENU( $self, MENUITEM_ABOUT, \&showAboutBox );
+	EVT_MENU( $self, id('MENUITEM_NEWPROF'), \&newProfileWindow );
+	EVT_MENU( $self, id('MENUITEM_LOADPROF'), sub {return 1;} );
+	EVT_MENU( $self, id('MENUITEM_SAVEPROF'), sub {return 1;} );
+	EVT_MENU( $self, id('MENUITEM_PREFS'), sub {return 1;} );
+	EVT_MENU( $self, id('MENUITEM_EXIT'), sub {shift->Close(1)} );
+	EVT_MENU( $self, id('MENUITEM_MANUAL'), sub {return 1;} );
+	EVT_MENU( $self, id('MENUITEM_FAQ'), sub {return 1;} );
+	EVT_MENU( $self, id('MENUITEM_LICENSE'), sub {return 1;} );
+	EVT_MENU( $self, id('MENUITEM_ABOUT'), \&showAboutBox );
 
 
 	# TODO - read in the config for the window (size, location, etc)
@@ -131,13 +133,13 @@ sub new {
 sub newProfileWindow {
 	my $self = shift;
 
-	if (my $oldpanel = Wx::Window::FindWindowById(PANEL_PROFILETABS)) {
+	if (my $oldpanel = Wx::Window::FindWindowById(id('PANEL_PROFILETABS'))) {
 		$oldpanel->Destroy();
 	}
 
 	my $panel = Wx::Panel->new(
 		$self,
-		PANEL_PROFILETABS,
+		id('PANEL_PROFILETABS'),
 		wxDefaultPosition,
 		wxDefaultSize,
 		wxTAB_TRAVERSAL,

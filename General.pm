@@ -11,9 +11,10 @@ use Wx qw(wxVERTICAL wxHORIZONTAL
 );
 use Wx::Event qw( EVT_COMBOBOX );
 
-use BCConstants;
 use GameData;
 use Profile;
+
+use Utility qw(id);
 
 use base 'Wx::Panel';
 
@@ -33,8 +34,7 @@ sub new {
 
 	# Name
 	$topSizer->Add( Wx::StaticText->new( $self, -1, "Name:"), 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT,);
-	#$topSizer->Add( Wx::TextCtrl->new( $self, PROFILE_NAMETEXT, "",), 0, wxALL,) ;
-	my $tc = Wx::TextCtrl->new( $self, PROFILE_NAMETEXT, "",);
+	my $tc = Wx::TextCtrl->new( $self, id('PROFILE_NAMETEXT'), "",);
 	# TODO -- suss out what we want the min size to be, and set it someplace sane.
 	$tc->SetMinSize([300,-1]);
 	$topSizer->Add( $tc, 0, wxALL,) ;
@@ -42,7 +42,7 @@ sub new {
 	# Archetype
 	$topSizer->Add( Wx::StaticText->new( $self, -1, "Archetype:"), 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT,);
 	$topSizer->Add( Wx::BitmapComboBox->new(
-			$self, PICKER_ARCHETYPE, '',
+			$self, id('PICKER_ARCHETYPE'), '',
 			wxDefaultPosition, wxDefaultSize,
 			[sort keys %$GameData::Archetypes],
 			wxCB_READONLY,
@@ -51,7 +51,7 @@ sub new {
 	# Origin
 	$topSizer->Add( Wx::StaticText->new( $self, -1, "Origin:"), 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT,); 
 	$topSizer->Add( Wx::BitmapComboBox->new(
-			$self, PICKER_ORIGIN, '',
+			$self, id('PICKER_ORIGIN'), '',
 			wxDefaultPosition, wxDefaultSize,
 			[@GameData::Origins],
 			wxCB_READONLY,
@@ -60,7 +60,7 @@ sub new {
 	# Primary
 	$topSizer->Add( Wx::StaticText->new( $self, -1, "Primary Powerset:"), 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT,);
  	$topSizer->Add( Wx::BitmapComboBox->new(
- 			$self, PICKER_PRIMARY, '',
+ 			$self, id('PICKER_PRIMARY'), '',
 			wxDefaultPosition, wxDefaultSize,
  			[sort keys %{$GameData::PowerSets->{$a}->{'Primary'}}],
 			wxCB_READONLY,
@@ -69,7 +69,7 @@ sub new {
 	# Secondary
 	$topSizer->Add( Wx::StaticText->new( $self, -1, "Secondary Powerset:"), 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT,);
  	$topSizer->Add( Wx::BitmapComboBox->new(
- 			$self, PICKER_SECONDARY, '',
+ 			$self, id('PICKER_SECONDARY'), '',
 			wxDefaultPosition, wxDefaultSize,
  			[sort keys %{$GameData::PowerSets->{$a}->{'Secondary'}}],
 			wxCB_READONLY,
@@ -87,10 +87,10 @@ sub new {
 
 	$self->SetSizerAndFit($topSizer);
 
-	EVT_COMBOBOX( $self, PICKER_ARCHETYPE, \&Profile::pickArchetype );
-	EVT_COMBOBOX( $self, PICKER_ORIGIN,    \&Profile::pickOrigin );
-	EVT_COMBOBOX( $self, PICKER_PRIMARY,   \&Profile::pickPrimaryPowerSet );
-	EVT_COMBOBOX( $self, PICKER_SECONDARY, \&Profile::pickSecondaryPowerSet );
+	EVT_COMBOBOX( $self, id('PICKER_ARCHETYPE'), \&Profile::pickArchetype );
+	EVT_COMBOBOX( $self, id('PICKER_ORIGIN'),    \&Profile::pickOrigin );
+	EVT_COMBOBOX( $self, id('PICKER_PRIMARY'),   \&Profile::pickPrimaryPowerSet );
+	EVT_COMBOBOX( $self, id('PICKER_SECONDARY'), \&Profile::pickSecondaryPowerSet );
 
 	Profile::fillPickers();
 

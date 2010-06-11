@@ -7,7 +7,6 @@ use Wx qw(wxVERTICAL wxHORIZONTAL
 		wxTAB_TRAVERSAL wxEXPAND wxCB_READONLY);
 use Wx::Event qw( EVT_COMBOBOX );
 
-use BCConstants;
 use GameData;
 use Profile;
 use General;

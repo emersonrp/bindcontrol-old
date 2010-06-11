@@ -5,8 +5,7 @@ use strict;
 package BCPlugins::SoD;
 use parent "BCPlugins";
 
-use BCConstants;
-use Utility;
+use Utility qw(id);
 use Wx qw(
 	wxALL wxVERTICAL
 	wxDefaultPosition wxDefaultSize wxDefaultValidator
@@ -21,67 +20,6 @@ use Wx::Event qw(
 use constant true => 1;
 use constant nil => undef;
 
-
-use constant USE_SOD => 301;
-
-use constant UP_KEY => 310;
-use constant DOWN_KEY => 311;
-use constant FORWARD_KEY => 312;
-use constant BACK_KEY => 313;
-use constant STRAFE_LEFT_KEY => 314;
-use constant STRAFE_RIGHT_KEY => 315;
-use constant TURN_LEFT_KEY => 316;
-use constant TURN_RIGHT_KEY => 317;
-use constant MOUSECHORD_SOD => 318;
-
-use constant SPRINT_PICKER => 319;
-
-use constant AUTO_MOUSELOOK => 320;
-use constant AUTORUN_KEY => 321;
-use constant FOLLOW_KEY => 322;
-use constant NON_SOD_KEY => 323;
-use constant SPRINT_ONLY_SOD_KEY => 324;
-use constant SPRINT_SOD => 325;
-use constant SOD_TOGGLE_KEY => 326;
-use constant CHANGE_TRAVEL_CAMERA => 327;
-use constant BASE_CAMERA_DISTANCE => 328;
-use constant TRAVEL_CAMERA_DISTANCE => 329;
-use constant CHANGE_TRAVEL_DETAIL => 330;
-use constant BASE_DETAIL_LEVEL => 331;
-use constant TRAVEL_DETAIL_LEVEL => 332;
-use constant DEFAULT_MOVEMENT_MODE => 333;
-use constant HIDE_WINDOWS_TELEPORTING => 334;
-
-
-use constant SEND_SOD_SELF_TELLS => 335;
-use constant SS_KEY => 336;
-use constant SS_ONLY_WHEN_MOVING => 327;
-use constant SS_SJ_MODE => 328;
-
-use constant SJ_KEY => 329;
-use constant SJ_SIMPLE_TOGGLE => 330;
-
-use constant FLY_KEY => 331;
-use constant FLY_GROUPFLY_KEY => 332;
-
-use constant TP_KEY => 333;
-use constant TP_COMBO_KEY => 334;
-use constant TP_RESET_KEY => 335;
-use constant TP_HOVER_WHEN_TP => 336;
-use constant TP_TEAM_COMBO_KEY => 337;
-use constant TP_TEAM_RESET_KEY => 338;
-use constant TP_GROUP_FLY_WHEN_TP_TEAM => 339;
-
-use constant TEMP_KEY => 341;
-use constant TEMP_POWERTRAY => 341;
-
-use constant KHELD_NOVA_KEY => 342;
-use constant KHELD_NOVA_POWERTRAY => 343;
-use constant KHELD_DWARF_KEY => 344;
-use constant KHELD_DWARF_POWERTRAY => 345;
-use constant KHELD_HUMAN_KEY => 346;
-use constant KHELD_HUMAN_POWERTRAY => 347;
-
 sub tab {
 	my ($self, $parent) = @_;
 
@@ -90,7 +28,7 @@ sub tab {
 	my $topSizer = Wx::FlexGridSizer->new(0,1,3,3);
 
 	$topSizer->Add(
-		Wx::CheckBox->new( $tab, USE_SOD, "Enable Speed On Demand Binds" ),
+		Wx::CheckBox->new( $tab, id('USE_SOD'), "Enable Speed On Demand Binds" ),
 		0,
 		wxALL,
 		10,
@@ -98,7 +36,7 @@ sub tab {
 
 	$tab->SetSizer($topSizer);
 
-	EVT_CHECKBOX( $tab, USE_SOD, \&FillSoDPanel );
+	EVT_CHECKBOX( $tab, id('USE_SOD'), \&FillSoDPanel );
 
 	return ($tab, "Speed On Demand");
 }
@@ -120,36 +58,36 @@ sub FillSoDPanel {
 		$generalSizer = Wx::FlexGridSizer->new(0,2,3,3);
 
 		$generalSizer->Add( Wx::StaticText->new($panel, -1, "Up:"), 0, wxALL,);
-		$generalSizer->Add( Wx::TextCtrl->  new($panel, UP_KEY, ""), 0, wxALL,);
+		$generalSizer->Add( Wx::TextCtrl->  new($panel, id('UP_KEY'), ""), 0, wxALL,);
 
 		$generalSizer->Add( Wx::StaticText->new($panel, -1, "Down:"), 0, wxALL,);
-		$generalSizer->Add( Wx::TextCtrl->  new($panel, DOWN_KEY, ""), 0, wxALL,);
+		$generalSizer->Add( Wx::TextCtrl->  new($panel, id('DOWN_KEY'), ""), 0, wxALL,);
 
 		$generalSizer->Add( Wx::StaticText->new($panel, -1, "Forward:"), 0, wxALL,);
-		$generalSizer->Add( Wx::TextCtrl->  new($panel, FORWARD_KEY, ""), 0, wxALL,);
+		$generalSizer->Add( Wx::TextCtrl->  new($panel, id('FORWARD_KEY'), ""), 0, wxALL,);
 
 		$generalSizer->Add( Wx::StaticText->new($panel, -1, "Back:"), 0, wxALL,);
-		$generalSizer->Add( Wx::TextCtrl->  new($panel, BACK_KEY, ""), 0, wxALL,);
+		$generalSizer->Add( Wx::TextCtrl->  new($panel, id('BACK_KEY'), ""), 0, wxALL,);
 
 		$generalSizer->Add( Wx::StaticText->new($panel, -1, "Strafe Left:"), 0, wxALL,);
-		$generalSizer->Add( Wx::TextCtrl->  new($panel, STRAFE_LEFT_KEY, ""), 0, wxALL,);
+		$generalSizer->Add( Wx::TextCtrl->  new($panel, id('STRAFE_LEFT_KEY'), ""), 0, wxALL,);
 
 		$generalSizer->Add( Wx::StaticText->new($panel, -1, "Strafe Right:"), 0, wxALL,);
-		$generalSizer->Add( Wx::TextCtrl->  new($panel, STRAFE_RIGHT_KEY, ""), 0, wxALL,);
+		$generalSizer->Add( Wx::TextCtrl->  new($panel, id('STRAFE_RIGHT_KEY'), ""), 0, wxALL,);
 
 		$generalSizer->Add( Wx::StaticText->new($panel, -1, "Turn Left:"), 0, wxALL,);
-		$generalSizer->Add( Wx::TextCtrl->  new($panel, TURN_LEFT_KEY, ""), 0, wxALL,);
+		$generalSizer->Add( Wx::TextCtrl->  new($panel, id('TURN_LEFT_KEY'), ""), 0, wxALL,);
 
 		$generalSizer->Add( Wx::StaticText->new($panel, -1, "Turn Right:"), 0, wxALL,);
-		$generalSizer->Add( Wx::TextCtrl->  new($panel, TURN_RIGHT_KEY, ""), 0, wxALL,);
+		$generalSizer->Add( Wx::TextCtrl->  new($panel, id('TURN_RIGHT_KEY'), ""), 0, wxALL,);
 
-		$generalSizer->Add( Wx::CheckBox->new($panel, MOUSECHORD_SOD, "Use Mousechord as SoD Forward"), 0, wxALL,);
+		$generalSizer->Add( Wx::CheckBox->new($panel, id('MOUSECHORD_SOD'), "Use Mousechord as SoD Forward"), 0, wxALL,);
 		$generalSizer->AddSpacer(1);
 
 		# TODO!  fill this picker with only the appropriate bits.
 		$generalSizer->Add( Wx::StaticText->new($panel, -1, "Default Movement Mode:"), 0, wxALL,);
 		$generalSizer->Add( Wx::ComboBox->new(
-				$panel, DEFAULT_MOVEMENT_MODE, '',
+				$panel, id('DEFAULT_MOVEMENT_MODE'), '',
 				wxDefaultPosition, wxDefaultSize,
 				['No SoD','Sprint','Super Speed','Jump','Fly'],
 				wxCB_READONLY,
@@ -169,58 +107,58 @@ sub FillSoDPanel {
 
 		$sprintSizer->Add( Wx::StaticText->new($panel, -1, "Sprint Power:"), 0, wxALL,);
 		$sprintSizer->Add( Wx::ComboBox->new(
-				$panel, SPRINT_PICKER, '',
+				$panel, id('SPRINT_PICKER'), '',
 				wxDefaultPosition, wxDefaultSize,
 				[@Profile::SprintPowers],
 				wxCB_READONLY,
 			), 0, wxALL,);
 
-		$sprintSizer->Add( Wx::CheckBox->new($panel, AUTO_MOUSELOOK, "Automatically Mouselook When Moving"), 0, wxALL,);
+		$sprintSizer->Add( Wx::CheckBox->new($panel, id('AUTO_MOUSELOOK'), "Automatically Mouselook When Moving"), 0, wxALL,);
 		$sprintSizer->AddSpacer(1);
 
 		# TODO -- decide what to do with this.
 		# $sprintSizer->Add( Wx::CheckBox->new($panel, SPRINT_UNQUEUE, "Exec powexecunqueue"), 0, wxALL,);
 
 		$sprintSizer->Add( Wx::StaticText->new($panel, -1, "Autorun:"), 0, wxALL,);
-		$sprintSizer->Add( Wx::TextCtrl->  new($panel, AUTORUN_KEY, ""), 0, wxALL,);
+		$sprintSizer->Add( Wx::TextCtrl->  new($panel, id('AUTORUN_KEY'), ""), 0, wxALL,);
 
 		$sprintSizer->Add( Wx::StaticText->new($panel, -1, "Follow Target:"), 0, wxALL,);
-		$sprintSizer->Add( Wx::TextCtrl->  new($panel, FOLLOW_KEY, ""), 0, wxALL,);
+		$sprintSizer->Add( Wx::TextCtrl->  new($panel, id('FOLLOW_KEY'), ""), 0, wxALL,);
 
 		$sprintSizer->Add( Wx::StaticText->new($panel, -1, "Non-SoD Mode:"), 0, wxALL,);
-		$sprintSizer->Add( Wx::TextCtrl->  new($panel, NON_SOD_KEY, ""), 0, wxALL,);
+		$sprintSizer->Add( Wx::TextCtrl->  new($panel, id('NON_SOD_KEY'), ""), 0, wxALL,);
 
 		$sprintSizer->Add( Wx::StaticText->new($panel, -1, "Sprint-Only SoD Mode:"), 0, wxALL,);
-		$sprintSizer->Add( Wx::TextCtrl->  new($panel, SPRINT_ONLY_SOD_KEY, ""), 0, wxALL,);
+		$sprintSizer->Add( Wx::TextCtrl->  new($panel, id('SPRINT_ONLY_SOD_KEY'), ""), 0, wxALL,);
 
-		$sprintSizer->Add( Wx::CheckBox->new($panel, SPRINT_SOD, "Enable Sprint SoD"), 0, wxALL,);
+		$sprintSizer->Add( Wx::CheckBox->new($panel, id('SPRINT_SOD'), "Enable Sprint SoD"), 0, wxALL,);
 		$sprintSizer->AddSpacer(1);
 
 		$sprintSizer->Add( Wx::StaticText->new($panel, -1, "SoD Mode Toggle:"), 0, wxALL,);
-		$sprintSizer->Add( Wx::TextCtrl->  new($panel, SOD_TOGGLE_KEY, ""), 0, wxALL,);
+		$sprintSizer->Add( Wx::TextCtrl->  new($panel, id('SOD_TOGGLE_KEY'), ""), 0, wxALL,);
 
-		$sprintSizer->Add( Wx::CheckBox->new($panel, CHANGE_TRAVEL_CAMERA, "Change Camera Distance When Travel Power Active"), 0, wxALL,);
+		$sprintSizer->Add( Wx::CheckBox->new($panel, id('CHANGE_TRAVEL_CAMERA'), "Change Camera Distance When Travel Power Active"), 0, wxALL,);
 		$sprintSizer->AddSpacer(1);
 
 		$sprintSizer->Add( Wx::StaticText->new($panel, -1, "Base Camera Distance:"), 0, wxALL,);
-		$sprintSizer->Add( Wx::TextCtrl->  new($panel, BASE_CAMERA_DISTANCE, ""), 0, wxALL,);
+		$sprintSizer->Add( Wx::TextCtrl->  new($panel, id('BASE_CAMERA_DISTANCE'), ""), 0, wxALL,);
 
 		$sprintSizer->Add( Wx::StaticText->new($panel, -1, "Travelling Camera Distance:"), 0, wxALL,);
-		$sprintSizer->Add( Wx::TextCtrl->  new($panel, TRAVEL_CAMERA_DISTANCE, ""), 0, wxALL,);
+		$sprintSizer->Add( Wx::TextCtrl->  new($panel, id('TRAVEL_CAMERA_DISTANCE'), ""), 0, wxALL,);
 
-		$sprintSizer->Add( Wx::CheckBox->new($panel, CHANGE_TRAVEL_DETAIL, "Change Graphic Detail When Travel Power Active"), 0, wxALL,);
+		$sprintSizer->Add( Wx::CheckBox->new($panel, id('CHANGE_TRAVEL_DETAIL'), "Change Graphic Detail When Travel Power Active"), 0, wxALL,);
 		$sprintSizer->AddSpacer(1);
 
 		$sprintSizer->Add( Wx::StaticText->new($panel, -1, "Base Detail Level:"), 0, wxALL,);
-		$sprintSizer->Add( Wx::TextCtrl->  new($panel, BASE_DETAIL_LEVEL, ""), 0, wxALL,);
+		$sprintSizer->Add( Wx::TextCtrl->  new($panel, id('BASE_DETAIL_LEVEL'), ""), 0, wxALL,);
 
 		$sprintSizer->Add( Wx::StaticText->new($panel, -1, "Travelling Detail Level:"), 0, wxALL,);
-		$sprintSizer->Add( Wx::TextCtrl->  new($panel, TRAVEL_DETAIL_LEVEL, ""), 0, wxALL,);
+		$sprintSizer->Add( Wx::TextCtrl->  new($panel, id('TRAVEL_DETAIL_LEVEL'), ""), 0, wxALL,);
 
-		$sprintSizer->Add( Wx::CheckBox->new($panel, HIDE_WINDOWS_TELEPORTING, "Hide Windows When Teleporting"), 0, wxALL,);
+		$sprintSizer->Add( Wx::CheckBox->new($panel, id('HIDE_WINDOWS_TELEPORTING'), "Hide Windows When Teleporting"), 0, wxALL,);
 		$sprintSizer->AddSpacer(1);
 
-		$sprintSizer->Add( Wx::CheckBox->new($panel, SEND_SOD_SELF_TELLS, "Send Self-Tells When Changing SoD Modes"), 0, wxALL,);
+		$sprintSizer->Add( Wx::CheckBox->new($panel, id('SEND_SOD_SELF_TELLS'), "Send Self-Tells When Changing SoD Modes"), 0, wxALL,);
 		$sprintSizer->AddSpacer(1);
 
 		$overallSizer->Add($sprintSizer);
@@ -246,12 +184,12 @@ sub FillSoDPanel {
 		$superSpeedSizer = Wx::FlexGridSizer->new(0,2,3,3);
 
 		$superSpeedSizer->Add( Wx::StaticText->new($panel, -1, "Toggle Super Speed"), 0, wxALL,);
-		$superSpeedSizer->Add( Wx::TextCtrl->  new($panel, SS_KEY, ""), 0, wxALL,);
+		$superSpeedSizer->Add( Wx::TextCtrl->  new($panel, id('SS_KEY'), ""), 0, wxALL,);
 
-		$superSpeedSizer->Add( Wx::CheckBox->new($panel, SS_ONLY_WHEN_MOVING, "Only Super Speed When Moving"), 0, wxALL,);
+		$superSpeedSizer->Add( Wx::CheckBox->new($panel, id('SS_ONLY_WHEN_MOVING'), "Only Super Speed When Moving"), 0, wxALL,);
 		$superSpeedSizer->AddSpacer(1);
 
-		$superSpeedSizer->Add( Wx::CheckBox->new($panel, SS_SJ_MODE, "Enable Super Speed + Super Jump Mode"), 0, wxALL,);
+		$superSpeedSizer->Add( Wx::CheckBox->new($panel, id('SS_SJ_MODE'), "Enable Super Speed + Super Jump Mode"), 0, wxALL,);
 		$superSpeedSizer->AddSpacer(1);
 
 		$overallSizer->Add($superSpeedSizer);
@@ -265,9 +203,9 @@ sub FillSoDPanel {
 		$superJumpSizer = Wx::FlexGridSizer->new(0,2,3,3);
 
 		$superJumpSizer->Add( Wx::StaticText->new($panel, -1, "Toggle Jump Mode"), 0, wxALL,);
-		$superJumpSizer->Add( Wx::TextCtrl->  new($panel, SJ_KEY, ""), 0, wxALL,);
+		$superJumpSizer->Add( Wx::TextCtrl->  new($panel, id('SJ_KEY'), ""), 0, wxALL,);
 
-		$superJumpSizer->Add( Wx::CheckBox->new($panel, SJ_SIMPLE_TOGGLE, "Use Simple CJ / SJ Mode Toggle"), 0, wxALL,);
+		$superJumpSizer->Add( Wx::CheckBox->new($panel, id('SJ_SIMPLE_TOGGLE'), "Use Simple CJ / SJ Mode Toggle"), 0, wxALL,);
 		$superJumpSizer->AddSpacer(1);
 
 		$overallSizer->Add($superJumpSizer);
@@ -282,10 +220,10 @@ sub FillSoDPanel {
 		$flySizer = Wx::FlexGridSizer->new(0,2,3,3);
 
 		$flySizer->Add( Wx::StaticText->new($panel, -1, "Toggle Fly Mode"), 0, wxALL,);
-		$flySizer->Add( Wx::TextCtrl->  new($panel, FLY_KEY, ""), 0, wxALL,);
+		$flySizer->Add( Wx::TextCtrl->  new($panel, id('FLY_KEY'), ""), 0, wxALL,);
 
 		$flySizer->Add( Wx::StaticText->new($panel, -1, "Toggle Group Fly Mode"), 0, wxALL,);
-		$flySizer->Add( Wx::TextCtrl->  new($panel, FLY_GROUPFLY_KEY, ""), 0, wxALL,);
+		$flySizer->Add( Wx::TextCtrl->  new($panel, id('FLY_GROUPFLY_KEY'), ""), 0, wxALL,);
 
 		$overallSizer->Add($flySizer);
 	}
@@ -302,28 +240,28 @@ sub FillSoDPanel {
 		# if (at == warshade) "Shadow Step / Dwarf Step Key"
 
 		$teleportSizer->Add( Wx::StaticText->new($panel, -1, "$teleportPowerName Combo Key"), 0, wxALL,);
-		$teleportSizer->Add( Wx::TextCtrl->  new($panel, TP_COMBO_KEY, ""), 0, wxALL,);
+		$teleportSizer->Add( Wx::TextCtrl->  new($panel, id('TP_COMBO_KEY'), ""), 0, wxALL,);
 
 		$teleportSizer->Add( Wx::StaticText->new($panel, -1, "$teleportPowerName Reset Key"), 0, wxALL,);
-		$teleportSizer->Add( Wx::TextCtrl->  new($panel, TP_RESET_KEY, ""), 0, wxALL,);
+		$teleportSizer->Add( Wx::TextCtrl->  new($panel, id('TP_RESET_KEY'), ""), 0, wxALL,);
 
 		$teleportSizer->Add( Wx::StaticText->new($panel, -1, "$teleportPowerName Mode"), 0, wxALL,);
-		$teleportSizer->Add( Wx::TextCtrl->  new($panel, TP_KEY, ""), 0, wxALL,);
+		$teleportSizer->Add( Wx::TextCtrl->  new($panel, id('TP_KEY'), ""), 0, wxALL,);
 
 		# if (player has hover): {
-			$teleportSizer->Add( Wx::CheckBox->new($panel, TP_HOVER_WHEN_TP, "Auto-Hover When Teleporting"), 0, wxALL,);
+			$teleportSizer->Add( Wx::CheckBox->new($panel, id('TP_HOVER_WHEN_TP'), "Auto-Hover When Teleporting"), 0, wxALL,);
 			$teleportSizer->AddSpacer(1);
 		# }
 
 		# if (player has team-tp) {
 			$teleportSizer->Add( Wx::StaticText->new($panel, -1, "Team Teleport Combo Key"), 0, wxALL,);
-			$teleportSizer->Add( Wx::TextCtrl->  new($panel, TP_TEAM_COMBO_KEY, ""), 0, wxALL,);
+			$teleportSizer->Add( Wx::TextCtrl->  new($panel, id('TP_TEAM_COMBO_KEY'), ""), 0, wxALL,);
 
 			$teleportSizer->Add( Wx::StaticText->new($panel, -1, "Team Teleport Reset Key"), 0, wxALL,);
-			$teleportSizer->Add( Wx::TextCtrl->  new($panel, TP_TEAM_RESET_KEY, ""), 0, wxALL,);
+			$teleportSizer->Add( Wx::TextCtrl->  new($panel, id('TP_TEAM_RESET_KEY'), ""), 0, wxALL,);
 
 			# if (player has group fly) {
-				$teleportSizer->Add( Wx::CheckBox->new($panel, TP_GROUP_FLY_WHEN_TP_TEAM, "Auto-Group-Fly When Team Teleporting"), 0, wxALL,);
+				$teleportSizer->Add( Wx::CheckBox->new($panel, id('TP_GROUP_FLY_WHEN_TP_TEAM'), "Auto-Group-Fly When Team Teleporting"), 0, wxALL,);
 				$teleportSizer->AddSpacer(1);
 
 			# }
@@ -340,10 +278,10 @@ sub FillSoDPanel {
 
 		# if (temp travel powers exist)?  Should this be "custom"?
 		$tempSizer->Add( Wx::StaticText->new($panel, -1, "Toggle Temp Mode"), 0, wxALL,);
-		$tempSizer->Add( Wx::TextCtrl->  new($panel, TEMP_KEY, ""), 0, wxALL,);
+		$tempSizer->Add( Wx::TextCtrl->  new($panel, id('TEMP_KEY'), ""), 0, wxALL,);
 
 		$tempSizer->Add( Wx::StaticText->new($panel, -1, "Temp Travel Power Tray"), 0, wxALL,);
-		$tempSizer->Add( Wx::TextCtrl->  new($panel, TEMP_POWERTRAY, ""), 0, wxALL,);
+		$tempSizer->Add( Wx::TextCtrl->  new($panel, id('TEMP_POWERTRAY'), ""), 0, wxALL,);
 
 		$overallSizer->Add($tempSizer);
 	}
@@ -355,23 +293,23 @@ sub FillSoDPanel {
 		$kheldianSizer = Wx::FlexGridSizer->new(0,2,3,3);
 
 		$kheldianSizer->Add( Wx::StaticText->new($panel, -1, "Toggle Nova Form"), 0, wxALL,);
-		$kheldianSizer->Add( Wx::TextCtrl->  new($panel, KHELD_NOVA_KEY, ""), 0, wxALL,);
+		$kheldianSizer->Add( Wx::TextCtrl->  new($panel, id('KHELD_NOVA_KEY'), ""), 0, wxALL,);
 
 		$kheldianSizer->Add( Wx::StaticText->new($panel, -1, "Nova Powertray"), 0, wxALL,);
-		$kheldianSizer->Add( Wx::TextCtrl->  new($panel, KHELD_NOVA_POWERTRAY, ""), 0, wxALL,);
+		$kheldianSizer->Add( Wx::TextCtrl->  new($panel, id('KHELD_NOVA_POWERTRAY'), ""), 0, wxALL,);
 
 		$kheldianSizer->Add( Wx::StaticText->new($panel, -1, "Toggle Dwarf Form"), 0, wxALL,);
-		$kheldianSizer->Add( Wx::TextCtrl->  new($panel, KHELD_DWARF_KEY, ""), 0, wxALL,);
+		$kheldianSizer->Add( Wx::TextCtrl->  new($panel, id('KHELD_DWARF_KEY'), ""), 0, wxALL,);
 
 		$kheldianSizer->Add( Wx::StaticText->new($panel, -1, "Dwarf Powertray"), 0, wxALL,);
-		$kheldianSizer->Add( Wx::TextCtrl->  new($panel, KHELD_DWARF_POWERTRAY, ""), 0, wxALL,);
+		$kheldianSizer->Add( Wx::TextCtrl->  new($panel, id('KHELD_DWARF_POWERTRAY'), ""), 0, wxALL,);
 
 		# do we want a key to change directly to human form, instead of toggles?
 		$kheldianSizer->Add( Wx::StaticText->new($panel, -1, "Human Form"), 0, wxALL,);
-		$kheldianSizer->Add( Wx::TextCtrl->  new($panel, KHELD_HUMAN_KEY, ""), 0, wxALL,);
+		$kheldianSizer->Add( Wx::TextCtrl->  new($panel, id('KHELD_HUMAN_KEY'), ""), 0, wxALL,);
 
 		$kheldianSizer->Add( Wx::StaticText->new($panel, -1, "Human Powertray"), 0, wxALL,);
-		$kheldianSizer->Add( Wx::TextCtrl->  new($panel, KHELD_HUMAN_POWERTRAY, ""), 0, wxALL,);
+		$kheldianSizer->Add( Wx::TextCtrl->  new($panel, id('KHELD_HUMAN_POWERTRAY'), ""), 0, wxALL,);
 
 		$overallSizer->Add($kheldianSizer);
 	}
