@@ -24,52 +24,49 @@ sub new {
 	my $p = $Profile::current->{'Primary'};
 	my $s = $Profile::current->{'Secondary'};
  
-	my $topSizer = Wx::FlexGridSizer->new(0,3,5,5);
+	my $topSizer = Wx::FlexGridSizer->new(0,2,5,5);
+
+	my $PAD = 10;
 
 	# Name
-	$topSizer->Add( Wx::StaticText->new( $self, -1, "Name:"), 0, wxALL, 10,);
-	$topSizer->Add( Wx::TextCtrl->new( $self, PROFILE_NAMETEXT, "",), 0, wxALL, 10,) ;
-	$topSizer->AddSpacer(1);
+	$topSizer->Add( Wx::StaticText->new( $self, -1, "Name:"), 0, wxALL, $PAD,);
+	$topSizer->Add( Wx::TextCtrl->new( $self, PROFILE_NAMETEXT, "",), 0, wxALL, $PAD,) ;
 
 	# Archetype
-	$topSizer->Add( Wx::StaticText->new( $self, -1, "Archetype:"), 0, wxALL, 10,);
+	$topSizer->Add( Wx::StaticText->new( $self, -1, "Archetype:"), 0, wxALL, $PAD,);
 	$topSizer->Add( Wx::BitmapComboBox->new(
 			$self, PICKER_ARCHETYPE, '',
 			wxDefaultPosition, wxDefaultSize,
 			[sort keys %$GameData::Archetypes],
 			wxCB_READONLY,
-		), 0, wxALL, 10,);
-	$topSizer->AddSpacer(1);
+		), 0, wxALL, $PAD,);
 
 	# Origin
-	$topSizer->Add( Wx::StaticText->new( $self, -1, "Origin:"), 0, wxALL, 10,); 
+	$topSizer->Add( Wx::StaticText->new( $self, -1, "Origin:"), 0, wxALL, $PAD,); 
 	$topSizer->Add( Wx::BitmapComboBox->new(
 			$self, PICKER_ORIGIN, '',
 			wxDefaultPosition, wxDefaultSize,
 			[@GameData::Origins],
 			wxCB_READONLY,
-		), 0, wxALL, 10,);
-	$topSizer->AddSpacer(1);
+		), 0, wxALL, $PAD,);
 
 	# Primary
-	$topSizer->Add( Wx::StaticText->new( $self, -1, "Primary Powerset:"), 0, wxALL, 10,);
+	$topSizer->Add( Wx::StaticText->new( $self, -1, "Primary Powerset:"), 0, wxALL, $PAD,);
  	$topSizer->Add( Wx::BitmapComboBox->new(
  			$self, PICKER_PRIMARY, '',
 			wxDefaultPosition, wxDefaultSize,
  			[sort keys %{$GameData::PowerSets->{$a}->{'Primary'}}],
 			wxCB_READONLY,
- 		), 0, wxALL, 10,);
-	$topSizer->AddSpacer(1);
+ 		), 0, wxALL, $PAD,);
 
 	# Secondary
-	$topSizer->Add( Wx::StaticText->new( $self, -1, "Secondary Powerset:"), 0, wxALL, 10,);
+	$topSizer->Add( Wx::StaticText->new( $self, -1, "Secondary Powerset:"), 0, wxALL, $PAD,);
  	$topSizer->Add( Wx::BitmapComboBox->new(
  			$self, PICKER_SECONDARY, '',
 			wxDefaultPosition, wxDefaultSize,
  			[sort keys %{$GameData::PowerSets->{$a}->{'Secondary'}}],
 			wxCB_READONLY,
- 		), 0, wxALL, 10,);
-	$topSizer->AddSpacer(1);
+ 		), 0, wxALL, $PAD,);
 
 	$self->SetSizerAndFit($topSizer);
 

@@ -7,7 +7,8 @@ use parent "BCPlugins";
 
 use Wx qw(
 	wxDefaultPosition wxDefaultSize
-	wxALIGN_CENTER wxVERTICAL wxALL wxID_ANY wxEXPAND
+	wxALIGN_CENTER wxHORIZONTAL wxVERTICAL wxALL wxID_ANY wxEXPAND
+	wxCB_READONLY
 );
 
 sub bindsettings {
@@ -16,28 +17,6 @@ sub bindsettings {
 	if (not defined $petaction) {
 		# iup.Message("Notice","Creating Default Pet Action Bindings")
 		$petaction = {
-			selall => "LALT+V",
-			sayall => "Orders?",
-			selmin => "LALT+Z",
-			saymin => "Orders?",
-			sellts => "LALT+X",
-			saylts => "Orders?",
-			selbos => "LALT+C",
-			saybos => "Orders?",
-			setagg => "LALT+A",
-			sayagg => "Kill on Sight.",
-			setdef => "LALT+S",
-			saydef => "Return Fire Only.",
-			setpas => "LALT+D",
-			saypas => "At Ease.",
-			cmdatk => "LALT+Q",
-			sayatk => "Open Fire!",
-			cmdfol => "LALT+W",
-			sayfol => "Falling In.",
-			cmdsty => "LALT+E",
-			saysty => "Holding this Position.",
-			cmdgoto => "LALT+LBUTTON",
-			saygo => "Moving to Checkpoint.",
 			enable => undef,
 			primnumber => 1,
 			primary => "Mercenaries",
@@ -59,13 +38,6 @@ sub bindsettings {
 	$petaction->{'sayfolmethod'} ||= ($petaction->{'cmdmethod'} or 3);
 	$petaction->{'saystymethod'} ||= ($petaction->{'cmdmethod'} or 3);
 	$petaction->{'saygomethod'}  ||= ($petaction->{'cmdmethod'} or 3);
-	$petaction->{'chattykey'} ||= "LALT+M";
-	$petaction->{'sel0'} ||= "F1";
-	$petaction->{'sel1'} ||= "F2";
-	$petaction->{'sel2'} ||= "F3";
-	$petaction->{'sel3'} ||= "F4";
-	$petaction->{'sel4'} ||= "F5";
-	$petaction->{'sel5'} ||= "F6";
 	if ($profile->{'archetype'} eq "Mastermind") {
 		# TODO "GameData::ATPrimaries" can probably be replaced with nice hashes.
 		$petaction->{'primary'} = $Gamedata::ATPrimaries[$profile->{'atnumber'}][$profile->{'primaryset'}];
@@ -79,9 +51,11 @@ sub tab {
 
 	my ($self, $parent) = @_;
 
-	my $profile = $Profile::current || $Profile::default;
-print STDERR Data::Dumper::Dumper $profile;
+	my $profile = $Profile::current;
+
 	my $tab = Wx::Panel->new($parent);
+
+	my $topSizer = Wx::BoxSizer->new(wxHORIZONTAL);
 
 	my $sizer = Wx::BoxSizer->new(wxVERTICAL);
 
@@ -101,206 +75,24 @@ print STDERR Data::Dumper::Dumper $profile;
 	$useCB->SetToolTip(Wx::ToolTip->new('Check this to enable the Mastermind Pet Action Binds'));
 	$sizer->Add($useCB, 0, wxALL);
 
+# TODO - add checkbox handler to hide/show (enable/disable?) the bodyguard options
+	my $bgCB = Wx::CheckBox->new( $tab, -1, 'Enable Bodyguard Mode Binds');
+	$bgCB->SetToolTip(Wx::ToolTip->new('Check this to enable the Bodyguard Mode Binds'));
+	$bgCB->SetValue($profile->{'PetBodyguardMode'});
+	$sizer->Add($bgCB, 0, wxALL);
+
 	$sizer->AddSpacer(10);
 
+	my $PetCommandKeys = Wx::FlexGridSizer->new(0,5,2,2);
 
-	my $PetCommandKeys = Wx::FlexGridSizer->new(0,2,2,2);
+	for my $keydef (getPetCommandKeyDefinitions()) {
+		for my $cell(buildCommandKeyRow($keydef, $tab, $profile)) {
+			$PetCommandKeys->Add($cell);
+		}
+	}
 
-	Layout::AddLabeledKeyBox({
-		parent => $tab,
-		buttonid => wxID_ANY,
-		sizer => $PetCommandKeys,
-		value => $profile->{'PetSelectAll'},
-		tooltip => 'Choose the Key Combo that will select all of your pets',
-		label => 'Select All',
-	});
-
-	Layout::AddLabeledKeyBox({
-		parent => $tab,
-		buttonid => wxID_ANY,
-		sizer => $PetCommandKeys,
-		value => $profile->{'PetSelectMinion'},
-		tooltip => 'Choose the Key Combo that will select your "minion" pets',
-		label => 'Select Minions',
-	});
-
-	Layout::AddLabeledKeyBox({
-		parent => $tab,
-		buttonid => wxID_ANY,
-		sizer => $PetCommandKeys,
-		value => $profile->{'PetSelectLieutenant'},
-		tooltip => 'Choose the Key Combo that will select your "lieutenant" pets',
-		label => 'Select Lieutenants',
-	});
-
-	Layout::AddLabeledKeyBox({
-		parent => $tab,
-		buttonid => wxID_ANY,
-		sizer => $PetCommandKeys,
-		value => $profile->{'PetSelectBoss'},
-		tooltip => 'Choose the Key Combo that will select your "boss" pet',
-		label => 'Select Boss',
-	});
-
-	Layout::AddLabeledKeyBox({
-		parent => $tab,
-		buttonid => wxID_ANY,
-		sizer => $PetCommandKeys,
-		value => $profile->{'PetBodyguard'},
-		tooltip => 'Choose the Key Combo that will put your selected pets into Bodyguard mode',
-		label => 'Bodyguard',
-	});
-
-	Layout::AddLabeledKeyBox({
-		parent => $tab,
-		buttonid => wxID_ANY,
-		sizer => $PetCommandKeys,
-		value => $profile->{'PetAggressive'},
-		tooltip => 'Choose the Key Combo that will set your selected pets to Aggressive mode',
-		label => 'Aggressive',
-	});
-
-	Layout::AddLabeledKeyBox({
-		parent => $tab,
-		buttonid => wxID_ANY,
-		sizer => $PetCommandKeys,
-		value => $profile->{'PetDefensive'},
-		tooltip => 'Choose the Key Combo that will set your selected pets to Defensive mode',
-		label => 'Defensive',
-	});
-
-	Layout::AddLabeledKeyBox({
-		parent => $tab,
-		buttonid => wxID_ANY,
-		sizer => $PetCommandKeys,
-		value => $profile->{'PetPassive'},
-		tooltip => 'Choose the Key Combo that will set your selected pets to Passive mode',
-		label => 'Passive',
-	});
-
-	Layout::AddLabeledKeyBox({
-		parent => $tab,
-		buttonid => wxID_ANY,
-		sizer => $PetCommandKeys,
-		value => $profile->{'PetAttack'},
-		tooltip => 'Choose the Key Combo that will order your selected pets to Attack your target',
-		label => 'Attack',
-	});
-
-	Layout::AddLabeledKeyBox({
-		parent => $tab,
-		buttonid => wxID_ANY,
-		sizer => $PetCommandKeys,
-		value => $profile->{'PetFollow'},
-		tooltip => 'Choose the Key Combo that will order your selected pets to Follow you',
-		label => 'Follow',
-	});
-
-	Layout::AddLabeledKeyBox({
-		parent => $tab,
-		buttonid => wxID_ANY,
-		sizer => $PetCommandKeys,
-		value => $profile->{'PetStay'},
-		tooltip => 'Choose the Key Combo that will order your selected pets to Stay at their current location',
-		label => 'Move',
-	});
-
-	Layout::AddLabeledKeyBox({
-		parent => $tab,
-		buttonid => wxID_ANY,
-		sizer => $PetCommandKeys,
-		value => $profile->{'PetGoto'},
-		tooltip => 'Choose the Key Combo that will order your selected pets to Go To a targeted location',
-		label => 'Goto',
-	});
-
-	$sizer->Add($PetCommandKeys, 0, wxALL);
-
-#   cbToolTip("Choose the Key Combo that will command your Bodyguards to Attack your target")
-#   my $bgcmdatkhbox = cbCheckBind("BG Attack",petaction,"bgatk","bgatkenabled","Pet Order: BG Attack",profile)
-#   cbToolTip("Choose the Key Combo that will command your Bodyguards to Go to a targetted location")
-#   my $bgcmdgotohbox = cbCheckBind("BG Goto",petaction,"bggoto","bggotoenabled","Pet Order: BG Goto",profile)
+	$sizer->Add($PetCommandKeys);
 #
-#   if ($petaction->{'bg_enable'}) {
-#   	petselbghbox.active = "yes";
-#   	bgcmdatkhbox.active = "yes";
-#   	bgcmdgotohbox.active = "yes";
-#   } else {
-#   	petselbghbox.active = "no";
-#   	bgcmdatkhbox.active = "no";
-#   	bgcmdgotohbox.active = "no";
-#   }
-#
-#   my $tempcb = cbCheckBoxCB(profile,petaction,"bg_enable")
-#   cbToolTip("Check this to Enable the Bodyguard mode binds")
-#   my $bguardenable = cbCheckBox("Enable Bodyguard Mode",$petaction->{'bg_enable'},function(_,v)
-#   	tempcb(_,v)
-#   	if (v == 1) {
-#   		petselbghbox.active = "yes";
-#   		bgcmdatkhbox.active = "yes";
-#   		bgcmdgotohbox.active = "yes";
-#   	} else {
-#   		petselbghbox.active = "no";
-#   		bgcmdatkhbox.active = "no";
-#   		bgcmdgotohbox.active = "no";
-#   	}
-#   })
-#   cbToolTip("Choose the Key Combo that will switch from chatty mode to quiet mode")
-#   my $petchattytgl = cbBindBox("Chat Mode Toggle",petaction,"chattykey","Pet Action Bind Chatty Mode Toggle",profile)
-#   my $chatlist = {"Local","Self-Tell","Petsay","None"}
-#   cbToolTip("Choose the Chat Response when selecting all your pets")
-#   my $petsayallhbox = cbListText("Response to Select All",chatlist,$petaction->{'sayallmethod'},$petaction->{'sayall'},
-#   	cbListBoxCB(profile,petaction,"sayallmethod"),
-#   	cbTextBoxCB(profile,petaction,"sayall"))
-#   cbToolTip("Choose the Chat Response when selecting your Tier 1 pets")
-#   my $petsayminhbox = cbListText("Response to Select Minions",chatlist,$petaction->{'sayminmethod'},$petaction->{'saymin'},
-#   	cbListBoxCB(profile,petaction,"sayminmethod"),
-#   	cbTextBoxCB(profile,petaction,"saymin"))
-#   cbToolTip("Choose the Chat Response when selecting your Tier 2 pets")
-#   my $petsayltshbox = cbListText("Response to Select Lts.",chatlist,$petaction->{'sayltsmethod'},$petaction->{'saylts'},
-#   	cbListBoxCB(profile,petaction,"sayltsmethod"),
-#   	cbTextBoxCB(profile,petaction,"saylts"))
-#   cbToolTip("Choose the Chat Response when selecting your Tier 3 pets")
-#   my $petsayboshbox = cbListText("Response to Select Boss",chatlist,$petaction->{'saybosmethod'},$petaction->{'saybos'},
-#   	cbListBoxCB(profile,petaction,"saybosmethod"),
-#   	cbTextBoxCB(profile,petaction,"saybos"))
-#   cbToolTip("Choose the Chat Response used by Bodyguards when entering Bodyguard mode")
-#   my $petsaybghbox = cbListText("Response to BG Mode (BG)",chatlist,$petaction->{'saybgmethod'},$petaction->{'saybg'},
-#   	cbListBoxCB(profile,petaction,"saybgmethod"),
-#   	cbTextBoxCB(profile,petaction,"saybg"))
-#   # cbToolTip("Choose the Chat Response used by non-Bodyguards when entering Bodyguard mode")
-#   # my $petsaynbghbox = cbListText("Response to BG Mode (non-BG)",chatlist,$petaction->{'saynbgmethod'},$petaction->{'saynbg'},
-#   	# cbListBoxCB(profile,petaction,"saynbgmethod"),
-#   	# cbTextBoxCB(profile,petaction,"saynbg"))
-#   cbToolTip("Choose the Chat Response when setting your pets to Aggressive mode")
-#   my $petsayagghbox = cbListText("Response to Set Aggressive",chatlist,$petaction->{'sayaggmethod'},$petaction->{'sayagg'},
-#   	cbListBoxCB(profile,petaction,"sayaggmethod"),
-#   	cbTextBoxCB(profile,petaction,"sayagg"))
-#   cbToolTip("Choose the Chat Response when setting your pets to Defensive mode")
-#   my $petsaydefhbox = cbListText("Response to Set Defensive",chatlist,$petaction->{'saydefmethod'},$petaction->{'saydef'},
-#   	cbListBoxCB(profile,petaction,"saydefmethod"),
-#   	cbTextBoxCB(profile,petaction,"saydef"))
-#   cbToolTip("Choose the Chat Response when setting your pets to Passive mode")
-#   my $petsaypashbox = cbListText("Response to Set Passive",chatlist,$petaction->{'saypasmethod'},$petaction->{'saypas'},
-#   	cbListBoxCB(profile,petaction,"saypasmethod"),
-#   	cbTextBoxCB(profile,petaction,"saypas"))
-#   cbToolTip("Choose the Chat Response when commanding your pets to Attack")
-#   my $petsayatkhbox = cbListText("Response to Attack",chatlist,$petaction->{'sayatkmethod'},$petaction->{'sayatk'},
-#   	cbListBoxCB(profile,petaction,"sayatkmethod"),
-#   	cbTextBoxCB(profile,petaction,"sayatk"))
-#   cbToolTip("Choose the Chat Response when commanding your pets to Follow")
-#   my $petsayfolhbox = cbListText("Response to Follow",chatlist,$petaction->{'sayfolmethod'},$petaction->{'sayfol'},
-#   	cbListBoxCB(profile,petaction,"sayfolmethod"),
-#   	cbTextBoxCB(profile,petaction,"sayfol"))
-#   cbToolTip("Choose the Chat Response when commanding your pets to Stay")
-#   my $petsaystyhbox = cbListText("Response to Stay",chatlist,$petaction->{'saystymethod'},$petaction->{'saysty'},
-#   	cbListBoxCB(profile,petaction,"saystymethod"),
-#   	cbTextBoxCB(profile,petaction,"saysty"))
-#   cbToolTip("Choose the Chat Response when commanding your pets to Goto")
-#   my $petsaygotohbox = cbListText("Response to Goto",chatlist,$petaction->{'saygomethod'},$petaction->{'saygo'},
-#   	cbListBoxCB(profile,petaction,"saygomethod"),
-#   	cbTextBoxCB(profile,petaction,"saygo"))
-#   
 #   #  pet name fields, as well as pet bodyguard status.
 #   my $pet1name = cbToggleText("First Pet's Name (required for pet selection)",$petaction->{'pet1nameenabled'},$petaction->{'pet1name'},
 #   	cbCheckBoxCB(profile,petaction,"pet1nameenabled"),
@@ -365,10 +157,34 @@ print STDERR Data::Dumper::Dumper $profile;
 #   	title = "Mastermind : Henchman Binds",maxbox="NO",resize="NO",mdichild="YES",mdiclient=mdiClient}
 #   cbShowDialog(petactdlg,218,10,profile,function(self) $petaction->{'dialog'} = undef end)
 #   $petaction->{'dialog'} = petactdlg
+	$topSizer->Add($sizer);
 
-	$tab->SetSizerAndFit($sizer);
+	$tab->SetSizerAndFit($topSizer);
 
 	return ($tab, 'Mastermind Pet Binds');
+}
+
+# The ids of the rows and such are in a data structure at the end of the file;  they're passed in here as $k.
+# The current profile is in $p, and we fetch bits out of it as needed, as defined by fields in $k.
+my $ChatOptions = [ qw( Local Self-Tell Petsay None ) ];
+sub buildCommandKeyRow {
+	my ($k, $tab, $p) = @_;
+
+	my $basename = $k->{'basename'};  # all of the fieldnames we look up in the profile are based on this value
+
+	my $al = Wx::StaticText->new($tab, -1, $k->{'actlabel'});
+	my $ab = Wx::Button->    new($tab, $k->{'buttonid'}, $p->{$basename});
+
+	my $cl = Wx::StaticText->new($tab, -1, $k->{'chatlabel'});
+	my $cm = Wx::ComboBox->  new($tab, $k->{'comboid'},    $p->{"${basename}ResponseMethod"}, wxDefaultPosition, wxDefaultSize, $ChatOptions, wxCB_READONLY);
+	my $cr = Wx::TextCtrl->  new($tab, $k->{'textctrlid'}, $p->{"${basename}Response"});
+
+	my $tip = $k->{'tooltipdetail'};
+	$ab->SetToolTip( Wx::ToolTip->new("Choose the key combo that will $tip"));
+	$cm->SetToolTip( Wx::ToolTip->new("Choose the method your pets will use to respond when they are in chatty mode and you $tip"));
+	$cr->SetToolTip( Wx::ToolTip->new("Choose the chat response your pets will give when you $tip"));
+
+	return ($al, $ab, $cl, $cm, $cr);
 }
 
 sub mmBGSelBind {
@@ -1062,6 +878,120 @@ sub bindisused {
 	my ($profile) = @_;
 	if ($profile->{'petaction'} == undef) { return undef; }
 	return $profile->{'petaction'}->{'enable'}
+}
+
+
+sub getPetCommandKeyDefinitions {
+	(
+		{
+			actlabel      => 'Select All',
+			basename      => 'PetSelectAll',
+			chatlabel     => 'Response to Select All',
+			buttonid      => wxID_ANY,
+			comboid       => wxID_ANY,
+			textctrlid    => wxID_ANY,
+			tooltipdetail => 'select all of your pets',
+		},
+		{
+			actlabel      => 'Select Minions',
+			basename      => 'PetSelectMinions',
+			chatlabel     => 'Response to Select Minions',
+			buttonid      => wxID_ANY,
+			comboid       => wxID_ANY,
+			textctrlid    => wxID_ANY,
+			tooltipdetail => 'select your "minion" pets',
+		},
+		{
+			actlabel      => 'Select Lieutenants',
+			basename      => 'PetSelectLieutenants',
+			chatlabel     => 'Response to Select Lieutenants',
+			buttonid      => wxID_ANY,
+			comboid       => wxID_ANY,
+			textctrlid    => wxID_ANY,
+			tooltipdetail => 'select your "lieutenant" pets',
+		},
+		{
+			actlabel      => 'Select Boss',
+			basename      => 'PetSelectBoss',
+			chatlabel     => 'Response to Select Boss',
+			buttonid      => wxID_ANY,
+			comboid       => wxID_ANY,
+			textctrlid    => wxID_ANY,
+			tooltipdetail => 'select your "boss" pet',
+		},
+		{
+			actlabel      => 'Bodyguard',
+			basename      => 'PetBodyguard',
+			chatlabel     => 'Response to Bodyguard',
+			buttonid      => wxID_ANY,
+			comboid       => wxID_ANY,
+			textctrlid    => wxID_ANY,
+			tooltipdetail => 'put your selected pets into Bodyguard mode',
+		},
+		{
+			actlabel      => 'Aggressive',
+			basename      => 'PetAggressive',
+			chatlabel     => 'Response to Set Aggressive',
+			buttonid      => wxID_ANY,
+			comboid       => wxID_ANY,
+			textctrlid    => wxID_ANY,
+			tooltipdetail => 'set your selected pets to "Aggressive" mode',
+		},
+		{
+			actlabel      => 'Defensive',
+			basename      => 'PetDefensive',
+			chatlabel     => 'Response to Set Defensive',
+			buttonid      => wxID_ANY,
+			comboid       => wxID_ANY,
+			textctrlid    => wxID_ANY,
+			tooltipdetail => 'set your selected pets to "Defensive" mode',
+		},
+		{
+			actlabel      => 'Passive',
+			basename      => 'PetPassive',
+			chatlabel     => 'Response to Set Passive',
+			buttonid      => wxID_ANY,
+			comboid       => wxID_ANY,
+			textctrlid    => wxID_ANY,
+			tooltipdetail => 'set your selected pets to "Passive" mode',
+		},
+		{
+			actlabel      => 'Attack',
+			basename      => 'PetAttack',
+			chatlabel     => 'Response to Attack',
+			buttonid      => wxID_ANY,
+			comboid       => wxID_ANY,
+			textctrlid    => wxID_ANY,
+			tooltipdetail => 'order your selected pets to Attack your target',
+		},
+		{
+			actlabel      => 'Follow',
+			basename      => 'PetFollow',
+			chatlabel     => 'Response to Follow',
+			buttonid      => wxID_ANY,
+			comboid       => wxID_ANY,
+			textctrlid    => wxID_ANY,
+			tooltipdetail => 'order your selected pets to Follow you',
+		},
+		{
+			actlabel      => 'Stay',
+			basename      => 'PetStay',
+			chatlabel     => 'Response to Stay',
+			buttonid      => wxID_ANY,
+			comboid       => wxID_ANY,
+			textctrlid    => wxID_ANY,
+			tooltipdetail => 'order your selected pets to Stay at their current location',
+		},
+		{
+			actlabel      => 'Go To',
+			basename      => 'PetGoto',
+			chatlabel     => 'Response to Go To',
+			buttonid      => wxID_ANY,
+			comboid       => wxID_ANY,
+			textctrlid    => wxID_ANY,
+			tooltipdetail => 'order your selected pets to Go To a targeted location',
+		},
+	);
 }
 
 1;
