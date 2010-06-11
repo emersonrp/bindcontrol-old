@@ -15,7 +15,6 @@ sub bindsettings {
 	my ($profile) = @_;
 	my $petaction = $profile->{'petaction'};
 	if (not defined $petaction) {
-		# iup.Message("Notice","Creating Default Pet Action Bindings")
 		$petaction = {
 			enable => undef,
 			primnumber => 1,
@@ -55,8 +54,6 @@ sub tab {
 
 	my $tab = Wx::Panel->new($parent);
 
-	my $topSizer = Wx::BoxSizer->new(wxHORIZONTAL);
-
 	my $sizer = Wx::BoxSizer->new(wxVERTICAL);
 
 	$sizer->Add(
@@ -82,9 +79,9 @@ sub tab {
 
 	$sizer->AddSpacer(10);
 
-	my $PetCommandKeyRows = Wx::FlexGridSizer->new(0,5,2,2);
-
+	# Iterate the data structure at the bottom and make the grid of controls for the basic pet binds
 	my $ChatOptions = [ qw( Local Self-Tell Petsay None ) ];
+	my $PetCommandKeyRows = Wx::FlexGridSizer->new(0,5,2,2);
 	for my $k (getPetCommandKeyDefinitions()) {
 
 		my $basename = $k->{'basename'};  # all of the fieldnames we look up in the profile are based on this value
@@ -93,8 +90,8 @@ sub tab {
 		my $ab = Wx::Button->    new($tab, $basename, $profile->{$basename});
 
 		my $cl = Wx::StaticText->new($tab, -1, "Response to $k->{'label'}");
-		my $cm = Wx::ComboBox->  new($tab, "${basename}RespPicker",    $profile->{"${basename}ResponseMethod"}, wxDefaultPosition, wxDefaultSize, $ChatOptions, wxCB_READONLY);
-		my $cr = Wx::TextCtrl->  new($tab, "${basename}Response", $profile->{"${basename}Response"});
+		my $cm = Wx::ComboBox->  new($tab, "${basename}RespPicker", $profile->{"${basename}ResponseMethod"}, wxDefaultPosition, wxDefaultSize, $ChatOptions, wxCB_READONLY);
+		my $cr = Wx::TextCtrl->  new($tab, "${basename}Response",   $profile->{"${basename}Response"});
 
 		my $tip = $k->{'tooltipdetail'};
 		$ab->SetToolTip( Wx::ToolTip->new("Choose the key combo that will $tip"));
@@ -108,76 +105,29 @@ sub tab {
 		$PetCommandKeyRows->Add($cr);
 
 	}
-
 	$sizer->Add($PetCommandKeyRows);
-#
-#   #  pet name fields, as well as pet bodyguard status.
-#   my $pet1name = cbToggleText("First Pet's Name (required for pet selection)",$petaction->{'pet1nameenabled'},$petaction->{'pet1name'},
-#   	cbCheckBoxCB(profile,petaction,"pet1nameenabled"),
-#   	cbTextBoxCB(profile,petaction,"pet1name"))
-#   my $pet1isbguard = cbCheckBox("Bodyguard",$petaction->{'pet1isbguard'},
-#   	cbCheckBoxCB(profile,petaction,"pet1isbguard"))
-#   my $pet2name = cbToggleText("Second Pet's Name (required for pet selection)",$petaction->{'pet2nameenabled'},$petaction->{'pet2name'},
-#   	cbCheckBoxCB(profile,petaction,"pet2nameenabled"),
-#   	cbTextBoxCB(profile,petaction,"pet2name"))
-#   my $pet2isbguard = cbCheckBox("Bodyguard",$petaction->{'pet2isbguard'},
-#   	cbCheckBoxCB(profile,petaction,"pet2isbguard"))
-#   my $pet3name = cbToggleText("Third Pet's Name (required for pet selection)",$petaction->{'pet3nameenabled'},$petaction->{'pet3name'},
-#   	cbCheckBoxCB(profile,petaction,"pet3nameenabled"),
-#   	cbTextBoxCB(profile,petaction,"pet3name"))
-#   my $pet3isbguard = cbCheckBox("Bodyguard",$petaction->{'pet3isbguard'},
-#   	cbCheckBoxCB(profile,petaction,"pet3isbguard"))
-#   my $pet4name = cbToggleText("Fourth Pet's Name (required for pet selection)",$petaction->{'pet4nameenabled'},$petaction->{'pet4name'},
-#   	cbCheckBoxCB(profile,petaction,"pet4nameenabled"),
-#   	cbTextBoxCB(profile,petaction,"pet4name"))
-#   my $pet4isbguard = cbCheckBox("Bodyguard",$petaction->{'pet4isbguard'},
-#   	cbCheckBoxCB(profile,petaction,"pet4isbguard"))
-#   my $pet5name = cbToggleText("Fifth Pet's Name (required for pet selection)",$petaction->{'pet5nameenabled'},$petaction->{'pet5name'},
-#   	cbCheckBoxCB(profile,petaction,"pet5nameenabled"),
-#   	cbTextBoxCB(profile,petaction,"pet5name"))
-#   my $pet5isbguard = cbCheckBox("Bodyguard",$petaction->{'pet5isbguard'},
-#   	cbCheckBoxCB(profile,petaction,"pet5isbguard"))
-#   my $pet6name = cbToggleText("Sixth Pet's Name (required for pet selection)",$petaction->{'pet6nameenabled'},$petaction->{'pet6name'},
-#   	cbCheckBoxCB(profile,petaction,"pet6nameenabled"),
-#   	cbTextBoxCB(profile,petaction,"pet6name"))
-#   my $pet6isbguard = cbCheckBox("Bodyguard",$petaction->{'pet6isbguard'},
-#   	cbCheckBoxCB(profile,petaction,"pet6isbguard"))
-#   my $petbgbox = iup.vbox{
-#   	iup.hbox{pet1name,pet1isbguard},
-#   	iup.hbox{pet2name,pet2isbguard},
-#   	iup.hbox{pet3name,pet3isbguard},
-#   	iup.hbox{pet4name,pet4isbguard},
-#   	iup.hbox{pet5name,pet5isbguard},
-#   	iup.hbox{pet6name,pet6isbguard}}
-#
-#   cbToolTip("Check this to Enable the Pet Selection Binds using Pet Names")
-#   my $petselenable = cbCheckBox("Enable Pet Selection Binds (by Name)",$petaction->{'petselenable'},cbCheckBoxCB(profile,petaction,"petselenable"))
-#   cbToolTip("Choose the Key Combo that will select your First Pet")
-#   my $petsel0hbox = cbBindBox("Select First Pet",petaction,"sel0",undef,profile)
-#   cbToolTip("Choose the Key Combo that will select your Second Pet")
-#   my $petsel1hbox = cbBindBox("Select Second Pet",petaction,"sel1",undef,profile)
-#   cbToolTip("Choose the Key Combo that will select your Third Pet")
-#   my $petsel2hbox = cbBindBox("Select Third Pet",petaction,"sel2",undef,profile)
-#   cbToolTip("Choose the Key Combo that will select your Fourth Pet")
-#   my $petsel3hbox = cbBindBox("Select Fourth Pet",petaction,"sel3",undef,profile)
-#   cbToolTip("Choose the Key Combo that will select your Fifth Pet")
-#   my $petsel4hbox = cbBindBox("Select Fifth Pet",petaction,"sel4",undef,profile)
-#   cbToolTip("Choose the Key Combo that will select your Sixth Pet")
-#   my $petsel5hbox = cbBindBox("Select Sixth Pet",petaction,"sel5",undef,profile)
-#
-#   my $expimpbtn = cbImportExportButtons(profile,"petaction",module2.bindsettings)
-#
-#   my $petactdlg = iup.dialog{iup.vbox{iup.hbox{credits,iup.fill{},petbgbox,iup.fill{},iup.vbox{petselenable,petsel0hbox,petsel1hbox,petsel2hbox,petsel3hbox,petsel4hbox,petsel5hbox}},
-#   	iup.hbox{iup.vbox{petactenable,mmprimhbox,petselallhbox,petselminhbox,petselltshbox,petselboshbox,petselbghbox,
-#   	petsetagghbox,petsetdefhbox,petsetpashbox,petcmdatkhbox,petcmdfolhbox,petcmdstyhbox,petcmdgotohbox,bgcmdatkhbox,bgcmdgotohbox},
-#   	iup.vbox{bguardenable,petchattytgl,petsayallhbox,petsayminhbox,petsayltshbox,petsayboshbox,petsaybghbox,# petsaynbghbox,
-#   	petsayagghbox,petsaydefhbox,petsaypashbox,petsayatkhbox,petsayfolhbox,petsaystyhbox,petsaygotohbox,expimpbtn}}},
-#   	title = "Mastermind : Henchman Binds",maxbox="NO",resize="NO",mdichild="YES",mdiclient=mdiClient}
-#   cbShowDialog(petactdlg,218,10,profile,function(self) $petaction->{'dialog'} = undef end)
-#   $petaction->{'dialog'} = petactdlg
-	$topSizer->Add($sizer);
 
-	$tab->SetSizerAndFit($topSizer);
+	$sizer->AddSpacer(15);
+
+	# get the pet names, whether they're bodyguards, and binds to select them directly
+	# TODO -- probably want to enable/disable various bits of this based on whether bodyguard is
+	# active, or whether we have names, or whatever
+	my $PetNames = Wx::FlexGridSizer->new(0,5,5,5);
+	for my $PetID (1..6) {
+		my $cb = Wx::CheckBox->  new($tab, "Pet${PetID}Bodyguard", "Bodyguard" );
+		$cb->SetValue($profile->{"Pet${PetID}Bodyguard"});
+
+		$PetNames->Add( Wx::StaticText->new($tab, -1, "Pet ${PetID}'s Name"),
+			0, wxALIGN_CENTER_VERTICAL);
+		$PetNames->Add( Wx::TextCtrl->  new($tab, "Pet${PetID}Name", $profile->{"Pet${PetID}Name"}));
+		$PetNames->Add( $cb, 0, wxALIGN_CENTER_VERTICAL);
+		$PetNames->Add( Wx::StaticText->new($tab, -1, "Select Pet $PetID"),
+			0, wxALIGN_CENTER_VERTICAL);
+		$PetNames->Add( Wx::Button->    new($tab, "PetSelect$PetID", $profile->{"PetSelect$PetID"}));
+	}
+	$sizer->Add($PetNames);
+
+	$tab->SetSizerAndFit($sizer);
 
 	return ($tab, 'Mastermind Pet Binds');
 }

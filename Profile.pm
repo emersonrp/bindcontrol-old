@@ -69,6 +69,16 @@ our $default = {
 	PetSelect4 => 'F4',
 	PetSelect5 => 'F5',
 	PetSelect6 => 'F6',
+
+	Pet1Name => 'Crow T Robot',
+	Pet2Name => 'Tom Servo',
+	Pet3Name => 'Cambot',
+	Pet4Name => 'Gypsy',
+	Pet5Name => 'Mike',
+	Pet6Name => 'Joel',
+
+	Pet2Bodyguard => 1,
+	Pet5Bodyguard => 1,
 };
 
 # TODO TODO TODO XXX -- eventually "current" should be loaded from a file or something
