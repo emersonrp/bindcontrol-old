@@ -5,11 +5,11 @@ use strict;
 package BCPlugins::Mastermind;
 use parent "BCPlugins";
 
-use Wx qw(
-	wxDefaultPosition wxDefaultSize
-	wxALIGN_CENTER wxHORIZONTAL wxVERTICAL wxALL wxID_ANY wxEXPAND
-	wxCB_READONLY
-);
+use Wx qw( wxDefaultSize wxDefaultPosition wxID_OK wxID_CANCEL wxID_YES wxID_ANY );
+use Wx qw( wxVERTICAL wxHORIZONTAL wxALL wxLEFT wxRIGHT wxTOP wxBOTTOM wxCENTER wxEXPAND );
+use Wx qw( wxALIGN_RIGHT wxALIGN_BOTTOM wxALIGN_CENTER wxALIGN_CENTER_VERTICAL wxALIGN_CENTER_HORIZONTAL );
+use Wx qw( wxCB_READONLY );
+
 
 sub bindsettings {
 	my ($profile) = @_;
@@ -67,8 +67,7 @@ sub tab {
 			"a.k.a. Sandolphan\n" .
 			"Bodyguard code inspired directly from\n" .
 			"Sandolphan's Bodyguard binds.\n" .
-			"Thugs added by Konoko!\n")
-			#wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER)
+			"Thugs added by Konoko!\n"), 0, wxALL, 5
 	);
 
 	my $useCB = Wx::CheckBox->new( $tab, -1, 'Enable Mastermind Pet Binds');
@@ -83,15 +82,34 @@ sub tab {
 
 	$sizer->AddSpacer(10);
 
-	my $PetCommandKeys = Wx::FlexGridSizer->new(0,5,2,2);
+	my $PetCommandKeyRows = Wx::FlexGridSizer->new(0,5,2,2);
 
-	for my $keydef (getPetCommandKeyDefinitions()) {
-		for my $cell(buildCommandKeyRow($keydef, $tab, $profile)) {
-			$PetCommandKeys->Add($cell);
-		}
+	my $ChatOptions = [ qw( Local Self-Tell Petsay None ) ];
+	for my $k (getPetCommandKeyDefinitions()) {
+
+		my $basename = $k->{'basename'};  # all of the fieldnames we look up in the profile are based on this value
+
+		my $al = Wx::StaticText->new($tab, -1, $k->{'label'});
+		my $ab = Wx::Button->    new($tab, $basename, $profile->{$basename});
+
+		my $cl = Wx::StaticText->new($tab, -1, "Response to $k->{'label'}");
+		my $cm = Wx::ComboBox->  new($tab, "${basename}RespPicker",    $profile->{"${basename}ResponseMethod"}, wxDefaultPosition, wxDefaultSize, $ChatOptions, wxCB_READONLY);
+		my $cr = Wx::TextCtrl->  new($tab, "${basename}Response", $profile->{"${basename}Response"});
+
+		my $tip = $k->{'tooltipdetail'};
+		$ab->SetToolTip( Wx::ToolTip->new("Choose the key combo that will $tip"));
+		$cm->SetToolTip( Wx::ToolTip->new("Choose the method your pets will use to respond when they are in chatty mode and you $tip"));
+		$cr->SetToolTip( Wx::ToolTip->new("Choose the chat response your pets will give when you $tip"));
+
+		$PetCommandKeyRows->Add($al, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
+		$PetCommandKeyRows->Add($ab, 0, wxEXPAND);
+		$PetCommandKeyRows->Add($cl, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
+		$PetCommandKeyRows->Add($cm);
+		$PetCommandKeyRows->Add($cr);
+
 	}
 
-	$sizer->Add($PetCommandKeys);
+	$sizer->Add($PetCommandKeyRows);
 #
 #   #  pet name fields, as well as pet bodyguard status.
 #   my $pet1name = cbToggleText("First Pet's Name (required for pet selection)",$petaction->{'pet1nameenabled'},$petaction->{'pet1name'},
@@ -162,29 +180,6 @@ sub tab {
 	$tab->SetSizerAndFit($topSizer);
 
 	return ($tab, 'Mastermind Pet Binds');
-}
-
-# The ids of the rows and such are in a data structure at the end of the file;  they're passed in here as $k.
-# The current profile is in $p, and we fetch bits out of it as needed, as defined by fields in $k.
-my $ChatOptions = [ qw( Local Self-Tell Petsay None ) ];
-sub buildCommandKeyRow {
-	my ($k, $tab, $p) = @_;
-
-	my $basename = $k->{'basename'};  # all of the fieldnames we look up in the profile are based on this value
-
-	my $al = Wx::StaticText->new($tab, -1, $k->{'actlabel'});
-	my $ab = Wx::Button->    new($tab, $k->{'buttonid'}, $p->{$basename});
-
-	my $cl = Wx::StaticText->new($tab, -1, $k->{'chatlabel'});
-	my $cm = Wx::ComboBox->  new($tab, $k->{'comboid'},    $p->{"${basename}ResponseMethod"}, wxDefaultPosition, wxDefaultSize, $ChatOptions, wxCB_READONLY);
-	my $cr = Wx::TextCtrl->  new($tab, $k->{'textctrlid'}, $p->{"${basename}Response"});
-
-	my $tip = $k->{'tooltipdetail'};
-	$ab->SetToolTip( Wx::ToolTip->new("Choose the key combo that will $tip"));
-	$cm->SetToolTip( Wx::ToolTip->new("Choose the method your pets will use to respond when they are in chatty mode and you $tip"));
-	$cr->SetToolTip( Wx::ToolTip->new("Choose the chat response your pets will give when you $tip"));
-
-	return ($al, $ab, $cl, $cm, $cr);
 }
 
 sub mmBGSelBind {
@@ -884,111 +879,63 @@ sub bindisused {
 sub getPetCommandKeyDefinitions {
 	(
 		{
-			actlabel      => 'Select All',
+			label      => 'Select All',
 			basename      => 'PetSelectAll',
-			chatlabel     => 'Response to Select All',
-			buttonid      => wxID_ANY,
-			comboid       => wxID_ANY,
-			textctrlid    => wxID_ANY,
 			tooltipdetail => 'select all of your pets',
 		},
 		{
-			actlabel      => 'Select Minions',
+			label      => 'Select Minions',
 			basename      => 'PetSelectMinions',
-			chatlabel     => 'Response to Select Minions',
-			buttonid      => wxID_ANY,
-			comboid       => wxID_ANY,
-			textctrlid    => wxID_ANY,
 			tooltipdetail => 'select your "minion" pets',
 		},
 		{
-			actlabel      => 'Select Lieutenants',
+			label      => 'Select Lieutenants',
 			basename      => 'PetSelectLieutenants',
-			chatlabel     => 'Response to Select Lieutenants',
-			buttonid      => wxID_ANY,
-			comboid       => wxID_ANY,
-			textctrlid    => wxID_ANY,
 			tooltipdetail => 'select your "lieutenant" pets',
 		},
 		{
-			actlabel      => 'Select Boss',
+			label      => 'Select Boss',
 			basename      => 'PetSelectBoss',
-			chatlabel     => 'Response to Select Boss',
-			buttonid      => wxID_ANY,
-			comboid       => wxID_ANY,
-			textctrlid    => wxID_ANY,
 			tooltipdetail => 'select your "boss" pet',
 		},
 		{
-			actlabel      => 'Bodyguard',
+			label      => 'Bodyguard',
 			basename      => 'PetBodyguard',
-			chatlabel     => 'Response to Bodyguard',
-			buttonid      => wxID_ANY,
-			comboid       => wxID_ANY,
-			textctrlid    => wxID_ANY,
 			tooltipdetail => 'put your selected pets into Bodyguard mode',
 		},
 		{
-			actlabel      => 'Aggressive',
+			label      => 'Aggressive',
 			basename      => 'PetAggressive',
-			chatlabel     => 'Response to Set Aggressive',
-			buttonid      => wxID_ANY,
-			comboid       => wxID_ANY,
-			textctrlid    => wxID_ANY,
 			tooltipdetail => 'set your selected pets to "Aggressive" mode',
 		},
 		{
-			actlabel      => 'Defensive',
+			label      => 'Defensive',
 			basename      => 'PetDefensive',
-			chatlabel     => 'Response to Set Defensive',
-			buttonid      => wxID_ANY,
-			comboid       => wxID_ANY,
-			textctrlid    => wxID_ANY,
 			tooltipdetail => 'set your selected pets to "Defensive" mode',
 		},
 		{
-			actlabel      => 'Passive',
+			label      => 'Passive',
 			basename      => 'PetPassive',
-			chatlabel     => 'Response to Set Passive',
-			buttonid      => wxID_ANY,
-			comboid       => wxID_ANY,
-			textctrlid    => wxID_ANY,
 			tooltipdetail => 'set your selected pets to "Passive" mode',
 		},
 		{
-			actlabel      => 'Attack',
+			label      => 'Attack',
 			basename      => 'PetAttack',
-			chatlabel     => 'Response to Attack',
-			buttonid      => wxID_ANY,
-			comboid       => wxID_ANY,
-			textctrlid    => wxID_ANY,
 			tooltipdetail => 'order your selected pets to Attack your target',
 		},
 		{
-			actlabel      => 'Follow',
+			label      => 'Follow',
 			basename      => 'PetFollow',
-			chatlabel     => 'Response to Follow',
-			buttonid      => wxID_ANY,
-			comboid       => wxID_ANY,
-			textctrlid    => wxID_ANY,
 			tooltipdetail => 'order your selected pets to Follow you',
 		},
 		{
-			actlabel      => 'Stay',
+			label      => 'Stay',
 			basename      => 'PetStay',
-			chatlabel     => 'Response to Stay',
-			buttonid      => wxID_ANY,
-			comboid       => wxID_ANY,
-			textctrlid    => wxID_ANY,
 			tooltipdetail => 'order your selected pets to Stay at their current location',
 		},
 		{
-			actlabel      => 'Go To',
+			label      => 'Go To',
 			basename      => 'PetGoto',
-			chatlabel     => 'Response to Go To',
-			buttonid      => wxID_ANY,
-			comboid       => wxID_ANY,
-			textctrlid    => wxID_ANY,
 			tooltipdetail => 'order your selected pets to Go To a targeted location',
 		},
 	);
