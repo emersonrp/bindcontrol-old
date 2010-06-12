@@ -3,7 +3,7 @@
 use strict;
 
 package BCPlugins::TeamSel;
-use base "BCPlugins";
+use parent "BCPlugins";
 
 sub bindsettings {
 	my ($profile) = @_;
