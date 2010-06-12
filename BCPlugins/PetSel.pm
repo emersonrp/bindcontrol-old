@@ -30,22 +30,22 @@ sub tab {
 	my $button;
 
 	$button = Wx::Button->new($tab, id('selnext'), $petsel->{'selnext'});
-	$button->SetToolTip( Wx::ToolTip->new('Choose the key that will select the next pet from the one currently selected');
+	$button->SetToolTip( Wx::ToolTip->new('Choose the key that will select the next pet from the one currently selected') );
 	$sizer->Add( Wx::StaticText->new($tab, -1, 'Select Next Pet'), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL );
 	$sizer->Add( $button, 0, wxEXPAND);
 
 	$button = Wx::Button->new($tab, id('selprev'), $petsel->{'selprev'});
-	$button->SetToolTip( Wx::ToolTip->new('Choose the key that will select the previous pet from the one currently selected');
+	$button->SetToolTip( Wx::ToolTip->new('Choose the key that will select the previous pet from the one currently selected') );
 	$sizer->Add( Wx::StaticText->new($tab, -1, 'Select Previous Pet'), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL );
 	$sizer->Add( $button, 0, wxEXPAND);
 
 	$button = Wx::Button->new($tab, id('sizeup'), $petsel->{'sizeup'});
-	$button->SetToolTip( Wx::ToolTip->new('Choose the key that will increase the size of your henchman group rotation');
+	$button->SetToolTip( Wx::ToolTip->new('Choose the key that will increase the size of your henchman group rotation') );
 	$sizer->Add( Wx::StaticText->new($tab, -1, 'Increase Pet Group Size'), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL );
 	$sizer->Add( $button, 0, wxEXPAND);
 
 	$button = Wx::Button->new($tab, id('sizedn'), $petsel->{'sizedn'});
-	$button->SetToolTip( Wx::ToolTip->new('Choose the key that will decrease the size of your henchman group rotation');
+	$button->SetToolTip( Wx::ToolTip->new('Choose the key that will decrease the size of your henchman group rotation') );
 	$sizer->Add( Wx::StaticText->new($tab, -1, 'Decrease Pet Group Size'), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL );
 	$sizer->Add( $button, 0, wxEXPAND);
 
