@@ -16,7 +16,7 @@ use Profile;
 
 use Utility qw(id);
 
-use base 'Wx::Panel';
+use parent -norequire, 'Wx::Panel';
 
 sub new {
 	my ($class, $parentwindow) = @_;

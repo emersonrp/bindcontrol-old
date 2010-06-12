@@ -19,7 +19,7 @@ BCApp->new->MainLoop;
 # Application class
 ###################
 package BCApp;
-use base 'Wx::App';
+use parent 'Wx::App';
 
 sub OnInit{
 	my $self = shift;
@@ -45,7 +45,7 @@ use Wx::Event qw(
 	EVT_MENU
 );
 
-use base 'Wx::Frame';
+use parent -norequire, 'Wx::Frame';
 
 use Utility qw(id);
 use Module::Pluggable require => 1, search_path => 'BCPlugins';

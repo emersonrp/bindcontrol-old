@@ -11,7 +11,7 @@ use GameData;
 use Profile;
 use General;
 
-use base 'Wx::Notebook';
+use parent -norequire, 'Wx::Notebook';
 
 sub new {
 	my ($class, $parentpanel, $mainwindow) = @_;
