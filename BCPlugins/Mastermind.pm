@@ -140,6 +140,7 @@ sub tab {
 		$ab->SetToolTip( Wx::ToolTip->new("Choose the key combo that will $tip"));
 		$cm->SetToolTip( Wx::ToolTip->new("Choose the method your pets will use to respond when they are in chatty mode and you $tip"));
 		$cr->SetToolTip( Wx::ToolTip->new("Choose the chat response your pets will give when you $tip"));
+		$cr->SetMinSize( [250, -1] );
 
 		$PetCommandKeyRows->Add($al, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
 		$PetCommandKeyRows->Add($ab, 0, wxEXPAND);
