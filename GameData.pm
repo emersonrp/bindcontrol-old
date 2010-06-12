@@ -2572,4 +2572,54 @@ our %Inspirations = (
 	ResistDamage => ['Sturdy','Rugged','Robust'],
 );
 
+our @Emotes = qw(
+	AFK Afraid Akimbo Angry AssumePositionWall AtEase Attack
+
+	BatSmash BatSmashReact BB BBAltitude BBBeat BBCatchMe BBDance BBDiscoFreak
+	BBDogWalk BBElectroVibe BBHeavyDude BBInfoOverload BBJumpy BBKickIt BBLooker
+	BBMeaty BBMoveOn BBNotorious BBPeace BBQuickie BBRaver BBShuffle BBSpaz
+	BBTechnoid BBVenus BBWahWah BBWindItUp BBYellow BeatChest BigLaugh BigWave
+	Boombox Bow Bowdown Burp BuzzOff
+
+	Champion Cheer Clap Coin CoinToss Cower CrossArms CurseYou
+
+	Dance Dice Disagree DontAttack Drat DropBoombox DrumDance
+
+	ELaugh ElegantBow EvilLaugh Explain
+
+	FancyBow Fear Flashlight Flex Flex1 Flex2 Flex3 FlexA FlexB FlexC FlipCoin Frustrated
+
+	GoAway Grief
+
+	Hand Handsup Hi HoldTorch Huh
+
+	JumpingJacks
+
+	Kata Kneel
+
+	Laptop Laugh Laugh2 LaughToo Lecture Ledgesit Lotus
+
+	MartialArts MilitarySalute Muahahaha
+
+	Newspaper No Nod Noooo
+
+	OverHere
+
+	Panhandle Paper PeerIn Point Praise Protest
+
+	RaiseHand Research ResearchLow Roar Rock RollDice Rooting
+
+	Salute Scared Scissors Score1 Score10 Score2 Score3 Score4 Score5 Score6 Score7
+	Score8 Score9 Shucks Sit Slap SlapReact Slash SlashThroat Smack SmackYou Sorry
+	Stop Surrender
+
+	TalkToHand Tarzan Taunt Taunt1 Taunt2 TauntA TauntB Thanks ThankYou
+	TheWave ThreatHand Thumbsup
+
+	Victory VillainLaugh VillainousLaugh
+
+	WallLean Wave WaveFist Welcome What Whistle Wings Winner
+
+	Yata YataYata Yes Yoga YoureWelcome
+);
 1;

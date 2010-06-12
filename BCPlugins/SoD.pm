@@ -10,12 +10,9 @@ use Wx qw(
 	wxALL wxVERTICAL
 	wxDefaultPosition wxDefaultSize wxDefaultValidator
 	wxCB_READONLY
-	wxALIGN_RIGHT
+	wxALIGN_RIGHT wxALIGN_CENTER_VERTICAL
+	wxEXPAND
 );
-use Wx::Event qw(
-	EVT_CHECKBOX
-);
-
 
 use constant true => 1;
 use constant nil => undef;
@@ -39,35 +36,35 @@ sub tab {
 	# general movement keys
 	my $generalSizer = Wx::FlexGridSizer->new(0,2,3,3);
 
-	$generalSizer->Add( Wx::StaticText->new($tab, -1, "Up:"), 0, wxALL,);
-	$generalSizer->Add( Wx::Button->    new($tab, id('UP_KEY'), ""), 0, wxALL,);
+	$generalSizer->Add( Wx::StaticText->new($tab, -1, "Up"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$generalSizer->Add( Wx::Button->    new($tab, id('UP_KEY'), ""), 0, wxEXPAND,);
 
-	$generalSizer->Add( Wx::StaticText->new($tab, -1, "Down:"), 0, wxALL,);
-	$generalSizer->Add( Wx::Button->    new($tab, id('DOWN_KEY'), ""), 0, wxALL,);
+	$generalSizer->Add( Wx::StaticText->new($tab, -1, "Down"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$generalSizer->Add( Wx::Button->    new($tab, id('DOWN_KEY'), ""), 0, wxEXPAND,);
 
-	$generalSizer->Add( Wx::StaticText->new($tab, -1, "Forward:"), 0, wxALL,);
-	$generalSizer->Add( Wx::Button->    new($tab, id('FORWARD_KEY'), ""), 0, wxALL,);
+	$generalSizer->Add( Wx::StaticText->new($tab, -1, "Forward"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$generalSizer->Add( Wx::Button->    new($tab, id('FORWARD_KEY'), ""), 0, wxEXPAND,);
 
-	$generalSizer->Add( Wx::StaticText->new($tab, -1, "Back:"), 0, wxALL,);
-	$generalSizer->Add( Wx::Button->    new($tab, id('BACK_KEY'), ""), 0, wxALL,);
+	$generalSizer->Add( Wx::StaticText->new($tab, -1, "Back"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$generalSizer->Add( Wx::Button->    new($tab, id('BACK_KEY'), ""), 0, wxEXPAND,);
 
-	$generalSizer->Add( Wx::StaticText->new($tab, -1, "Strafe Left:"), 0, wxALL,);
-	$generalSizer->Add( Wx::Button->    new($tab, id('STRAFE_LEFT_KEY'), ""), 0, wxALL,);
+	$generalSizer->Add( Wx::StaticText->new($tab, -1, "Strafe Left"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$generalSizer->Add( Wx::Button->    new($tab, id('STRAFE_LEFT_KEY'), ""), 0, wxEXPAND,);
 
-	$generalSizer->Add( Wx::StaticText->new($tab, -1, "Strafe Right:"), 0, wxALL,);
-	$generalSizer->Add( Wx::Button->    new($tab, id('STRAFE_RIGHT_KEY'), ""), 0, wxALL,);
+	$generalSizer->Add( Wx::StaticText->new($tab, -1, "Strafe Right"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$generalSizer->Add( Wx::Button->    new($tab, id('STRAFE_RIGHT_KEY'), ""), 0, wxEXPAND,);
 
-	$generalSizer->Add( Wx::StaticText->new($tab, -1, "Turn Left:"), 0, wxALL,);
-	$generalSizer->Add( Wx::Button->    new($tab, id('TURN_LEFT_KEY'), ""), 0, wxALL,);
+	$generalSizer->Add( Wx::StaticText->new($tab, -1, "Turn Left"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$generalSizer->Add( Wx::Button->    new($tab, id('TURN_LEFT_KEY'), ""), 0, wxEXPAND,);
 
-	$generalSizer->Add( Wx::StaticText->new($tab, -1, "Turn Right:"), 0, wxALL,);
-	$generalSizer->Add( Wx::Button->    new($tab, id('TURN_RIGHT_KEY'), ""), 0, wxALL,);
+	$generalSizer->Add( Wx::StaticText->new($tab, -1, "Turn Right"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$generalSizer->Add( Wx::Button->    new($tab, id('TURN_RIGHT_KEY'), ""), 0, wxEXPAND,);
 
 	$generalSizer->Add( Wx::CheckBox->new($tab, id('MOUSECHORD_SOD'), "Use Mousechord as SoD Forward"), 0, wxALL,);
 	$generalSizer->AddSpacer(1);
 
 	# TODO!  fill this picker with only the appropriate bits.
-	$generalSizer->Add( Wx::StaticText->new($tab, -1, "Default Movement Mode:"), 0, wxALL,);
+	$generalSizer->Add( Wx::StaticText->new($tab, -1, "Default Movement Mode"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
 	$generalSizer->Add( Wx::ComboBox->new(
 			$tab, id('DEFAULT_MOVEMENT_MODE'), '',
 			wxDefaultPosition, wxDefaultSize,
@@ -81,7 +78,7 @@ sub tab {
 	# general movement keys
 	my $sprintSizer = Wx::FlexGridSizer->new(0,2,3,3);
 
-	$sprintSizer->Add( Wx::StaticText->new($tab, -1, "Sprint Power:"), 0, wxALL,);
+	$sprintSizer->Add( Wx::StaticText->new($tab, -1, "Sprint Power"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
 	$sprintSizer->Add( Wx::ComboBox->new(
 			$tab, id('SPRINT_PICKER'), '',
 			wxDefaultPosition, wxDefaultSize,
@@ -95,41 +92,41 @@ sub tab {
 	# TODO -- decide what to do with this.
 	# $sprintSizer->Add( Wx::CheckBox->new($tab, SPRINT_UNQUEUE, "Exec powexecunqueue"), 0, wxALL,);
 
-	$sprintSizer->Add( Wx::StaticText->new($tab, -1, "Autorun:"), 0, wxALL,);
-	$sprintSizer->Add( Wx::Button->    new($tab, id('AUTORUN_KEY'), ""), 0, wxALL,);
+	$sprintSizer->Add( Wx::StaticText->new($tab, -1, "Autorun"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$sprintSizer->Add( Wx::Button->    new($tab, id('AUTORUN_KEY'), ""), 0, wxEXPAND,);
 
-	$sprintSizer->Add( Wx::StaticText->new($tab, -1, "Follow Target:"), 0, wxALL,);
-	$sprintSizer->Add( Wx::Button->    new($tab, id('FOLLOW_KEY'), ""), 0, wxALL,);
+	$sprintSizer->Add( Wx::StaticText->new($tab, -1, "Follow Target"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$sprintSizer->Add( Wx::Button->    new($tab, id('FOLLOW_KEY'), ""), 0, wxEXPAND,);
 
-	$sprintSizer->Add( Wx::StaticText->new($tab, -1, "Non-SoD Mode:"), 0, wxALL,);
-	$sprintSizer->Add( Wx::Button->    new($tab, id('NON_SOD_KEY'), ""), 0, wxALL,);
+	$sprintSizer->Add( Wx::StaticText->new($tab, -1, "Non-SoD Mode"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$sprintSizer->Add( Wx::Button->    new($tab, id('NON_SOD_KEY'), ""), 0, wxEXPAND,);
 
-	$sprintSizer->Add( Wx::StaticText->new($tab, -1, "Sprint-Only SoD Mode:"), 0, wxALL,);
-	$sprintSizer->Add( Wx::Button->    new($tab, id('SPRINT_ONLY_SOD_KEY'), ""), 0, wxALL,);
+	$sprintSizer->Add( Wx::StaticText->new($tab, -1, "Sprint-Only SoD Mode"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$sprintSizer->Add( Wx::Button->    new($tab, id('SPRINT_ONLY_SOD_KEY'), ""), 0, wxEXPAND,);
 
 	$sprintSizer->Add( Wx::CheckBox->new($tab, id('SPRINT_SOD'), "Enable Sprint SoD"), 0, wxALL,);
 	$sprintSizer->AddSpacer(1);
 
-	$sprintSizer->Add( Wx::StaticText->new($tab, -1, "SoD Mode Toggle:"), 0, wxALL,);
-	$sprintSizer->Add( Wx::Button->    new($tab, id('SOD_TOGGLE_KEY'), ""), 0, wxALL,);
+	$sprintSizer->Add( Wx::StaticText->new($tab, -1, "SoD Mode Toggle"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$sprintSizer->Add( Wx::Button->    new($tab, id('SOD_TOGGLE_KEY'), ""), 0, wxEXPAND,);
 
 	$sprintSizer->Add( Wx::CheckBox->new($tab, id('CHANGE_TRAVEL_CAMERA'), "Change Camera Distance When Travel Power Active"), 0, wxALL,);
 	$sprintSizer->AddSpacer(1);
 
-	$sprintSizer->Add( Wx::StaticText->new($tab, -1, "Base Camera Distance:"), 0, wxALL,);
-	$sprintSizer->Add( Wx::Button->    new($tab, id('BASE_CAMERA_DISTANCE'), ""), 0, wxALL,);
+	$sprintSizer->Add( Wx::StaticText->new($tab, -1, "Base Camera Distance"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$sprintSizer->Add( Wx::Button->    new($tab, id('BASE_CAMERA_DISTANCE'), ""), 0, wxEXPAND,);
 
-	$sprintSizer->Add( Wx::StaticText->new($tab, -1, "Travelling Camera Distance:"), 0, wxALL,);
-	$sprintSizer->Add( Wx::Button->    new($tab, id('TRAVEL_CAMERA_DISTANCE'), ""), 0, wxALL,);
+	$sprintSizer->Add( Wx::StaticText->new($tab, -1, "Travelling Camera Distance"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$sprintSizer->Add( Wx::Button->    new($tab, id('TRAVEL_CAMERA_DISTANCE'), ""), 0, wxEXPAND,);
 
 	$sprintSizer->Add( Wx::CheckBox->new($tab, id('CHANGE_TRAVEL_DETAIL'), "Change Graphic Detail When Travel Power Active"), 0, wxALL,);
 	$sprintSizer->AddSpacer(1);
 
-	$sprintSizer->Add( Wx::StaticText->new($tab, -1, "Base Detail Level:"), 0, wxALL,);
-	$sprintSizer->Add( Wx::Button->    new($tab, id('BASE_DETAIL_LEVEL'), ""), 0, wxALL,);
+	$sprintSizer->Add( Wx::StaticText->new($tab, -1, "Base Detail Level"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$sprintSizer->Add( Wx::Button->    new($tab, id('BASE_DETAIL_LEVEL'), ""), 0, wxEXPAND,);
 
-	$sprintSizer->Add( Wx::StaticText->new($tab, -1, "Travelling Detail Level:"), 0, wxALL,);
-	$sprintSizer->Add( Wx::Button->    new($tab, id('TRAVEL_DETAIL_LEVEL'), ""), 0, wxALL,);
+	$sprintSizer->Add( Wx::StaticText->new($tab, -1, "Travelling Detail Level"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$sprintSizer->Add( Wx::Button->    new($tab, id('TRAVEL_DETAIL_LEVEL'), ""), 0, wxEXPAND,);
 
 	$sprintSizer->Add( Wx::CheckBox->new($tab, id('HIDE_WINDOWS_TELEPORTING'), "Hide Windows When Teleporting"), 0, wxALL,);
 	$sprintSizer->AddSpacer(1);
@@ -145,8 +142,8 @@ sub tab {
 
 	my $superSpeedSizer = Wx::FlexGridSizer->new(0,2,3,3);
 
-	$superSpeedSizer->Add( Wx::StaticText->new($tab, -1, "Toggle Super Speed"), 0, wxALL,);
-	$superSpeedSizer->Add( Wx::Button->    new($tab, id('SS_KEY'), ""), 0, wxALL,);
+	$superSpeedSizer->Add( Wx::StaticText->new($tab, -1, "Toggle Super Speed"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$superSpeedSizer->Add( Wx::Button->    new($tab, id('SS_KEY'), ""), 0, wxEXPAND,);
 
 	$superSpeedSizer->Add( Wx::CheckBox->new($tab, id('SS_ONLY_WHEN_MOVING'), "Only Super Speed When Moving"), 0, wxALL,);
 	$superSpeedSizer->AddSpacer(1);
@@ -160,8 +157,8 @@ sub tab {
 
 	my $superJumpSizer = Wx::FlexGridSizer->new(0,2,3,3);
 
-	$superJumpSizer->Add( Wx::StaticText->new($tab, -1, "Toggle Jump Mode"), 0, wxALL,);
-	$superJumpSizer->Add( Wx::Button->    new($tab, id('SJ_KEY'), ""), 0, wxALL,);
+	$superJumpSizer->Add( Wx::StaticText->new($tab, -1, "Toggle Jump Mode"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$superJumpSizer->Add( Wx::Button->    new($tab, id('SJ_KEY'), ""), 0, wxEXPAND,);
 
 	$superJumpSizer->Add( Wx::CheckBox->new($tab, id('SJ_SIMPLE_TOGGLE'), "Use Simple CJ / SJ Mode Toggle"), 0, wxALL,);
 	$superJumpSizer->AddSpacer(1);
@@ -172,11 +169,11 @@ sub tab {
 	##### Fly
 	my $flySizer = Wx::FlexGridSizer->new(0,2,3,3);
 
-	$flySizer->Add( Wx::StaticText->new($tab, -1, "Toggle Fly Mode"), 0, wxALL,);
-	$flySizer->Add( Wx::Button->    new($tab, id('FLY_KEY'), ""), 0, wxALL,);
+	$flySizer->Add( Wx::StaticText->new($tab, -1, "Toggle Fly Mode"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$flySizer->Add( Wx::Button->    new($tab, id('FLY_KEY'), ""), 0, wxEXPAND,);
 
-	$flySizer->Add( Wx::StaticText->new($tab, -1, "Toggle Group Fly Mode"), 0, wxALL,);
-	$flySizer->Add( Wx::Button->    new($tab, id('FLY_GROUPFLY_KEY'), ""), 0, wxALL,);
+	$flySizer->Add( Wx::StaticText->new($tab, -1, "Toggle Group Fly Mode"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$flySizer->Add( Wx::Button->    new($tab, id('FLY_GROUPFLY_KEY'), ""), 0, wxEXPAND,);
 
 	$topSizer->Add($flySizer);
 
@@ -187,14 +184,14 @@ sub tab {
 	# if (at == peacebringer) "Dwarf Step Key"
 	# if (at == warshade) "Shadow Step / Dwarf Step Key"
 
-	$teleportSizer->Add( Wx::StaticText->new($tab, -1, "$teleportPowerName Combo Key"), 0, wxALL,);
-	$teleportSizer->Add( Wx::Button->    new($tab, id('TP_COMBO_KEY'), ""), 0, wxALL,);
+	$teleportSizer->Add( Wx::StaticText->new($tab, -1, "$teleportPowerName Combo Key"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$teleportSizer->Add( Wx::Button->    new($tab, id('TP_COMBO_KEY'), ""), 0, wxEXPAND,);
 
-	$teleportSizer->Add( Wx::StaticText->new($tab, -1, "$teleportPowerName Reset Key"), 0, wxALL,);
-	$teleportSizer->Add( Wx::Button->    new($tab, id('TP_RESET_KEY'), ""), 0, wxALL,);
+	$teleportSizer->Add( Wx::StaticText->new($tab, -1, "$teleportPowerName Reset Key"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$teleportSizer->Add( Wx::Button->    new($tab, id('TP_RESET_KEY'), ""), 0, wxEXPAND,);
 
-	$teleportSizer->Add( Wx::StaticText->new($tab, -1, "$teleportPowerName Mode"), 0, wxALL,);
-	$teleportSizer->Add( Wx::Button->    new($tab, id('TP_KEY'), ""), 0, wxALL,);
+	$teleportSizer->Add( Wx::StaticText->new($tab, -1, "$teleportPowerName Mode"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$teleportSizer->Add( Wx::Button->    new($tab, id('TP_KEY'), ""), 0, wxEXPAND,);
 
 	# if (player has hover): {
 		$teleportSizer->Add( Wx::CheckBox->new($tab, id('TP_HOVER_WHEN_TP'), "Auto-Hover When Teleporting"), 0, wxALL,);
@@ -202,11 +199,11 @@ sub tab {
 	# }
 
 	# if (player has team-tp) {
-		$teleportSizer->Add( Wx::StaticText->new($tab, -1, "Team Teleport Combo Key"), 0, wxALL,);
-		$teleportSizer->Add( Wx::Button->    new($tab, id('TP_TEAM_COMBO_KEY'), ""), 0, wxALL,);
+		$teleportSizer->Add( Wx::StaticText->new($tab, -1, "Team Teleport Combo Key"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+		$teleportSizer->Add( Wx::Button->    new($tab, id('TP_TEAM_COMBO_KEY'), ""), 0, wxEXPAND,);
 
-		$teleportSizer->Add( Wx::StaticText->new($tab, -1, "Team Teleport Reset Key"), 0, wxALL,);
-		$teleportSizer->Add( Wx::Button->    new($tab, id('TP_TEAM_RESET_KEY'), ""), 0, wxALL,);
+		$teleportSizer->Add( Wx::StaticText->new($tab, -1, "Team Teleport Reset Key"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+		$teleportSizer->Add( Wx::Button->    new($tab, id('TP_TEAM_RESET_KEY'), ""), 0, wxEXPAND,);
 
 		# if (player has group fly) {
 			$teleportSizer->Add( Wx::CheckBox->new($tab, id('TP_GROUP_FLY_WHEN_TP_TEAM'), "Auto-Group-Fly When Team Teleporting"), 0, wxALL,);
@@ -221,34 +218,34 @@ sub tab {
 	my $tempSizer = Wx::FlexGridSizer->new(0,2,3,3);
 
 	# if (temp travel powers exist)?  Should this be "custom"?
-	$tempSizer->Add( Wx::StaticText->new($tab, -1, "Toggle Temp Mode"), 0, wxALL,);
-	$tempSizer->Add( Wx::Button->    new($tab, id('TEMP_KEY'), ""), 0, wxALL,);
+	$tempSizer->Add( Wx::StaticText->new($tab, -1, "Toggle Temp Mode"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$tempSizer->Add( Wx::Button->    new($tab, id('TEMP_KEY'), ""), 0, wxEXPAND,);
 
-	$tempSizer->Add( Wx::StaticText->new($tab, -1, "Temp Travel Power Tray"), 0, wxALL,);
-	$tempSizer->Add( Wx::Button->    new($tab, id('TEMP_POWERTRAY'), ""), 0, wxALL,);
+	$tempSizer->Add( Wx::StaticText->new($tab, -1, "Temp Travel Power Tray"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$tempSizer->Add( Wx::Button->    new($tab, id('TEMP_POWERTRAY'), ""), 0, wxEXPAND,);
 
 	$topSizer->Add($tempSizer);
 
 	my $kheldianSizer = Wx::FlexGridSizer->new(0,2,3,3);
 
-	$kheldianSizer->Add( Wx::StaticText->new($tab, -1, "Toggle Nova Form"), 0, wxALL,);
-	$kheldianSizer->Add( Wx::Button->    new($tab, id('KHELD_NOVA_KEY'), ""), 0, wxALL,);
+	$kheldianSizer->Add( Wx::StaticText->new($tab, -1, "Toggle Nova Form"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$kheldianSizer->Add( Wx::Button->    new($tab, id('KHELD_NOVA_KEY'), ""), 0, wxEXPAND,);
 
-	$kheldianSizer->Add( Wx::StaticText->new($tab, -1, "Nova Powertray"), 0, wxALL,);
-	$kheldianSizer->Add( Wx::Button->    new($tab, id('KHELD_NOVA_POWERTRAY'), ""), 0, wxALL,);
+	$kheldianSizer->Add( Wx::StaticText->new($tab, -1, "Nova Powertray"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$kheldianSizer->Add( Wx::Button->    new($tab, id('KHELD_NOVA_POWERTRAY'), ""), 0, wxEXPAND,);
 
-	$kheldianSizer->Add( Wx::StaticText->new($tab, -1, "Toggle Dwarf Form"), 0, wxALL,);
-	$kheldianSizer->Add( Wx::Button->    new($tab, id('KHELD_DWARF_KEY'), ""), 0, wxALL,);
+	$kheldianSizer->Add( Wx::StaticText->new($tab, -1, "Toggle Dwarf Form"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$kheldianSizer->Add( Wx::Button->    new($tab, id('KHELD_DWARF_KEY'), ""), 0, wxEXPAND,);
 
-	$kheldianSizer->Add( Wx::StaticText->new($tab, -1, "Dwarf Powertray"), 0, wxALL,);
-	$kheldianSizer->Add( Wx::Button->    new($tab, id('KHELD_DWARF_POWERTRAY'), ""), 0, wxALL,);
+	$kheldianSizer->Add( Wx::StaticText->new($tab, -1, "Dwarf Powertray"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$kheldianSizer->Add( Wx::Button->    new($tab, id('KHELD_DWARF_POWERTRAY'), ""), 0, wxEXPAND,);
 
 	# do we want a key to change directly to human form, instead of toggles?
-	$kheldianSizer->Add( Wx::StaticText->new($tab, -1, "Human Form"), 0, wxALL,);
-	$kheldianSizer->Add( Wx::Button->    new($tab, id('KHELD_HUMAN_KEY'), ""), 0, wxALL,);
+	$kheldianSizer->Add( Wx::StaticText->new($tab, -1, "Human Form"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$kheldianSizer->Add( Wx::Button->    new($tab, id('KHELD_HUMAN_KEY'), ""), 0, wxEXPAND,);
 
-	$kheldianSizer->Add( Wx::StaticText->new($tab, -1, "Human Powertray"), 0, wxALL,);
-	$kheldianSizer->Add( Wx::Button->    new($tab, id('KHELD_HUMAN_POWERTRAY'), ""), 0, wxALL,);
+	$kheldianSizer->Add( Wx::StaticText->new($tab, -1, "Human Powertray"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$kheldianSizer->Add( Wx::Button->    new($tab, id('KHELD_HUMAN_POWERTRAY'), ""), 0, wxEXPAND,);
 
 	$topSizer->Add($kheldianSizer);
 

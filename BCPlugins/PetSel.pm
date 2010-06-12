@@ -5,34 +5,57 @@ use strict;
 package BCPlugins::PetSel;
 use parent "BCPlugins";
 
-sub bindsettings {
-	my ($profile) = @_;
+use Wx qw( wxALIGN_RIGHT wxALIGN_CENTER_VERTICAL wxEXPAND );
+use Utility qw(id);
+
+sub tab {
+
+	my ($self, $parent) = @_;
+
+	my $profile = $Profile::current;
 	my $petsel = $profile->{'petsel'};
-	if (not $petsel) {
-		$petsel = {};
-		$profile->{'petsel'} = $petsel;
-	}
-	if ($petsel->{'dialog'}) {
-#		petsel.dialog:show()
-	} else {
-#		local credits = iup.hbox{iup.fill{};iup.vbox{iup.fill{size="5"};iup.label{title="Single Key Pet Selection binds\nbased on binds from Weap0nX."};iup.fill{size="5"};alignment="ACENTER"};iup.fill{};alignment="ACENTER";rastersize="300x"}
-#		cbToolTip("Check this to enable the Single Key Pet Select Binds")
-#		local petselenable = cbCheckBox("Enable Pet Selector",petsel.enable,cbCheckBoxCB(profile,petsel,"enable"),300)
-#		local selnext = cbBindBox("Select next henchman",petsel,"selnext",nil,profile,nil,nil,200)
-#		local selprev = cbBindBox("Select previous henchman",petsel,"selprev",nil,profile,nil,nil,200)
-#		local sizeup = cbBindBox("Increase Henchman Group Size",petsel,"sizeup",nil,profile,nil,nil,200)
-#		local sizedn = cbBindBox("Decrease Henchman Group Size",petsel,"sizedn",nil,profile,nil,nil,200)
-#		local expimpbtn = cbImportExportButtons(profile,"petsel",module.bindsettings,150,nil,150,nil)
-#	
-#		local typdlg = iup.dialog{iup.vbox{credits,petselenable,selnext,selprev,sizeup,sizedn,reset,expimpbtn};title = "Mastermind : Single Key Pet Selector",maxbox="NO",resize="NO",mdichild="YES",mdiclient=mdiClient}
-#		cbShowDialog(typdlg,218,10,profile,function(self) petsel.dialog = nil })
-#		petsel.dialog = typdlg
-	}
+	unless ($petsel) { $profile->{'petsel'} = $petsel = {}; }
+
+
+	my $tab = Wx::Panel->new($parent);
+
+	my $sizer = Wx::FlexGridSizer->new(0,2,4,4);
+
+
+### TODO add credits in, and on/off checkbox
+#	local credits = iup.hbox{iup.fill{};iup.vbox{iup.fill{size="5"};iup.label{title="Single Key Pet Selection binds\nbased on binds from Weap0nX."};iup.fill{size="5"};alignment="ACENTER"};iup.fill{};alignment="ACENTER";rastersize="300x"}
+#	cbToolTip("Check this to enable the Single Key Pet Select Binds")
+#	local petselenable = cbCheckBox("Enable Pet Selector",petsel.enable,cbCheckBoxCB(profile,petsel,"enable"),300)
+
+	my $button;
+
+	$button = Wx::Button->new($tab, id('selnext'), $petsel->{'selnext'});
+	$button->SetToolTip( Wx::ToolTip->new('Choose the key that will select the next pet from the one currently selected');
+	$sizer->Add( Wx::StaticText->new($tab, -1, 'Select Next Pet'), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL );
+	$sizer->Add( $button, 0, wxEXPAND);
+
+	$button = Wx::Button->new($tab, id('selprev'), $petsel->{'selprev'});
+	$button->SetToolTip( Wx::ToolTip->new('Choose the key that will select the previous pet from the one currently selected');
+	$sizer->Add( Wx::StaticText->new($tab, -1, 'Select Previous Pet'), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL );
+	$sizer->Add( $button, 0, wxEXPAND);
+
+	$button = Wx::Button->new($tab, id('sizeup'), $petsel->{'sizeup'});
+	$button->SetToolTip( Wx::ToolTip->new('Choose the key that will increase the size of your henchman group rotation');
+	$sizer->Add( Wx::StaticText->new($tab, -1, 'Increase Pet Group Size'), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL );
+	$sizer->Add( $button, 0, wxEXPAND);
+
+	$button = Wx::Button->new($tab, id('sizedn'), $petsel->{'sizedn'});
+	$button->SetToolTip( Wx::ToolTip->new('Choose the key that will decrease the size of your henchman group rotation');
+	$sizer->Add( Wx::StaticText->new($tab, -1, 'Decrease Pet Group Size'), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL );
+	$sizer->Add( $button, 0, wxEXPAND);
+
+	$tab->SetSizer($sizer);
+
+	return ($tab, 'Single Key Pet Selection');
+
 }
 
-my @post = qw( First Second Third Fourth Fifth Sixth Seventh Eighth );
-
-sub formatPetConfig { "[" . shift() . " Pet ]" }
+sub formatPetConfig { "[" . qw( First Second Third Fourth Fifth Sixth Seventh Eighth )[shift()] . " Pet ]" }
 
 sub ts2CreateSet {
 	my ($profile,$ts2,$tsize,$tsel,$file) = @_;
