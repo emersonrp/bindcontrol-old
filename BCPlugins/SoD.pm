@@ -17,8 +17,11 @@ use Wx qw(
 use constant true => 1;
 use constant nil => undef;
 
-sub tab {
-	my ($self) = @_;
+sub new {
+
+	my ($class, $parent) = @_;
+
+	my $self = $class->SUPER::new($parent);
 
 	$self->{'TabTitle'} = "Speed On Demand";
 

@@ -13,8 +13,11 @@ use Wx qw( wxCB_READONLY );
 
 use Utility qw(id);
 
-sub tab {
-	my ($self) = @_;
+sub new {
+
+	my ($class, $parent) = @_;
+
+	my $self = $class->SUPER::new($parent);
 
 	$self->{'TabTitle'} = 'Inspiration Popper';
 

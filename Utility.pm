@@ -2,6 +2,7 @@ package Utility;
 
 use strict;
 use parent 'Exporter';
+use feature 'state';
 
 use Wx qw( :everything );
 Wx::InitAllImageHandlers();
@@ -10,8 +11,8 @@ our @EXPORT_OK = qw( id );
 
 my ($resetfile1, $resetfile2, $resetkey, $numbinds);
 
-my (%ids, $nextID);
 sub id {
+	state (%ids, $nextID);
 	my $control = shift;
 	$ids{$control} ||= ++$nextID;
 	return $ids{$control};
@@ -55,25 +56,18 @@ sub ColorDefault {
 	}
 }
 
-{
-	my %Icons;
-	sub Icon {
-		my $iconname = shift;
-		unless ($Icons{$iconname}) {
-			$Icons{$iconname} =
-				Wx::Bitmap->new (
-					Wx::Image->new (
-						"icons/$iconname.png", wxBITMAP_TYPE_ANY, -1,
-					)
-				);
-		}
-		return $Icons{$iconname};
+sub Icon {
+	state %Icons;
+	my $iconname = shift;
+	unless ($Icons{$iconname}) {
+		$Icons{$iconname} =
+			Wx::Bitmap->new (
+				Wx::Image->new (
+					"icons/$iconname.png", wxBITMAP_TYPE_ANY, -1,
+				)
+			);
 	}
-}
-
-sub Help {
-	my ($thingie) = shift;
-	return sub { $thingie->help() };
+	return $Icons{$iconname};
 }
 
 1;

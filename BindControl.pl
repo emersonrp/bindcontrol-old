@@ -31,8 +31,6 @@ sub OnInit{
 }
 
 
-
-
 ###################
 # Main Window Class
 ###################
@@ -41,14 +39,12 @@ package BCMainWindow;
 use Wx qw(wxVERTICAL wxHORIZONTAL wxDefaultSize wxDefaultPosition
 		wxTAB_TRAVERSAL wxEXPAND wxALL wxLB_SORT :id);
 
-use Wx::Event qw(
-	EVT_MENU
-);
-
-use parent -norequire, 'Wx::Frame';
+use Wx::Event qw( EVT_MENU );
 
 use Utility qw(id);
 use Module::Pluggable instantiate => 'new', search_path => 'BCPlugins';
+
+use parent -norequire, 'Wx::Frame';
 
 sub new {
 
@@ -58,9 +54,6 @@ sub new {
         undef,         # No parent means "top-level window".
         -1,            # No need to assign a window ID
         "BindControl",   # Window title
-        [-1, -1],      # Let the system assign the window position
-        [-1 ,-1],      # Use a default size
-        # optionally specify a window style here
     );
 
     # "Profile" Menu
@@ -115,39 +108,12 @@ sub new {
 
 # TODO TODO TODO -- remove this once we actually start making and saving profiles
 	my $sizer = Wx::BoxSizer->new(Wx::wxVERTICAL);
-	my $profWindow = newProfileWindow($self);
-	$sizer->Add($profWindow, 1, wxEXPAND |  wxALL, 3);
+	my $profileTabs = ProfileTabs->new($self);
+	$sizer->Add($profileTabs, 1, wxEXPAND |  wxALL, 3);
 	$self->SetSizerAndFit($sizer);
 # TODO TODO TODO
 
-
-
 	return $self;
-}
-
-sub newProfileWindow {
-	my $self = shift;
-
-	if (my $oldpanel = Wx::Window::FindWindowById(id('PANEL_PROFILETABS'))) {
-		$oldpanel->Destroy();
-	}
-
-	my $panel = Wx::Panel->new(
-		$self,
-		id('PANEL_PROFILETABS'),
-		wxDefaultPosition,
-		wxDefaultSize,
-		wxTAB_TRAVERSAL,
-	);
-	my $sizer = Wx::BoxSizer->new(Wx::wxVERTICAL);
-
-	my $profileTabs = ProfileTabs->new($panel, $self);
-
-	$sizer->Add ($profileTabs, 1, wxEXPAND | wxALL, 3);
-	$panel->SetSizerAndFit($sizer);
-
-	return $panel;
-
 }
 
 sub showAboutBox { return Wx::AboutBox(our $aboutDialogInfo); }

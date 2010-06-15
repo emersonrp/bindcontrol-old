@@ -14,9 +14,11 @@ use Wx::Event qw(EVT_BUTTON);
 use Utility qw(id);
 
 
-sub tab {
+sub new {
 
-	my ($self) = @_;
+	my ($class, $parent) = @_;
+
+	my $self = $class->SUPER::new($parent);
 
 	$self->{'TabTitle'} = 'One-Key Team/Pet Select';
 
@@ -36,7 +38,7 @@ sub tab {
 	$enablecb->SetToolTip( Wx::ToolTip->new('Check this to enable the Team/Pet Select Binds') );
 
 	my $helpbutton = Wx::BitmapButton->new($self, -1, Utility::Icon('Help'));
-	EVT_BUTTON($self, $helpbutton, Utility::Help($self));  # yah, not &Utility...  help() sends us back a closure
+	EVT_BUTTON($self, $helpbutton, sub { $self->help }); 
 
 	$headerSizer->Add($enablecb, 0, wxALIGN_CENTER_VERTICAL);
 	$headerSizer->Add($helpbutton, wxALIGN_RIGHT, 0);

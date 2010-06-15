@@ -11,13 +11,6 @@ sub new {
 	my ($proto, $parent) = @_;
 	my $class = ref $proto || $proto;
 	my $self = $class->SUPER::new($parent);
-	return $self;
-}
-
-# plugins will want to override this method.
-# it needs to return a wxPanel to pack into a notebook tab, and the title of the tab
-sub tab {
-	my ($self) = @_;
 
 	($self->{'TabTitle'} = ref $self) =~ s/BCPlugins:://;
 

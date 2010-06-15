@@ -11,9 +11,11 @@ use Wx qw( wxALIGN_RIGHT wxALIGN_BOTTOM wxALIGN_CENTER wxALIGN_CENTER_VERTICAL w
 use Wx qw( wxCB_READONLY );
 
 
-sub tab {
+sub new {
 
-	my ($self) = @_;
+	my ($class, $parent) = @_;
+
+	my $self = $class->SUPER::new($parent);
 
 	$self->{'TabTitle'} = 'Mastermind / Pet Binds';
 

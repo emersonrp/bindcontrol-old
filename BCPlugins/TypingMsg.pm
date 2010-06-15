@@ -11,9 +11,11 @@ use Utility qw(id);
 
 my $Typingnotifierlimit = { cmdlist => ["Away From Keyboard","Emote"] };
 
-sub tab {
+sub new {
 
-	my ($self) = @_;
+	my ($class, $parent) = @_;
+
+	my $self = $class->SUPER::new($parent);
 
 	$self->{'TabTitle'} = 'Typing Message';
 

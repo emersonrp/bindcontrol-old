@@ -8,9 +8,11 @@ use parent "BCPlugins";
 use Wx qw( wxALIGN_RIGHT wxALIGN_CENTER_VERTICAL wxEXPAND );
 use Utility qw(id);
 
-sub tab {
+sub new {
 
-	my ($self) = @_;
+	my ($class, $parent) = @_;
+
+	my $self = $class->SUPER::new($parent);
 
 	$self->{'TabTitle'} = 'Single Key Pet Selection';
 
