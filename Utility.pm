@@ -13,9 +13,7 @@ my ($resetfile1, $resetfile2, $resetkey, $numbinds);
 
 sub id {
 	state (%ids, $nextID);
-	my $control = shift;
-	$ids{$control} ||= ++$nextID;
-	return $ids{$control};
+	$ids{shift()} ||= ++$nextID;
 }
 
 sub WriteBind {

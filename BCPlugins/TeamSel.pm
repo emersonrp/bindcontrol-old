@@ -38,7 +38,7 @@ sub new {
 	$enablecb->SetToolTip( Wx::ToolTip->new('Check this to enable the Team/Pet Select Binds') );
 
 	my $helpbutton = Wx::BitmapButton->new($self, -1, Utility::Icon('Help'));
-	EVT_BUTTON($self, $helpbutton, sub { $self->help }); 
+	EVT_BUTTON($self, $helpbutton, sub { shift && $self->help(@_) }); 
 
 	$headerSizer->Add($enablecb, 0, wxALIGN_CENTER_VERTICAL);
 	$headerSizer->Add($helpbutton, wxALIGN_RIGHT, 0);

@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 package BCPlugins;
-use Wx qw( wxVERTICAL wxSTAY_ON_TOP );
+use Wx qw( :everything);
 
 use parent -norequire, 'Wx::Panel';
 
@@ -18,14 +18,18 @@ sub new {
 }
 
 sub help {
-	my $self = shift;
-
+	my ($self, $event) = @_;
+print STDERR Data::Dumper::Dumper $event;
 	unless ($self->{'helpwindow'}) {
-		my $helpwindow = Wx::MiniFrame->new(undef, -1, "$self->{'TabTitle'} Help");
-		my $sizer = Wx::FlexGridSizer->new(0,1,0,0);
-		my $st = Wx::StaticText->new( $helpwindow, -1, "love!");
-		# my $st = Wx::StaticText->new( $helpwindow, -1, $self->HelpText() );
-		$sizer->Add( $st, 0, wxALL );
+		my $helpwindow = Wx::MiniFrame->new(
+				undef, -1,
+				"$self->{'TabTitle'} Help",
+				wxDefaultPosition, # TODO 'under mouse' when we do hover
+				wxDefaultSize,
+		);
+		my $sizer = Wx::BoxSizer->new(wxVERTICAL);
+		my $st = Wx::StaticText->new( $helpwindow, -1, $self->HelpText );
+		$sizer->Add( $st, 0, wxALIGN_CENTER_VERTICAL, );
 
 		$helpwindow->SetSizer($sizer);
 
@@ -37,6 +41,6 @@ sub help {
 	return $self->{'helpwindow'};
 }
 
-sub HelpText { qw|Help not currently implemented here.|; }
+sub HelpText { qq|Help not currently implemented here.|; }
 
 1;
