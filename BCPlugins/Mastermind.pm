@@ -13,7 +13,9 @@ use Wx qw( wxCB_READONLY );
 
 sub tab {
 
-	my ($self, $parent) = @_;
+	my ($self) = @_;
+
+	$self->{'TabTitle'} = 'Mastermind / Pet Binds';
 
 	my $profile = $Profile::current;
 	my $MMP = $profile->{'MastermindPets'};
@@ -103,18 +105,16 @@ sub tab {
 		$MMP->{'Primary'} = "Mercenaries";
 	}
 
-	my $tab = Wx::Panel->new($parent);
-
 	my $sizer = Wx::BoxSizer->new(wxVERTICAL);
 
-	my $useCB = Wx::CheckBox->new( $tab, -1, 'Enable Mastermind Pet Binds');
+	my $useCB = Wx::CheckBox->new( $self, -1, 'Enable Mastermind Pet Binds');
 	$useCB->SetToolTip(Wx::ToolTip->new('Check this to enable the Mastermind Pet Action Binds'));
 	$sizer->Add($useCB, 0, wxALL);
 
 # TODO - add checkbox handler to hide/show (enable/disable?) the bodyguard options
 # TODO -- actually, automagically enable/disable these depending on whether any pets have their
 # individual "Bodyguard" checkboxes checked.
-	my $bgCB = Wx::CheckBox->new( $tab, -1, 'Enable Bodyguard Mode Binds');
+	my $bgCB = Wx::CheckBox->new( $self, -1, 'Enable Bodyguard Mode Binds');
 	$bgCB->SetToolTip(Wx::ToolTip->new('Check this to enable the Bodyguard Mode Binds'));
 	$bgCB->SetValue($MMP->{'PetBodyguardMode'});
 	$sizer->Add($bgCB, 0, wxALL);
@@ -128,13 +128,13 @@ sub tab {
 
 		my $basename = $k->{'basename'};  # all of the fieldnames we look up in the MMP are based on this value
 
-		my $al = Wx::StaticText->new($tab, -1, $k->{'label'});
-		my $ab = Wx::Button->    new($tab, $basename, $MMP->{$basename});
+		my $al = Wx::StaticText->new($self, -1, $k->{'label'});
+		my $ab = Wx::Button->    new($self, $basename, $MMP->{$basename});
 
-		my $cl = Wx::StaticText->new($tab, -1, "Response to $k->{'label'}");
-		my $cm = Wx::ComboBox->  new($tab, "${basename}RespPicker", $MMP->{"${basename}ResponseMethod"},
+		my $cl = Wx::StaticText->new($self, -1, "Response to $k->{'label'}");
+		my $cm = Wx::ComboBox->  new($self, "${basename}RespPicker", $MMP->{"${basename}ResponseMethod"},
 				wxDefaultPosition, wxDefaultSize, $ChatOptions, wxCB_READONLY);
-		my $cr = Wx::TextCtrl->  new($tab, "${basename}Response",   $MMP->{"${basename}Response"});
+		my $cr = Wx::TextCtrl->  new($self, "${basename}Response",   $MMP->{"${basename}Response"});
 
 		my $tip = $k->{'tooltipdetail'};
 		$ab->SetToolTip( Wx::ToolTip->new("Choose the key combo that will $tip"));
@@ -159,20 +159,20 @@ sub tab {
 	my $PetNames = Wx::FlexGridSizer->new(0,5,5,5);
 	for my $PetID (1..6) {
 
-		my $pn = Wx::TextCtrl->new($tab,  "Pet${PetID}Name", $MMP->{"Pet${PetID}Name"});
+		my $pn = Wx::TextCtrl->new($self,  "Pet${PetID}Name", $MMP->{"Pet${PetID}Name"});
 		$pn->SetToolTip( Wx::ToolTip->new("Specify Pet ${PetID}'s Name for individual selection") );
 
-		my $cb = Wx::CheckBox->new($tab, "Pet${PetID}Bodyguard", "Bodyguard" );
+		my $cb = Wx::CheckBox->new($self, "Pet${PetID}Bodyguard", "Bodyguard" );
 		$cb->SetValue($MMP->{"Pet${PetID}Bodyguard"});
 		$cb->SetToolTip( Wx::ToolTip->new("Select whether pet $PetID acts as Bodyguard") );
 
-		my $bn = Wx::Button->    new($tab, "PetSelect$PetID", $MMP->{"PetSelect$PetID"});
+		my $bn = Wx::Button->    new($self, "PetSelect$PetID", $MMP->{"PetSelect$PetID"});
 		$bn->SetToolTip( Wx::ToolTip->new("Choose the Key Combo to Select Pet $PetID"));
 
-		$PetNames->Add( Wx::StaticText->new($tab, -1, "Pet ${PetID}'s Name"), 0, wxALIGN_CENTER_VERTICAL);
+		$PetNames->Add( Wx::StaticText->new($self, -1, "Pet ${PetID}'s Name"), 0, wxALIGN_CENTER_VERTICAL);
 		$PetNames->Add( $pn );
 		$PetNames->Add( $cb, 0, wxALIGN_CENTER_VERTICAL);
-		$PetNames->Add( Wx::StaticText->new($tab, -1, "Select Pet $PetID"), 0, wxALIGN_CENTER_VERTICAL);
+		$PetNames->Add( Wx::StaticText->new($self, -1, "Select Pet $PetID"), 0, wxALIGN_CENTER_VERTICAL);
 		$PetNames->Add( $bn );
 	}
 	$sizer->Add($PetNames);
@@ -180,7 +180,7 @@ sub tab {
 # TODO -- add this stuff to a single "Credits" tab somewhere kthx
 	$sizer->Add(
 		Wx::StaticText->new(
-			$tab, -1,
+			$self, -1,
 			"The Original Mastermind Control Binds\n" .
 			"were created in CoV Beta by Khaiba\n" .
 			"a.k.a. Sandolphan\n" .
@@ -189,9 +189,9 @@ sub tab {
 			"Thugs added by Konoko!\n"), 0, wxALL, 5
 	);
 
-	$tab->SetSizerAndFit($sizer);
+	$self->SetSizerAndFit($sizer);
 
-	return ($tab, 'Mastermind Pet Binds');
+	return $self;
 }
 
 sub mmBGSelBind {

@@ -23,9 +23,9 @@ sub new {
 	$self->AddPage($GeneralPanel, "General");
 
 	# walk through the plugins and make them spit up their UI tabs.
-	for my $plugin ($mainwindow->plugins) {
-		my ($panel, $title) = $plugin->tab($self);
-		$self->AddPage($panel, $title);
+	for my $plugin ($mainwindow->plugins($self)) {
+		my $tab = $plugin->tab;
+		$self->AddPage($tab, $tab->{'TabTitle'});
 	}
 
 	return $self;

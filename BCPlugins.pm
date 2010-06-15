@@ -1,26 +1,49 @@
 #!/usr/bin/perl
 
 package BCPlugins;
-use Wx;
+use Wx qw( wxVERTICAL wxSTAY_ON_TOP );
+
+use parent -norequire, 'Wx::Panel';
 
 use Layout;
 
 sub new {
-	my $proto = shift;
+	my ($proto, $parent) = @_;
 	my $class = ref $proto || $proto;
-	return bless {}, $class;
+	my $self = $class->SUPER::new($parent);
+	return $self;
 }
 
 # plugins will want to override this method.
 # it needs to return a wxPanel to pack into a notebook tab, and the title of the tab
 sub tab {
-	my ($self, $parent) = @_;
+	my ($self) = @_;
 
-	my $panel = Wx::Panel->new($parent, -1);
+	($self->{'TabTitle'} = ref $self) =~ s/BCPlugins:://;
 
-	(my $title = $self) =~ s/BCPlugins:://;
-
-	return ($panel, $title);
+	return $self;
 }
+
+sub help {
+	my $self = shift;
+
+	unless ($self->{'helpwindow'}) {
+		my $helpwindow = Wx::MiniFrame->new(undef, -1, "$self->{'TabTitle'} Help");
+		my $sizer = Wx::FlexGridSizer->new(0,1,0,0);
+		my $st = Wx::StaticText->new( $helpwindow, -1, "love!");
+		# my $st = Wx::StaticText->new( $helpwindow, -1, $self->HelpText() );
+		$sizer->Add( $st, 0, wxALL );
+
+		$helpwindow->SetSizer($sizer);
+
+		$self->{'helpwindow'} = $helpwindow;
+	}
+
+	$self->{'helpwindow'}->Show(1);
+
+	return $self->{'helpwindow'};
+}
+
+sub HelpText { qw|Help not currently implemented here.|; }
 
 1;

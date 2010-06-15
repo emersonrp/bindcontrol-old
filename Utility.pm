@@ -3,6 +3,9 @@ package Utility;
 use strict;
 use parent 'Exporter';
 
+use Wx qw( :everything );
+Wx::InitAllImageHandlers();
+
 our @EXPORT_OK = qw( id );
 
 my ($resetfile1, $resetfile2, $resetkey, $numbinds);
@@ -46,24 +49,32 @@ sub WriteBind {
 
 sub ColorDefault {
 	{
-		border => {
-			r => 0,
-			g => 0,
-			b => 0,
-		},
-		foreground => {
-			r => 0,
-			g => 0,
-			b => 0,
-		},
-		background => {
-			r => 255,
-			g => 255,
-			b => 255,
-		},
+		border     => { r => 0,   g => 0,   b => 0, },
+		foreground => { r => 0,   g => 0,   b => 0, },
+		background => { r => 255, g => 255, b => 255, },
 	}
 }
 
+{
+	my %Icons;
+	sub Icon {
+		my $iconname = shift;
+		unless ($Icons{$iconname}) {
+			$Icons{$iconname} =
+				Wx::Bitmap->new (
+					Wx::Image->new (
+						"icons/$iconname.png", wxBITMAP_TYPE_ANY, -1,
+					)
+				);
+		}
+		return $Icons{$iconname};
+	}
+}
+
+sub Help {
+	my ($thingie) = shift;
+	return sub { $thingie->help() };
+}
 
 1;
 __DATA__

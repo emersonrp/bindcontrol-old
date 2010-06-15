@@ -48,7 +48,7 @@ use Wx::Event qw(
 use parent -norequire, 'Wx::Frame';
 
 use Utility qw(id);
-use Module::Pluggable require => 1, search_path => 'BCPlugins';
+use Module::Pluggable instantiate => 'new', search_path => 'BCPlugins';
 
 sub new {
 
@@ -62,11 +62,6 @@ sub new {
         [-1 ,-1],      # Use a default size
         # optionally specify a window style here
     );
-
-	for my $plugin ($self->plugins) {
-		my $new = "${plugin}::new";
-		$self->$new;
-	}
 
     # "Profile" Menu
 	my $ProfMenu = Wx::Menu->new();

@@ -14,7 +14,10 @@ use Wx qw( wxCB_READONLY );
 use Utility qw(id);
 
 sub tab {
-	my ($self, $parent) = @_;
+	my ($self) = @_;
+
+	$self->{'TabTitle'} = 'Inspiration Popper';
+
 	my $profile = $Profile::current;
 	my $InspPop = $profile->{'InspPop'};
 	unless ($InspPop) {
@@ -31,8 +34,6 @@ sub tab {
 		$profile->{'InspPop'} = $InspPop;
 	}
 
-	my $tab = Wx::Panel->new($parent);
-
 	my $sizer = Wx::BoxSizer->new(wxVERTICAL);
 
 	my $InspRows =    Wx::FlexGridSizer->new(0,10,2,2);
@@ -48,39 +49,39 @@ sub tab {
 
 			my $RowSet = $order ? $RevInspRows : $InspRows;
 
-			$RowSet->Add ( Wx::StaticText->new($tab, -1, "$order $Insp Key"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
+			$RowSet->Add ( Wx::StaticText->new($self, -1, "$order $Insp Key"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
 
-			my $KeyPicker =  Wx::Button->    new($tab, id("${order}${Insp}Key"), $InspPop->{"${order}${Insp}Key"});
+			my $KeyPicker =  Wx::Button->    new($self, id("${order}${Insp}Key"), $InspPop->{"${order}${Insp}Key"});
 			$KeyPicker->SetToolTip( Wx::ToolTip->new("Choose the key combo to activate a $Insp inspiration") );
 			$RowSet->Add ( $KeyPicker, 0, wxEXPAND);
 
 			$RowSet->AddStretchSpacer(wxEXPAND);
 
-			my $ColorsCB = Wx::CheckBox->    new($tab, id("${order}${Insp}Colors"), '');
+			my $ColorsCB = Wx::CheckBox->    new($self, id("${order}${Insp}Colors"), '');
 			$ColorsCB->SetToolTip( Wx::ToolTip->new("Colorize Inspiration-Popper chat feedback") );
 			$RowSet->Add ( $ColorsCB, 0, wxALIGN_CENTER_VERTICAL);
 
-			$RowSet->Add( Wx::StaticText->new($tab, -1, "Border"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
+			$RowSet->Add( Wx::StaticText->new($self, -1, "Border"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
 			my $bc = $InspPop->{"${order}${Insp}Colors"}->{'border'};
 			$RowSet->Add( Wx::ColourPickerCtrl->new(
-					$tab, id("${order}${Insp}BorderColor"),
+					$self, id("${order}${Insp}BorderColor"),
 					Wx::Colour->new($bc->{'r'}, $bc->{'g'}, $bc->{'b'}),
 					wxDefaultPosition, wxDefaultSize,
 				)
 			);
 
-			$RowSet->Add( Wx::StaticText->new($tab, -1, "Background"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
+			$RowSet->Add( Wx::StaticText->new($self, -1, "Background"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
 			my $bc = $InspPop->{"${order}${Insp}Colors"}->{'background'};
 			$RowSet->Add( Wx::ColourPickerCtrl->new(
-					$tab, id("${order}${Insp}BackgroundColor"),
+					$self, id("${order}${Insp}BackgroundColor"),
 					Wx::Colour->new($bc->{'r'}, $bc->{'g'}, $bc->{'b'}),
 					wxDefaultPosition, wxDefaultSize,
 				)
 			);
-			$RowSet->Add( Wx::StaticText->new($tab, -1, "Text"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
+			$RowSet->Add( Wx::StaticText->new($self, -1, "Text"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
 			my $fc = $InspPop->{"${order}${Insp}Colors"}->{'foreground'};
 			$RowSet->Add( Wx::ColourPickerCtrl->new(
-					$tab, id("${order}${Insp}ForegroundColor"),
+					$self, id("${order}${Insp}ForegroundColor"),
 					Wx::Colour->new($fc->{'r'}, $fc->{'g'}, $fc->{'b'}),
 					wxDefaultPosition, wxDefaultSize,
 				)
@@ -88,22 +89,23 @@ sub tab {
 		}
 	}
 
-	my $useCB = Wx::CheckBox->new( $tab, -1, 'Enable Inspiration Popper Binds (prefer largest)');
+	my $useCB = Wx::CheckBox->new( $self, -1, 'Enable Inspiration Popper Binds (prefer largest)');
 	$useCB->SetToolTip(Wx::ToolTip->new('Check this to enable the Inspiration Popper Binds, (largest used first)'));
 	$sizer->Add($useCB, 0, wxALL);
 
 	$sizer->Add($InspRows);
 
-	my $useRevCB = Wx::CheckBox->new( $tab, -1, 'Enable Reverse Inspiration Popper Binds (prefer smallest)');
+	my $useRevCB = Wx::CheckBox->new( $self, -1, 'Enable Reverse Inspiration Popper Binds (prefer smallest)');
 	$useCB->SetToolTip(Wx::ToolTip->new('Check this to enable the Reverse Inspiration Popper Binds, (smallest used first)'));
 	$sizer->Add($useRevCB, 0, wxALL);
 
 	$sizer->Add($RevInspRows);
 
-	$tab->SetSizerAndFit($sizer);
+	$self->SetSizerAndFit($sizer);
 
-	return ($tab, "Inspiration Popper");
+	return $self;
 }
+
 sub makebind {
 	my $profile = $Profile::current;
 	my $resetfile = $profile->{'resetfile'};

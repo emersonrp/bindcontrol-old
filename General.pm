@@ -29,7 +29,7 @@ sub new {
 	my $o = $profile->{'Origin'};
 	my $p = $profile->{'Primary'};
 	my $s = $profile->{'Secondary'};
- 
+
 	my $topSizer = Wx::FlexGridSizer->new(0,2,5,5);
 
 	# Name
@@ -85,7 +85,7 @@ sub new {
 	$topSizer->Add($dirPicker, 0, wxALL|wxEXPAND,);
 
 
-	$self->SetSizerAndFit($topSizer);
+	$self->SetSizer($topSizer);
 
 	EVT_COMBOBOX( $self, id('PICKER_ARCHETYPE'), \&Profile::pickArchetype );
 	EVT_COMBOBOX( $self, id('PICKER_ORIGIN'),    \&Profile::pickOrigin );
