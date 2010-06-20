@@ -128,7 +128,7 @@ sub bindisused {
 	return $profile->{'TeamSelect'} ? $profile->{'TeamSelect'}->{'enable'} : undef;
 }
 
-sub helptext {qq|
+sub HelpText {qq|
 
 Team/Pet Selection binds contributed by ShieldBearer.
 
