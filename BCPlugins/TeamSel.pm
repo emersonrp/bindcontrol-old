@@ -5,6 +5,8 @@ use strict;
 package BCPlugins::TeamSel;
 use parent "BCPlugins";
 
+use BindFile;
+
 use Wx qw( wxDefaultSize wxDefaultPosition wxID_OK wxID_CANCEL wxID_YES wxID_ANY );
 use Wx qw( wxVERTICAL wxHORIZONTAL wxALL wxLEFT wxRIGHT wxTOP wxBOTTOM wxCENTER wxEXPAND );
 use Wx qw( wxALIGN_RIGHT wxALIGN_BOTTOM wxALIGN_CENTER wxALIGN_CENTER_VERTICAL wxALIGN_CENTER_HORIZONTAL );
@@ -89,16 +91,16 @@ sub makebind {
 			$selmethod1 = "teamselect";
 			$selnummod1 = 0;
 		}
-		my $selresetfile = cbOpen($profile->{'base'} . '\\teamsel\\reset.txt','w');
+		my $selresetfile = BindFile->new("$profile->{'base'}\\teamsel\\reset.txt");
 		for my $i (1..8) {
-			my $selfile = cbOpen($profile->{'base'} . "\\teamsel\\sel${i}.txt",'w');
-			cbWriteBind($resetfile,   $TeamSelect->{"sel$i"},"$selmethod " . ($i - $selnummod) . '$$bindloadfile '.$profile->{'base'}."\\teamsel\\sel${i}.txt");
-			cbWriteBind($selresetfile,$TeamSelect->{"sel$i"},"$selmethod " . ($i - $selnummod) . '$$bindloadfile '.$profile->{'base'}."\\teamsel\\sel${i}.txt");
+			my $selfile = BindFile->new("$profile->{'base'}\\teamsel\\sel${i}.txt");
+			$resetfile->   SetBind($TeamSelect->{"sel$i"},"$selmethod " . ($i - $selnummod) . '$$bindloadfile ' . "$profile->{'base'}\\teamsel\\sel${i}.txt");
+			$selresetfile->SetBind($TeamSelect->{"sel$i"},"$selmethod " . ($i - $selnummod) . '$$bindloadfile ' . "$profile->{'base'}\\teamsel\\sel${i}.txt");
 			for my $j (1..8) {
 				if ($i == $j) {
-					cbWriteBind($selfile,$TeamSelect->{"sel$j"},"$selmethod1 " . ($j - $selnummod1) . '$$bindloadfile ' . "$profile->{'base'}\\teamsel\\reset.txt");
+					$selfile->SetBind($TeamSelect->{"sel$j"},"$selmethod1 " . ($j - $selnummod1) . '$$bindloadfile ' . "$profile->{'base'}\\teamsel\\reset.txt");
 				} else {
-					cbWriteBind($selfile,$TeamSelect->{"sel$j"},"$selmethod " .  ($j - $selnummod)  . '$$bindloadfile ' . "$profile->{'base'}\\teamsel\\sel$j.txt");
+					$selfile->SetBind($TeamSelect->{"sel$j"},"$selmethod " .  ($j - $selnummod)  . '$$bindloadfile ' . "$profile->{'base'}\\teamsel\\sel$j.txt");
 				}
 			}
 			close $selfile;
@@ -112,7 +114,7 @@ sub makebind {
 			$selnummod = 1;
 		}
 		for my $i (1..8) {
-			cbWriteBind($resetfile,$TeamSelect->{'sel1'},"$selmethod " . ($i - $selnummod));
+			$resetfile->SetBind($TeamSelect->{'sel1'},"$selmethod " . ($i - $selnummod));
 		}
 	}
 }

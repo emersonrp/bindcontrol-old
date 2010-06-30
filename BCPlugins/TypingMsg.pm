@@ -27,46 +27,25 @@ sub new {
 		# $Typing->{'Message'} = "Typing...";
 	}
 	$Typing->{'Message'} &&= "afk $Typing->{'Message'}";
-	$Typing->{'StartChat'} ||= "ENTER";
+	$Typing->{'StartChat'}  ||= "ENTER";
 	$Typing->{'SlashChat1'} ||= "/";
 	$Typing->{'SlashChat2'} ||= ";";
-	$Typing->{'AutoReply'} ||= "BACKSPACE";
+	$Typing->{'AutoReply'}  ||= "BACKSPACE";
 	$Typing->{'TellTarget'} ||= "COMMA";
-	$Typing->{'QuickChat'} ||= "\'";
+	$Typing->{'QuickChat'}  ||= "\'";
 
 	my $sizer = Wx::FlexGridSizer->new(0,2,10,10);
 
-	my $button;
-	$button = Wx::Button->new($self, id('StartChatKey'), $Typing->{'StartChat'});
-	$button->SetToolTip( Wx::ToolTip->new('Choose the key combo that activates the Chat bar'));
-	$sizer->Add( Wx::StaticText->new($self, -1, "Start Chat Key"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
-	$sizer->Add( $button, 0, wxEXPAND);
-
-
-	$button = Wx::Button->new($self, id('SlashChat1'), $Typing->{'SlashChat1'});
-	$button->SetToolTip( Wx::ToolTip->new('Choose the key combo that activates the Chat bar with a slash already typed'));
-	$sizer->Add( Wx::StaticText->new($self, -1, "Primary Slashchat"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
-	$sizer->Add( $button, 0, wxEXPAND);
-
-	$button = Wx::Button->new($self, id('SlashChat2'), $Typing->{'SlashChat2'});
-	$button->SetToolTip( Wx::ToolTip->new('Choose the second key combo that activates the Chat bar with a slash already typed'));
-	$sizer->Add( Wx::StaticText->new($self, -1, "Secondary Slashchat"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
-	$sizer->Add( $button, 0, wxEXPAND);
-
-	$button = Wx::Button->new($self, id('AutoReply'), $Typing->{'AutoReply'});
-	$button->SetToolTip( Wx::ToolTip->new('Choose the key combo that Autoreplies to incoming tells'));
-	$sizer->Add( Wx::StaticText->new($self, -1, "Autoreply Key"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
-	$sizer->Add( $button, 0, wxEXPAND);
-
-	$button = Wx::Button->new($self, id('TellTarget'), $Typing->{'TellTarget'});
-	$button->SetToolTip( Wx::ToolTip->new('Choose the key combo that starts a /tell to your current target'));
-	$sizer->Add( Wx::StaticText->new($self, -1, "Start Chat Key"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
-	$sizer->Add( $button, 0, wxEXPAND);
-
-	$button = Wx::Button->new($self, id('QuickChat'), $Typing->{'QuickChat'});
-	$button->SetToolTip( Wx::ToolTip->new('Choose the key combo that activates Quickchat'));
-	$sizer->Add( Wx::StaticText->new($self, -1, "Quickchat Key"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
-	$sizer->Add( $button, 0, wxEXPAND);
+	for my $b ( (
+		['StartChat', 'Start Chat Key',     'Choose the key combo that activates the Chat bar'],
+		['SlashChat1','Primary Slashchat',  'Choose the key combo that activates the Chat bar with a slash already typed'],
+		['SlashChat2','Secondary Slashchat','Choose the second key combo that activates the Chat bar with a slash already typed'],
+		['AutoReply', 'Autoreply Key',      'Choose the key combo that Autoreplies to incoming tells'],
+		['TellTarget','Tell Target Key',    'Choose the key combo that starts a /tell to your current target'],
+		['QuickChat', 'QuickChat Key',      'Choose the key combo that activates QuickChat'],
+	)) {
+		$self->addLabeledButton($sizer, $b->[1], $Typing->{$b->[0]}, $b->[2]);
+	}
 
 # # # TODO -- this is shiny, you can compose a multipart emote etc for typing.  Implement this.
 

@@ -50,18 +50,18 @@ sub ts2CreateSet {
 	#  tsize is the size of the team at the moment
 	#  tpos is the position of the player at the moment, or 0 if unknown
 	#  tsel is the currently selected team member as far as the bind knows, or 0 if unknown
-	cbWriteBind($file,$ts2->{'reset'},'tell $name, Re-Loaded Single Key Team Select Bind.$$bindloadfile ' . $profile->{'base'} . '\\teamsel2\\100.txt');
+	$file->SetBind($ts2->{'reset'},'tell $name, Re-Loaded Single Key Team Select Bind.$$bindloadfile ' . $profile->{'base'} . '\\teamsel2\\100.txt');
 	if ($tsize < 8) {
-		cbWriteBind($file,$ts2->{'sizeup'},'tell $name, ' . formatTeamConfig($tsize+1,$tpos) . '$$bindloadfile ' . $profile->{'base'} . '\\teamsel2\\' . ($tsize+1) . $tpos . $tsel . '.txt');
+		$file->SetBind($ts2->{'sizeup'},'tell $name, ' . formatTeamConfig($tsize+1,$tpos) . '$$bindloadfile ' . $profile->{'base'} . '\\teamsel2\\' . ($tsize+1) . $tpos . $tsel . '.txt');
 	} else {
-		cbWriteBind($file,$ts2->{'sizeup'},'nop');
+		$file->SetBind($ts2->{'sizeup'},'nop');
 	}
 	if ($tsize == 1) {
-		cbWriteBind($file,$ts2->{'sizedn'}, 'nop');
-		cbWriteBind($file,$ts2->{'posup'},  'nop');
-		cbWriteBind($file,$ts2->{'posdn'},  'nop');
-		cbWriteBind($file,$ts2->{'selnext'},'nop');
-		cbWriteBind($file,$ts2->{'selprev'},'nop');
+		$file->SetBind($ts2->{'sizedn'}, 'nop');
+		$file->SetBind($ts2->{'posup'},  'nop');
+		$file->SetBind($ts2->{'posdn'},  'nop');
+		$file->SetBind($ts2->{'selnext'},'nop');
+		$file->SetBind($ts2->{'selprev'},'nop');
 	} else {
 		my ($selnext,$selprev) = ($tsel+1,$tsel-1);
 		if ($selnext > $tsize) { $selnext = 1 }
@@ -80,12 +80,12 @@ sub ts2CreateSet {
 		if ($tsize-1 < $tsel) { $newsel = $tsize-1 }
 		if ($tsize == 2)      { $newpos = $newsel = 0 }
 
-		cbWriteBind($file,$ts2->{'sizedn'},'tell $name, ' . formatTeamConfig($tsize-1,$newpos) . '$$bindloadfile ' . $profile->{'base'} . '\\teamsel2\\' . ($tsize-1) . $newpos . $newsel . '.txt');
-		cbWriteBind($file,$ts2->{'posup'}, 'tell $name, ' . formatTeamConfig($tsize,$tposup)   . '$$bindloadfile ' . $profile->{'base'} . '\\teamsel2\\' . $tsize . $tposup . $tsel . '.txt');
-		cbWriteBind($file,$ts2->{'posdn'}, 'tell $name, ' . formatTeamConfig($tsize,$tposdn)   . '$$bindloadfile ' . $profile->{'base'} . '\\teamsel2\\' . $tsize . $tposdn . $tsel . '.txt');
+		$file->SetBind($ts2->{'sizedn'},'tell $name, ' . formatTeamConfig($tsize-1,$newpos) . '$$bindloadfile ' . $profile->{'base'} . "\\teamsel2\\" . ($tsize-1) . $newpos . $newsel . '.txt');
+		$file->SetBind($ts2->{'posup'}, 'tell $name, ' . formatTeamConfig($tsize,  $tposup) . '$$bindloadfile ' . $profile->{'base'} . "\\teamsel2\\" . $tsize . $tposup . $tsel . '.txt');
+		$file->SetBind($ts2->{'posdn'}, 'tell $name, ' . formatTeamConfig($tsize,  $tposdn) . '$$bindloadfile ' . $profile->{'base'} . "\\teamsel2\\" . $tsize . $tposdn . $tsel . '.txt');
 
-		cbWriteBind($file,$ts2->{'selnext'},'teamselect ' . $selnext . '$$bindloadfile ' . $profile->{'base'} . '\\teamsel2\\' . $tsize . $tpos . $selnext . '.txt');
-		cbWriteBind($file,$ts2->{'selprev'},'teamselect ' . $selprev . '$$bindloadfile ' . $profile->{'base'} . '\\teamsel2\\' . $tsize . $tpos . $selprev . '.txt');
+		$file->SetBind($ts2->{'selnext'},'teamselect ' . $selnext . '$$bindloadfile ' . $profile->{'base'} . "\\teamsel2\\" . $tsize . $tpos . $selnext . '.txt');
+		$file->SetBind($ts2->{'selprev'},'teamselect ' . $selprev . '$$bindloadfile ' . $profile->{'base'} . "\\teamsel2\\" . $tsize . $tpos . $selprev . '.txt');
 	}
 }
 
@@ -98,9 +98,8 @@ sub makebind {
 		for my $pos (0..$size) {
 			for my $sel (0..$size) {
 				unless (($sel != pos) or ($sel == 0)) {
-					my $file = cbOpen($profile->{'base'} . '\\teamsel2\\' . $size . $pos . $sel . '.txt','w');
+					my $file = BindFile->new($profile->{'base'} . '\\teamsel2\\' . $size . $pos . $sel . '.txt');
 					ts2CreateSet($profile,$teamsel2,$size,$pos,$sel,$file);
-					close $file;
 				}
 			}
 		}

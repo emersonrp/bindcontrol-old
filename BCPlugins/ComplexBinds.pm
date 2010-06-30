@@ -2,6 +2,8 @@
 
 use strict;
 
+use BindFile;
+
 package BCPlugins::ComplexBinds;
 use parent "BCPlugins";
 
@@ -175,7 +177,7 @@ sub writeBind {
 		$cmd = $cbinds->{$bindset}->{$key}->{$cycle} . '$$';
 	}
 	$cmd .= "bindloadfile $profile->{'base'}\\cbinds\\$bindset-$nextCycle.txt";
-	cbWriteBind($file,$k,$cmd);
+	$file->SetBind($k,$cmd);
 }
 
 sub makebind {
@@ -190,7 +192,7 @@ sub makebind {
 		for my $j (1..$maxC) { #  for each cycle in this bindset, counting the first one twice
 			# create a new bindfile if cycle is 2+
 			if ($j > 1) {
-				$cbindfile = cbOpen("$profile->{'base'}\\cbinds\\$k-" . ($j-1) .".txt","w")
+				$cbindfile = BindFile->new("$profile->{'base'}\\cbinds\\$k-" . ($j-1) .".txt")
 			}
 			for my $i (1..$maxK) {
 				if ($j == 1) {
@@ -198,9 +200,6 @@ sub makebind {
 				} else {
 					writeBind($cbindfile,$cbinds,$i,$j-1,$k,$maxC-1,$profile)
 				}
-			}
-			if ($j > 1) {
-				close $cbindfile;
 			}
 		}
 	}

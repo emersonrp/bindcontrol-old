@@ -16,35 +16,6 @@ sub id {
 	$ids{shift()} ||= ++$nextID;
 }
 
-sub WriteBind {
-	my ($file,$key,$bindtext) = @_;
-
-	if (not $file) { die("Invalid file argument to cbWriteBind."); }
-	if (not $key)  { die("invalid key: $key"); }
-
-	my $prefix;
-	# writes out a bind to the given file in the format [key] "[bindtext]"\n
-	# This makes writing new binds a bit easier.
-	# get rid of prefix and suffix whitespace in bindtext.
-	if ($bindtext =~ /^-? \$\$/) { $prefix = '- $$'; }
-	$bindtext =~ s/^ +//;
-	$bindtext =~ s/ +$//;
-
-	# $bindtext =~ prefix..string.gsub(bindtext,"^%$%$","")
-	# $bindtext =~ string.gsub(bindtext,"%$%$%$%$","$$")
-	my $s = qq|$key "$bindtext"\n|;
-	if (length $s > 255) {
-		# TODO TODO TODO
-		# iup.Message("Warning!","A bindfile line for the "..key.." key ("..cbGetDesc(activeprofile,key)..") in file "..file.filename.." is longer than 255 characters, you may experience problems ingame!")
-	}
-	if ($file eq $resetfile1 and $key eq $resetkey) {
-		# TODO TODO TODO
-		# table.insert(resetfile2.binds,{key=key,s=s})
-	}
-	# TODO TODO TODO
-	# table.insert(file.binds,{key=key,s=s})
-	$numbinds++;
-}
 
 sub ColorDefault {
 	{
@@ -149,18 +120,6 @@ function dumptable(file,n,o,nList)
 		file:write("nil\n")
 	else
 		error("cannot save a "..type(o))
-	end
-end
-
-function cbOpen(filename, mode,real)
-	if real then return assert(io.open(filename,mode)) else
-		local f = {}
-		f.filename = filename
-		f.mode = mode
-		f.binds = {}
-		setmetatable(f,fmt)
-		filelist[filename] = f
-		return f
 	end
 end
 

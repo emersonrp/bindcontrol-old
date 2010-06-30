@@ -5,7 +5,7 @@ use Wx qw( :everything );
 
 use parent -norequire, 'Wx::Panel';
 
-use Layout;
+use Utility;
 
 sub new {
 	my ($proto, $parent) = @_;
@@ -38,5 +38,16 @@ sub help {
 }
 
 sub HelpText { qq|Help not currently implemented here.|; }
+
+sub addLabeledButton {
+    my ($self, $sizer, $label, $value, $tooltip) = @_;
+
+    my $button = Wx::Button->new($self, Utility::id($label), $defaultVal);
+    $button->SetToolTip( Wx::ToolTip->new($tooltip)) if $tooltip;
+
+    $sizer->Add( Wx::StaticText->new($self, -1, $label), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+    $sizer->Add( $button, 0, wxEXPAND,);
+}
+
 
 1;

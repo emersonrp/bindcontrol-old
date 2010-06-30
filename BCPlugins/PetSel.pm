@@ -6,6 +6,8 @@ package BCPlugins::PetSel;
 use parent "BCPlugins";
 
 use Wx qw( wxALIGN_RIGHT wxALIGN_CENTER_VERTICAL wxEXPAND );
+
+use BindFile;
 use Utility qw(id);
 
 sub new {
@@ -63,17 +65,17 @@ sub ts2CreateSet {
 	# tsize is the size of the team at the moment
 	# tpos is the position of the player at the moment, or 0 if unknown
 	# tsel is the currently selected team member as far as the bind knows, or 0 if unknown
-	#cbWriteBind(file,ts2.reset,'tell $name, Re-Loaded Single Key Team Select Bind.$$bindloadfile '..profile.base..'\\petsel\\10.txt')
+	#file->SetBind(ts2.reset,'tell $name, Re-Loaded Single Key Team Select Bind.$$bindloadfile '..profile.base..'\\petsel\\10.txt')
 	if ($tsize < 8) {
-		cbWriteBind($file,$ts2->{'sizeup'},'tell $name, ' . formatPetConfig($tsize+1) . '$$bindloadfile ' . $profile->{'base'} . '\\petsel\\'.($tsize+1) . "$tsel.txt");
+		$file->SetBind($ts2->{'sizeup'},'tell $name, ' . formatPetConfig($tsize+1) . '$$bindloadfile ' . $profile->{'base'} . '\\petsel\\'.($tsize+1) . "$tsel.txt");
 	} else {
-		cbWriteBind($file,$ts2->{'sizeup'},'nop');
+		$file->SetBind($ts2->{'sizeup'},'nop');
 	}
 
 	if ($tsize == 1) {
-		cbWriteBind($file,$ts2->{'sizedn'},'nop');
-		cbWriteBind($file,$ts2->{'selnext'},'petselect 0$$bindloadfile ' . $profile->{'base'} . '\\petsel\\' . $tsize . '1.txt');
-		cbWriteBind($file,$ts2->{'selprev'},'petselect 0$$bindloadfile ' . $profile->{'base'} . '\\petsel\\' . $tsize . '1.txt');
+		$file->SetBind($ts2->{'sizedn'},'nop');
+		$file->SetBind($ts2->{'selnext'},'petselect 0$$bindloadfile ' . $profile->{'base'} . '\\petsel\\' . $tsize . '1.txt');
+		$file->SetBind($ts2->{'selprev'},'petselect 0$$bindloadfile ' . $profile->{'base'} . '\\petsel\\' . $tsize . '1.txt');
 	} else {
 		my ($selnext,$selprev) = ($tsel+1,$tsel-1);
 		if ($selnext > $tsize) { $selnext = 1 }
@@ -81,9 +83,9 @@ sub ts2CreateSet {
 		my $newsel = $tsel;
 		if ($tsize-1 < $tsel) { $newsel = $tsize-1 }
 		if ($tsize == 2) { $newsel = 0 }
-		cbWriteBind($file,$ts2->{'sizedn'},'tell $name, ' . formatPetConfig($tsize-1) . '$$bindloadfile ' . $profile->{'base'} . '\\petsel\\' . ($tsize-1) . $newsel . '.txt');
-		cbWriteBind($file,$ts2->{'selnext'},'petselect ' . ($selnext-1) . '$$bindloadfile ' . $profile->{'base'} . '\\petsel\\' . $tsize . $selnext . '.txt');
-		cbWriteBind($file,$ts2->{'selprev'},'petselect ' . ($selprev-1) . '$$bindloadfile ' . $profile->{'base'} . '\\petsel\\' . $tsize . $selprev . '.txt');
+		$file->SetBind($ts2->{'sizedn'},'tell $name, ' . formatPetConfig($tsize-1) . '$$bindloadfile ' . $profile->{'base'} . '\\petsel\\' . ($tsize-1) . $newsel . '.txt');
+		$file->SetBind($ts2->{'selnext'},'petselect ' . ($selnext-1) . '$$bindloadfile ' . $profile->{'base'} . '\\petsel\\' . $tsize . $selnext . '.txt');
+		$file->SetBind($ts2->{'selprev'},'petselect ' . ($selprev-1) . '$$bindloadfile ' . $profile->{'base'} . '\\petsel\\' . $tsize . $selprev . '.txt');
 	}
 }
 
@@ -94,9 +96,8 @@ sub makebind {
 	ts2CreateSet($profile->{'petsel'},1,0,$profile->{'resetfile'});
 	for my $size (1..8) {
 		for my $sel (0..$size) {
-			my $file = cbOpen("$profile.base\\petsel\\$size$sel.txt",'w');
+			my $file = BindFile->new("$profile.base\\petsel\\$size$sel.txt");
 			ts2CreateSet($profile,$petsel,$size,$sel,$file);
-			close $file;
 		}
 	}
 }

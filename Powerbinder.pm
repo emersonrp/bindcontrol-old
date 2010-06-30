@@ -2,7 +2,6 @@
 use strict;
 
 package Powerbinder;
-use PowerBindCmds;
 
 our $cmds = {};
 our $cmdlist = [];
@@ -18,6 +17,8 @@ sub addCmd {
 	push @$clist, $label;
 }
 
+# this needs to happen after addCmd() is defined -- this is sort of a bug
+use PowerBindCmds;
 1;
 
 __DATA__

@@ -3,6 +3,8 @@
 use strict;
 
 package PowerBindCmds;
+use GameData;
+use Powerbinder;
 
 sub match1arg {
 	my ($s,$arg1,$arg2match) = @_;
@@ -40,7 +42,7 @@ sub formUsePowerCmd {
 	return $t;
 }
 
-sub newUsePowerCmd { return { type => "Use Power", method => 1, power => ''}; }
+sub newUsePowerCmd { { type => "Use Power", method => 1, power => ''}; }
 
 sub makeUsePowerCmd {
 	my ($t) = @_;
@@ -324,11 +326,9 @@ Powerbinder::addCmd("Custom Bind",&newCustomBind,&formCustomBind,&makeCustomBind
 ################################################################################
 
 ################################################################################
-our @GameData::Emotes;
-
 sub formEmoteBind {
 	my ($t,$profile,$refreshcb) = @_;
-#	t.settings = iup.frame{(cbListBox("Emote",emotelist,emotecount,t.emote,cbListBoxCB(profile,t,undef,"emote",refreshcb),196,undef,undef,undef,1))}
+#	t.settings = iup.frame{(cbListBox("Emote",@GameData::Emotes,emotecount,t.emote,cbListBoxCB(profile,t,undef,"emote",refreshcb),196,undef,undef,undef,1))}
 	return $t;
 }
 
@@ -442,8 +442,6 @@ Powerbinder::addCmd("Use Inspiration From Row/Column",&newInspExecTray,&formInsp
 
 ################################################################################
 
-our %GameData::Inspirations;
-
 sub formInspExecName {
 	my ($t,$profile,$refreshcb) = @_;
 #	t.settings = iup.frame{
@@ -456,13 +454,13 @@ sub newInspExecName { { type => "Use Inspiration By Name", insp => 1 } }
 
 sub makeInspExecName {
 	my $s = shift;
-	return $s ? "inspexecname " . $insps[$s->{'insp'}] : '';
+	return $s ? "inspexecname " . $GameData::Inspirations[$s->{'insp'}] : '';
 }
 
 sub matchInspExecName {
 	my $s = shift;
-	for my $v (@insps) {
-		if (lc $s eq "inspexecname " . lc $v) { return { type => "Use Inspiration By Name" , insp => $v } }
+	for my $v (@GameData::Inspirations) {
+		if (lc $s eq lc "inspexecname $v") { return { type => "Use Inspiration By Name" , insp => $v } }
 	}
 }
 

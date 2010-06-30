@@ -5,6 +5,8 @@ use strict;
 package BCPlugins::Mastermind;
 use parent "BCPlugins";
 
+use BindFile;
+
 use Wx qw( wxDefaultSize wxDefaultPosition wxID_OK wxID_CANCEL wxID_YES wxID_ANY );
 use Wx qw( wxVERTICAL wxHORIZONTAL wxALL wxLEFT wxRIGHT wxTOP wxBOTTOM wxCENTER wxEXPAND );
 use Wx qw( wxALIGN_RIGHT wxALIGN_BOTTOM wxALIGN_CENTER wxALIGN_CENTER_VERTICAL wxALIGN_CENTER_HORIZONTAL );
@@ -276,7 +278,7 @@ sub mmBGSelBind {
 				$bgset .= '$$petcompow ' . "$bospow def fol";
 			}
 		}
-		cbWriteBind($file,$petaction->{'selbgm'},$bgsay.$bgset.'$$bindloadfile ' . $profile->{'base'} . '\mmbinds\cbguarda.txt');
+		$file->SetBind($petaction->{'selbgm'},$bgsay.$bgset.'$$bindloadfile ' . $profile->{'base'} . '\mmbinds\cbguarda.txt');
 	}
 }
 
@@ -442,7 +444,7 @@ sub mmBGActBGBind {
 			$bgact .= '$$petcompow ' . "$bospow $action";
 		}
 	}
-	# cbWriteBind(file,$petaction->{'selbgm'},bgsay.$bgset.'$$bindloadfile ' . $profile->{'base'} . '\\mmbinds\\cbguarda.txt')
+	# file->SetBind($petaction->{'selbgm'},bgsay.$bgset.'$$bindloadfile ' . $profile->{'base'} . '\\mmbinds\\cbguarda.txt')
 	cbWriteToggleBind($filedn,$fileup,$key,$bgsay,$bgact,$fnamedn,$fnameup);
 }
 
@@ -494,7 +496,7 @@ sub mmQuietBGSelBind {
 				$bgset .= '$$petcompow ' . "$bospow def fol";
 			}
 		}
-		cbWriteBind($file,$petaction->{'selbgm'},$bgset . '$$bindloadfile ' . $profile->{'base'} . '\\mmbinds\\bguarda.txt')
+		$file->SetBind($petaction->{'selbgm'},$bgset . '$$bindloadfile ' . $profile->{'base'} . '\\mmbinds\\bguarda.txt')
 	}
 }
 
@@ -546,7 +548,7 @@ sub mmQuietBGActBind {
 		}
 	}
 	# 'petcompow ',,grp.' Stay'
-	cbWriteBind($filedn,$key,$bgact);
+	$filedn->SetBind($key,$bgact);
 }
 
 sub mmQuietBGActBGBind {
@@ -597,7 +599,7 @@ sub mmQuietBGActBGBind {
 		}
 	}
 	# 'petcompow ',,grp.' Stay'
-	cbWriteBind($filedn,$key,$bgact);
+	$filedn->SetBind($key,$bgact);
 }
 
 sub mmSubBind {
@@ -620,35 +622,35 @@ sub mmSubBind {
 	my @saymethlts = ("local ",'tell, $name ',"petsaypow $ltspow ","");
 	my @saymethbos = ("local ",'tell, $name ',"petsaypow $bospow ","");
 
-	cbWriteBind($file,$petaction->{'selall'},$saymethall[$petaction->{'sayallmethod'}] . $sayall . '$$bindloadfile ' . "$profile->{'base'}\\mmbinds\\call.txt");
-	cbWriteBind($file,$petaction->{'selmin'},$saymethmin[$petaction->{'sayminmethod'}] . $saymin . '$$bindloadfile ' . "$profile->{'base'}\\mmbinds\\ctier1.txt");
-	cbWriteBind($file,$petaction->{'sellts'},$saymethlts[$petaction->{'sayltsmethod'}] . $saylts . '$$bindloadfile ' . "$profile->{'base'}\\mmbinds\\ctier2.txt");
-	cbWriteBind($file,$petaction->{'selbos'},$saymethbos[$petaction->{'saybosmethod'}] . $saybos . '$$bindloadfile ' . "$profile->{'base'}\\mmbinds\\ctier3.txt");
+	$file->SetBind($petaction->{'selall'},$saymethall[$petaction->{'sayallmethod'}] . $sayall . '$$bindloadfile ' . "$profile->{'base'}\\mmbinds\\call.txt");
+	$file->SetBind($petaction->{'selmin'},$saymethmin[$petaction->{'sayminmethod'}] . $saymin . '$$bindloadfile ' . "$profile->{'base'}\\mmbinds\\ctier1.txt");
+	$file->SetBind($petaction->{'sellts'},$saymethlts[$petaction->{'sayltsmethod'}] . $saylts . '$$bindloadfile ' . "$profile->{'base'}\\mmbinds\\ctier2.txt");
+	$file->SetBind($petaction->{'selbos'},$saymethbos[$petaction->{'saybosmethod'}] . $saybos . '$$bindloadfile ' . "$profile->{'base'}\\mmbinds\\ctier3.txt");
 	mmBGSelBind($profile,$file,$petaction,$saybg,$minpow,$ltspow,$bospow);
 	if ($grp) {
-		cbWriteBind($file,$petaction->{'setagg'},$saymethall[$petaction->{'sayaggmethod'}] . $sayagg . '$$petcompow ' . "$grp Aggressive");
-		cbWriteBind($file,$petaction->{'setdef'},$saymethall[$petaction->{'saydefmethod'}] . $saydef . '$$petcompow ' . "$grp Defensive");
-		cbWriteBind($file,$petaction->{'setpas'},$saymethall[$petaction->{'saypasmethod'}] . $saypas . '$$petcompow ' . "$grp Passive");
-		cbWriteBind($file,$petaction->{'cmdatk'},$saymethall[$petaction->{'sayatkmethod'}] . $sayatk . '$$petcompow ' . "$grp Attack");
-		cbWriteBind($file,$petaction->{'cmdfol'},$saymethall[$petaction->{'sayfolmethod'}] . $sayfol . '$$petcompow ' . "$grp Follow");
-		cbWriteBind($file,$petaction->{'cmdsty'},$saymethall[$petaction->{'saystymethod'}] . $saysty . '$$petcompow ' . "$grp Stay");
-		cbWriteBind($file,$petaction->{'cmdgoto'},$saymethall[$petaction->{'saygomethod'}] . $saygo . '$$petcompow ' . "$grp Goto");
+		$file->SetBind($petaction->{'setagg'},$saymethall[$petaction->{'sayaggmethod'}] . $sayagg . '$$petcompow ' . "$grp Aggressive");
+		$file->SetBind($petaction->{'setdef'},$saymethall[$petaction->{'saydefmethod'}] . $saydef . '$$petcompow ' . "$grp Defensive");
+		$file->SetBind($petaction->{'setpas'},$saymethall[$petaction->{'saypasmethod'}] . $saypas . '$$petcompow ' . "$grp Passive");
+		$file->SetBind($petaction->{'cmdatk'},$saymethall[$petaction->{'sayatkmethod'}] . $sayatk . '$$petcompow ' . "$grp Attack");
+		$file->SetBind($petaction->{'cmdfol'},$saymethall[$petaction->{'sayfolmethod'}] . $sayfol . '$$petcompow ' . "$grp Follow");
+		$file->SetBind($petaction->{'cmdsty'},$saymethall[$petaction->{'saystymethod'}] . $saysty . '$$petcompow ' . "$grp Stay");
+		$file->SetBind($petaction->{'cmdgoto'},$saymethall[$petaction->{'saygomethod'}] . $saygo . '$$petcompow ' . "$grp Goto");
 	} else {
-		cbWriteBind($file,$petaction->{'setagg'},$saymethall[$petaction->{'sayaggmethod'}] . $sayagg . '$$petcomall Aggressive');
-		cbWriteBind($file,$petaction->{'setdef'},$saymethall[$petaction->{'saydefmethod'}] . $saydef . '$$petcomall Defensive');
-		cbWriteBind($file,$petaction->{'setpas'},$saymethall[$petaction->{'saypasmethod'}] . $saypas . '$$petcomall Passive');
-		cbWriteBind($file,$petaction->{'cmdatk'},$saymethall[$petaction->{'sayatkmethod'}] . $sayatk . '$$petcomall Attack');
-		cbWriteBind($file,$petaction->{'cmdfol'},$saymethall[$petaction->{'sayfolmethod'}] . $sayfol . '$$petcomall Follow');
-		cbWriteBind($file,$petaction->{'cmdsty'},$saymethall[$petaction->{'saystymethod'}] . $saysty . '$$petcomall Stay');
-		cbWriteBind($file,$petaction->{'cmdgoto'},$saymethall[$petaction->{'saygomethod'}] . $saygo . '$$petcomall Goto');
+		$file->SetBind($petaction->{'setagg'},$saymethall[$petaction->{'sayaggmethod'}] . $sayagg . '$$petcomall Aggressive');
+		$file->SetBind($petaction->{'setdef'},$saymethall[$petaction->{'saydefmethod'}] . $saydef . '$$petcomall Defensive');
+		$file->SetBind($petaction->{'setpas'},$saymethall[$petaction->{'saypasmethod'}] . $saypas . '$$petcomall Passive');
+		$file->SetBind($petaction->{'cmdatk'},$saymethall[$petaction->{'sayatkmethod'}] . $sayatk . '$$petcomall Attack');
+		$file->SetBind($petaction->{'cmdfol'},$saymethall[$petaction->{'sayfolmethod'}] . $sayfol . '$$petcomall Follow');
+		$file->SetBind($petaction->{'cmdsty'},$saymethall[$petaction->{'saystymethod'}] . $saysty . '$$petcomall Stay');
+		$file->SetBind($petaction->{'cmdgoto'},$saymethall[$petaction->{'saygomethod'}] . $saygo . '$$petcomall Goto');
 	}
 	if ($petaction->{'bgatkenabled'}) {
-		cbWriteBind($file,$petaction->{'bgatk'},'nop');
+		$file->SetBind($petaction->{'bgatk'},'nop');
 	}
 	if ($petaction->{'bggotoenabled'}) {
-		cbWriteBind($file,$petaction->{'bggoto'},'nop');
+		$file->SetBind($petaction->{'bggoto'},'nop');
 	}
-	cbWriteBind($file,$petaction->{'chattykey'},'tell $name, Non-Chatty Mode$$bindloadfile ' . "$profile->{'base'}\\mmbinds\\$fn.txt");
+	$file->SetBind($petaction->{'chattykey'},'tell $name, Non-Chatty Mode$$bindloadfile ' . "$profile->{'base'}\\mmbinds\\$fn.txt");
 }
 
 sub mmBGSubBind {
@@ -671,10 +673,10 @@ sub mmBGSubBind {
 	my @saymethlts = ("local ",'tell, $name ',"petsaypow $ltspow ","");
 	my @saymethbos = ("local ",'tell, $name ',"petsaypow $bospow ","");
 
-	cbWriteBind($filedn,$petaction->{'selall'},$saymethall[$petaction->{'sayallmethod'}] . $sayall . '$$bindloadfile ' . $profile->{'base'} . '\\mmbinds\\call.txt');
-	cbWriteBind($filedn,$petaction->{'selmin'},$saymethmin[$petaction->{'sayminmethod'}] . $saymin . '$$bindloadfile ' . $profile->{'base'} . '\\mmbinds\\ctier1.txt');
-	cbWriteBind($filedn,$petaction->{'sellts'},$saymethlts[$petaction->{'sayltsmethod'}] . $saylts . '$$bindloadfile ' . $profile->{'base'} . '\\mmbinds\\ctier2.txt');
-	cbWriteBind($filedn,$petaction->{'selbos'},$saymethbos[$petaction->{'saybosmethod'}] . $saybos . '$$bindloadfile ' . $profile->{'base'} . '\\mmbinds\\ctier3.txt');
+	$filedn->SetBind($petaction->{'selall'},$saymethall[$petaction->{'sayallmethod'}] . $sayall . '$$bindloadfile ' . $profile->{'base'} . '\\mmbinds\\call.txt');
+	$filedn->SetBind($petaction->{'selmin'},$saymethmin[$petaction->{'sayminmethod'}] . $saymin . '$$bindloadfile ' . $profile->{'base'} . '\\mmbinds\\ctier1.txt');
+	$filedn->SetBind($petaction->{'sellts'},$saymethlts[$petaction->{'sayltsmethod'}] . $saylts . '$$bindloadfile ' . $profile->{'base'} . '\\mmbinds\\ctier2.txt');
+	$filedn->SetBind($petaction->{'selbos'},$saymethbos[$petaction->{'saybosmethod'}] . $saybos . '$$bindloadfile ' . $profile->{'base'} . '\\mmbinds\\ctier3.txt');
 	mmBGSelBind($profile,$filedn,$petaction,$saybg,$minpow,$ltspow,$bospow);
 
 	mmBGActBind($profile,$filedn,$fileup,$petaction,$petaction->{'setagg'},'Aggressive',$sayagg,$petaction->{'sayaggmethod'},$minpow,$ltspow,$bospow,$profile->{'base'}.'\\mmbinds\\cbguarda.txt',$profile->{'base'}.'\\mmbinds\\cbguardb.txt');
@@ -690,48 +692,48 @@ sub mmBGSubBind {
 	if ($petaction->{'bggotoenabled'}) {
 		mmBGActBGBind($profile,$filedn,$fileup,$petaction,$petaction->{'bggoto'},'Goto',$saygo,$petaction->{'saygomethod'},$minpow,$ltspow,$bospow,$profile->{'base'}.'\\mmbinds\\cbguarda.txt',$profile->{'base'}.'\\mmbinds\\cbguardb.txt');
 	}
-	cbWriteBind($filedn,$petaction->{'chattykey'},'tell $name, Non-Chatty Mode$$bindloadfile ' . "$profile->{'base'}\\mmbinds\\${fn}a.txt");
+	$filedn->SetBind($petaction->{'chattykey'},'tell $name, Non-Chatty Mode$$bindloadfile ' . "$profile->{'base'}\\mmbinds\\${fn}a.txt");
 }
 
 sub mmQuietSubBind {
 	my ($profile,$file,$petaction,$fn,$grp,$minpow,$ltspow,$bospow) = @_;
-	cbWriteBind($file,$petaction->{'selall'},'bindloadfile ' . $profile->{'base'} . '\\mmbinds\\all.txt');
-	cbWriteBind($file,$petaction->{'selmin'},'bindloadfile ' . $profile->{'base'} . '\\mmbinds\\tier1.txt');
-	cbWriteBind($file,$petaction->{'sellts'},'bindloadfile ' . $profile->{'base'} . '\\mmbinds\\tier2.txt');
-	cbWriteBind($file,$petaction->{'selbos'},'bindloadfile ' . $profile->{'base'} . '\\mmbinds\\tier3.txt');
+	$file->SetBind($petaction->{'selall'},'bindloadfile ' . $profile->{'base'} . '\\mmbinds\\all.txt');
+	$file->SetBind($petaction->{'selmin'},'bindloadfile ' . $profile->{'base'} . '\\mmbinds\\tier1.txt');
+	$file->SetBind($petaction->{'sellts'},'bindloadfile ' . $profile->{'base'} . '\\mmbinds\\tier2.txt');
+	$file->SetBind($petaction->{'selbos'},'bindloadfile ' . $profile->{'base'} . '\\mmbinds\\tier3.txt');
 	mmQuietBGSelBind($profile,$file,$petaction,$minpow,$ltspow,$bospow);
 	if ($grp) {
-		cbWriteBind($file,$petaction->{'setagg'},'petcompow ' . "$grp Aggressive");
-		cbWriteBind($file,$petaction->{'setdef'},'petcompow ' . "$grp Defensive");
-		cbWriteBind($file,$petaction->{'setpas'},'petcompow ' . "$grp Passive");
-		cbWriteBind($file,$petaction->{'cmdatk'},'petcompow ' . "$grp Attack");
-		cbWriteBind($file,$petaction->{'cmdfol'},'petcompow ' . "$grp Follow");
-		cbWriteBind($file,$petaction->{'cmdsty'},'petcompow ' . "$grp Stay");
-		cbWriteBind($file,$petaction->{'cmdgoto'},'petcompow ' . "$grp Goto");
+		$file->SetBind($petaction->{'setagg'},'petcompow ' . "$grp Aggressive");
+		$file->SetBind($petaction->{'setdef'},'petcompow ' . "$grp Defensive");
+		$file->SetBind($petaction->{'setpas'},'petcompow ' . "$grp Passive");
+		$file->SetBind($petaction->{'cmdatk'},'petcompow ' . "$grp Attack");
+		$file->SetBind($petaction->{'cmdfol'},'petcompow ' . "$grp Follow");
+		$file->SetBind($petaction->{'cmdsty'},'petcompow ' . "$grp Stay");
+		$file->SetBind($petaction->{'cmdgoto'},'petcompow ' . "$grp Goto");
 	} else {
-		cbWriteBind($file,$petaction->{'setagg'},'petcomall Aggressive');
-		cbWriteBind($file,$petaction->{'setdef'},'petcomall Defensive');
-		cbWriteBind($file,$petaction->{'setpas'},'petcomall Passive');
-		cbWriteBind($file,$petaction->{'cmdatk'},'petcomall Attack');
-		cbWriteBind($file,$petaction->{'cmdfol'},'petcomall Follow');
-		cbWriteBind($file,$petaction->{'cmdsty'},'petcomall Stay');
-		cbWriteBind($file,$petaction->{'cmdgoto'},'petcomall Goto');
+		$file->SetBind($petaction->{'setagg'},'petcomall Aggressive');
+		$file->SetBind($petaction->{'setdef'},'petcomall Defensive');
+		$file->SetBind($petaction->{'setpas'},'petcomall Passive');
+		$file->SetBind($petaction->{'cmdatk'},'petcomall Attack');
+		$file->SetBind($petaction->{'cmdfol'},'petcomall Follow');
+		$file->SetBind($petaction->{'cmdsty'},'petcomall Stay');
+		$file->SetBind($petaction->{'cmdgoto'},'petcomall Goto');
 	}
 	if ($petaction->{'bgatkenabled'}) {
-		cbWriteBind($file,$petaction->{'bgatk'},'nop');
+		$file->SetBind($petaction->{'bgatk'},'nop');
 	}
 	if ($petaction->{'bggotoenabled'}) {
-		cbWriteBind($file,$petaction->{'bggoto'},'nop');
+		$file->SetBind($petaction->{'bggoto'},'nop');
 	}
-	cbWriteBind($file,$petaction->{'chattykey'},'tell $name, Chatty Mode$$bindloadfile ' . $profile->{'base'} . '\\mmbinds\\c' . $fn . '.txt');
+	$file->SetBind($petaction->{'chattykey'},'tell $name, Chatty Mode$$bindloadfile ' . $profile->{'base'} . '\\mmbinds\\c' . $fn . '.txt');
 }
 
 sub mmQuietBGSubBind {
 	my ($profile,$filedn,$fileup,$petaction,$fn,$minpow,$ltspow,$bospow) = @_;
-	cbWriteBind($filedn,$petaction->{'selall'},'bindloadfile ' . $profile->{'base'} . '\\mmbinds\\all.txt');
-	cbWriteBind($filedn,$petaction->{'selmin'},'bindloadfile ' . $profile->{'base'} . '\\mmbinds\\tier1.txt');
-	cbWriteBind($filedn,$petaction->{'sellts'},'bindloadfile ' . $profile->{'base'} . '\\mmbinds\\tier2.txt');
-	cbWriteBind($filedn,$petaction->{'selbos'},'bindloadfile ' . $profile->{'base'} . '\\mmbinds\\tier3.txt');
+	$filedn->SetBind($petaction->{'selall'},'bindloadfile ' . $profile->{'base'} . '\\mmbinds\\all.txt');
+	$filedn->SetBind($petaction->{'selmin'},'bindloadfile ' . $profile->{'base'} . '\\mmbinds\\tier1.txt');
+	$filedn->SetBind($petaction->{'sellts'},'bindloadfile ' . $profile->{'base'} . '\\mmbinds\\tier2.txt');
+	$filedn->SetBind($petaction->{'selbos'},'bindloadfile ' . $profile->{'base'} . '\\mmbinds\\tier3.txt');
 	mmQuietBGSelBind($profile,$filedn,$petaction,$minpow,$ltspow,$bospow);
 	mmQuietBGActBind($profile,$filedn,$fileup,$petaction,$petaction->{'setagg'},'Aggressive',$minpow,$ltspow,$bospow,$profile->{'base'}.'\\mmbinds\\bguarda.txt',$profile->{'base'}.'\\mmbinds\\bguardb.txt');
 	mmQuietBGActBind($profile,$filedn,$fileup,$petaction,$petaction->{'setdef'},'Defensive',$minpow,$ltspow,$bospow,$profile->{'base'}.'\\mmbinds\\bguarda.txt',$profile->{'base'}.'\\mmbinds\\bguardb.txt');
@@ -746,7 +748,7 @@ sub mmQuietBGSubBind {
 	if ($petaction->{'bggotoenabled'}) {
 		mmQuietBGActBGBind($profile,$filedn,$fileup,$petaction,$petaction->{'bggoto'},'Goto',$minpow,$ltspow,$bospow,$profile->{'base'}.'\\mmbinds\\bguarda.txt',$profile->{'base'}.'\\mmbinds\\bguardb.txt');
 	}
-	cbWriteBind($filedn,$petaction->{'chattykey'},'tell $name, Chatty Mode$$bindloadfile '.$profile->{'base'}.'\\mmbinds\\c' . $fn . 'a.txt');
+	$filedn->SetBind($petaction->{'chattykey'},'tell $name, Chatty Mode$$bindloadfile '.$profile->{'base'}.'\\mmbinds\\c' . $fn . 'a.txt');
 }
 
 sub makebind {
@@ -755,46 +757,46 @@ sub makebind {
 	my $petaction = $profile->{'petaction'};
 	if ($petaction->{'petselenable'}) {
 		if ($petaction->{'pet1nameenabled'}) {
-			cbWriteBind($resetfile,$petaction->{'sel0'},'petselectname ' . $petaction->{'pet1name'});
+			$resetfile->SetBind($petaction->{'sel0'},'petselectname ' . $petaction->{'pet1name'});
 		}
 		if ($petaction->{'pet2nameenabled'}) {
-			cbWriteBind($resetfile,$petaction->{'sel1'},'petselectname ' . $petaction->{'pet2name'});
+			$resetfile->SetBind($petaction->{'sel1'},'petselectname ' . $petaction->{'pet2name'});
 		}
 		if ($petaction->{'pet3nameenabled'}) {
-			cbWriteBind($resetfile,$petaction->{'sel2'},'petselectname ' . $petaction->{'pet3name'});
+			$resetfile->SetBind($petaction->{'sel2'},'petselectname ' . $petaction->{'pet3name'});
 		}
 		if ($petaction->{'pet4nameenabled'}) {
-			cbWriteBind($resetfile,$petaction->{'sel3'},'petselectname ' . $petaction->{'pet4name'});
+			$resetfile->SetBind($petaction->{'sel3'},'petselectname ' . $petaction->{'pet4name'});
 		}
 		if ($petaction->{'pet5nameenabled'}) {
-			cbWriteBind($resetfile,$petaction->{'sel4'},'petselectname ' . $petaction->{'pet5name'});
+			$resetfile->SetBind($petaction->{'sel4'},'petselectname ' . $petaction->{'pet5name'});
 		}
 		if ($petaction->{'pet6nameenabled'}) {
-			cbWriteBind($resetfile,$petaction->{'sel5'},'petselectname ' . $petaction->{'pet6name'});
+			$resetfile->SetBind($petaction->{'sel5'},'petselectname ' . $petaction->{'pet6name'});
 		}
 	}
 	cbMakeDirectory($profile->{'base'}."\\mmbinds");
-	my $allfile = cbOpen($profile->{'base'} . "\\mmbinds\\all.txt","w");
-	my $minfile = cbOpen($profile->{'base'} . "\\mmbinds\\tier1.txt","w");
-	my $ltsfile = cbOpen($profile->{'base'} . "\\mmbinds\\tier2.txt","w");
-	my $bosfile = cbOpen($profile->{'base'} . "\\mmbinds\\tier3.txt","w");
+	my $allfile = BindFile->new($profile->{'base'} . "\\mmbinds\\all.txt");
+	my $minfile = BindFile->new($profile->{'base'} . "\\mmbinds\\tier1.txt");
+	my $ltsfile = BindFile->new($profile->{'base'} . "\\mmbinds\\tier2.txt");
+	my $bosfile = BindFile->new($profile->{'base'} . "\\mmbinds\\tier3.txt");
 	my $bgfiledn;
 	my $bgfileup;
 	if ($petaction->{'bg_enable'}) {
-		$bgfiledn = cbOpen($profile->{'base'} . "\\mmbinds\\bguarda.txt","w");
+		$bgfiledn = BindFile->new($profile->{'base'} . "\\mmbinds\\bguarda.txt");
 		#  since we never need to split lines up in this fashion
 		#  comment the next line out so an empty file is not created.
-		# bgfileup = cbOpen($profile->{'base'} . "\\mmbinds\\bguardb.txt","w")
+		# bgfileup = BindFile->new($profile->{'base'} . "\\mmbinds\\bguardb.txt")
 	}
-	my $callfile = cbOpen($profile->{'base'} . "\\mmbinds\\call.txt","w");
-	my $cminfile = cbOpen($profile->{'base'} . "\\mmbinds\\ctier1.txt","w");
-	my $cltsfile = cbOpen($profile->{'base'} . "\\mmbinds\\ctier2.txt","w");
-	my $cbosfile = cbOpen($profile->{'base'} . "\\mmbinds\\ctier3.txt","w");
+	my $callfile = BindFile->new($profile->{'base'} . "\\mmbinds\\call.txt");
+	my $cminfile = BindFile->new($profile->{'base'} . "\\mmbinds\\ctier1.txt");
+	my $cltsfile = BindFile->new($profile->{'base'} . "\\mmbinds\\ctier2.txt");
+	my $cbosfile = BindFile->new($profile->{'base'} . "\\mmbinds\\ctier3.txt");
 	my $cbgfiledn;
 	my $cbgfileup;
 	if ($petaction->{'bg_enable'}) {
-		$cbgfiledn = cbOpen($profile->{'base'} . "\\mmbinds\\cbguarda.txt","w");
-		$cbgfileup = cbOpen($profile->{'base'} . "\\mmbinds\\cbguardb.txt","w");
+		$cbgfiledn = BindFile->new($profile->{'base'} . "\\mmbinds\\cbguarda.txt");
+		$cbgfileup = BindFile->new($profile->{'base'} . "\\mmbinds\\cbguardb.txt");
 	}
 	my $minpow;
 	my $ltspow;
@@ -835,22 +837,6 @@ sub makebind {
 	mmSubBind($profile,$cbosfile,$petaction,"tier3",$bospow,$minpow,$ltspow,$bospow);
 	if ($petaction->{'bg_enable'}) {
 		mmBGSubBind($profile,$cbgfiledn,$cbgfileup,$petaction,"bguard",$minpow,$ltspow,$bospow);
-	}
-	close $allfile;
-	close $minfile;
-	close $ltsfile;
-	close $bosfile;
-	if ($petaction->{'bg_enable'}) {
-		close $bgfiledn;
-		# close $bgfileup;
-	}
-	close $callfile;
-	close $cminfile;
-	close $cltsfile;
-	close $cbosfile;
-	if ($petaction->{'bg_enable'}) {
-		close $cbgfiledn;
-		close $cbgfileup;
 	}
 }
 

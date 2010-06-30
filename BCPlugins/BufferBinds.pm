@@ -5,6 +5,8 @@ use strict;
 package BCPlugins::BufferBinds;
 use parent "BCPlugins";
 
+use BindFile;
+
 sub addBBind {
 	my ($bbinds,$n,$profile) = @_;
 #	my $bbind = $bbinds[$n]
@@ -291,27 +293,23 @@ sub makebind {
 			for my $j (1..8) {
 				my $teamid = "team$j";
 				my $filebase = "$profile->{'base'}\\buff$i\\bufft${j}";
-				$afile = cbOpen("${filebase}a.txt","w");
-				$bfile = cbOpen("${filebase}b.txt","w");
-				cbWriteBind($afile,    $teamid,'+down$$teamselect ' . $j . '$$' . "${selchat}bindloadfile ${filebase}b.txt");
-				cbWriteBind($resetfile,$teamid,'+down$$teamselect ' . $j . '$$' . "${selchat}bindloadfile ${filebase}b.txt");
+				$afile = BindFile->new("${filebase}a.txt");
+				$bfile = BindFile->new("${filebase}b.txt");
+				$afile->SetBind(    $teamid,'+down$$teamselect ' . $j . '$$' . "${selchat}bindloadfile ${filebase}b.txt");
+				$resetfile->SetBind($teamid,'+down$$teamselect ' . $j . '$$' . "${selchat}bindloadfile ${filebase}b.txt");
 				if ($npow == 1) {
-					cbWriteBind($bfile,$teamid,'-down$$' . "${chat1}powexecname $bbind->{'power1'}" . '$$bindloadfile ' . "${filebase}a.txt");
+					$bfile->SetBind($teamid,'-down$$' . "${chat1}powexecname $bbind->{'power1'}" . '$$bindloadfile ' . "${filebase}a.txt");
 				} else {
-					cbWriteBind($bfile,$teamid,'-down$$' . "${chat1}powexecname $bbind->{'power1'}" . '$$bindloadfile ' . "${filebase}c.txt");
-					$cfile = cbOpen("${filebase}c.txt","w");
+					$bfile->SetBind($teamid,'-down$$' . "${chat1}powexecname $bbind->{'power1'}" . '$$bindloadfile ' . "${filebase}c.txt");
+					$cfile = BindFile->new("${filebase}c.txt");
 					if ($npow == 2) {
-						cbWriteBind($cfile,$teamid,"${chat2}powexecname $bbind->{'power2'}" . '$$bindloadfile ' . "${filebase}a.txt");
+						$cfile->SetBind($teamid,"${chat2}powexecname $bbind->{'power2'}" . '$$bindloadfile ' . "${filebase}a.txt");
 					} else {
-						$dfile = cbOpen("${filebase}d.txt","w");
-						cbWriteBind($cfile,$teamid,'+down$$' . "${chat2}powexecname $bbind->{'power2'}" . '$$bindloadfile ' ."${filebase}d.txt");
-						cbWriteBind($dfile,$teamid,'-down$$' . "${chat3}powexecname $bbind->{'power3'}" . '$$bindloadfile ' ."${filebase}a.txt");
-						close $dfile;
+						$dfile = BindFile->new("${filebase}d.txt");
+						$cfile->SetBind($teamid,'+down$$' . "${chat2}powexecname $bbind->{'power2'}" . '$$bindloadfile ' ."${filebase}d.txt");
+						$dfile->SetBind($teamid,'-down$$' . "${chat3}powexecname $bbind->{'power3'}" . '$$bindloadfile ' ."${filebase}a.txt");
 					}
-					close $cfile;
 				}
-				close $afile;
-				close $bfile;
 			}
 		}
 		if (($bbind->{'target'} == 2) or ($bbind->{'target'} == 3)) {
@@ -319,34 +317,30 @@ sub makebind {
 				my $petid = "pet$j";
 				my $filebase = "$profile->{'base'}\\buff$i\\buffp${j}";
 				if ($bbind->{'usepetnames'}) {
-					cbWriteBind($resetfile,$petid,'+down$$petselectname ' . $profile->{'petaction'}->{"pet${j}name"} . '$$' . "${selchat}bindloadfile ${filebase}b.txt");
+					$resetfile->SetBind($petid,'+down$$petselectname ' . $profile->{'petaction'}->{"pet${j}name"} . '$$' . "${selchat}bindloadfile ${filebase}b.txt");
 				} else {
-					cbWriteBind($resetfile,$petid,'+down$$petselect ' . ($j-1) . '$$' . "${selchat}bindloadfile ${filebase}b.txt");
+					$resetfile->SetBind($petid,'+down$$petselect ' . ($j-1) . '$$' . "${selchat}bindloadfile ${filebase}b.txt");
 				}
-				$afile = cbOpen("${filebase}a.txt","w");
-				$bfile = cbOpen("${filebase}b.txt","w");
+				$afile = BindFile->new("${filebase}a.txt");
+				$bfile = BindFile->new("${filebase}b.txt");
 				if ($bbind->{'usepetnames'}) {
-					cbWriteBind($afile,$petid,'+down$$petselectname ' . $profile->{'petaction'}->{"pet${j}name"} . '$$' . "${selchat}bindloadfile ${filebase}b.txt");
+					$afile->SetBind($petid,'+down$$petselectname ' . $profile->{'petaction'}->{"pet${j}name"} . '$$' . "${selchat}bindloadfile ${filebase}b.txt");
 				} else {
-					cbWriteBind($afile,$petid,'+down$$petselect ' . ($j-1) . '$$' . "${selchat}bindloadfile ${filebase}b.txt");
+					$afile->SetBind($petid,'+down$$petselect ' . ($j-1) . '$$' . "${selchat}bindloadfile ${filebase}b.txt");
 				}
 				if ($npow == 1) {
-					cbWriteBind($bfile,$petid,'-down$$' . "${chat1}powexecname $bbind->{'power1'}" . '$$bindloadfile '."${filebase}a.txt");
+					$bfile->SetBind($petid,'-down$$' . "${chat1}powexecname $bbind->{'power1'}" . '$$bindloadfile '."${filebase}a.txt");
 				} else {
-					cbWriteBind($bfile,$petid,'-down$$' . "${chat1}powexecname $bbind->{'power1'}" . '$$bindloadfile '."${filebase}c.txt");
-					$cfile = cbOpen("${filebase}c.txt","w");
+					$bfile->SetBind($petid,'-down$$' . "${chat1}powexecname $bbind->{'power1'}" . '$$bindloadfile '."${filebase}c.txt");
+					$cfile = BindFile->new("${filebase}c.txt");
 					if ($npow == 2) {
-						cbWriteBind($cfile,$petid,"${chat2}powexecname $bbind->{'power2'}" . '$$bindloadfile '. "${filebase}a.txt");
+						$cfile->SetBind($petid,"${chat2}powexecname $bbind->{'power2'}" . '$$bindloadfile '. "${filebase}a.txt");
 					} else {
-						$dfile = cbOpen("${filebase}d.txt","w");
-						cbWriteBind($cfile,$petid,'+down$$' . "${chat2}powexecname $bbind->{'power2'}" . '$$bindloadfile '."${filebase}d.txt");
-						cbWriteBind($dfile,$petid,'-down$$' . "${chat3}powexecname $bbind->{'power3'}" . '$$bindloadfile '."${filebase}a.txt");
-						close $dfile;
+						$dfile = BindFile->new("${filebase}d.txt");
+						$cfile->SetBind($petid,'+down$$' . "${chat2}powexecname $bbind->{'power2'}" . '$$bindloadfile '."${filebase}d.txt");
+						$dfile->SetBind($petid,'-down$$' . "${chat3}powexecname $bbind->{'power3'}" . '$$bindloadfile '."${filebase}a.txt");
 					}
-					close $cfile;
 				}
-				close $afile;
-				close $bfile;
 			}
 		}
 	}
