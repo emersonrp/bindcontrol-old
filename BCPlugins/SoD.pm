@@ -6,6 +6,7 @@ package BCPlugins::SoD;
 use parent "BCPlugins";
 
 use BindFile;
+use Profile;
 use Utility qw(id);
 use Wx qw(
 	wxALL wxVERTICAL
@@ -25,200 +26,7 @@ sub new {
 
 	$self->{'TabTitle'} = "Speed On Demand";
 
-	my $topSizer = Wx::FlexGridSizer->new(0,2,10,10);
-
-	$topSizer->Add(
-		Wx::CheckBox->new( $self, id('USE_SOD'), "Enable Speed On Demand Binds" ),
-		0,
-		wxALL,
-		10,
-	);
-	$topSizer->AddSpacer(1);
-
-	##### GENERAL MOVEMENT KEYS
-	# general movement keys
-	my $generalSizer = Wx::FlexGridSizer->new(0,2,3,3);
-
-	for ( ('Up','Down','Forward','Back','Strafe Left','Strafe Right') ){
-		$self->addLabeledButton($generalSizer, $_, '');
-	}
-
-	$generalSizer->Add( Wx::CheckBox->new($self, id('MOUSECHORD_SOD'), "Use Mousechord as SoD Forward"), 0, wxALL,);
-	$generalSizer->AddSpacer(1);
-
-	# TODO!  fill this picker with only the appropriate bits.
-	$generalSizer->Add( Wx::StaticText->new($self, -1, "Default Movement Mode"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
-	$generalSizer->Add( Wx::ComboBox->new(
-			$self, id('DEFAULT_MOVEMENT_MODE'), '',
-			wxDefaultPosition, wxDefaultSize,
-			['No SoD','Sprint','Super Speed','Jump','Fly'],
-			wxCB_READONLY,
-		), 0, wxALL,);
-
-	$topSizer->Add($generalSizer);
-
-
-	# general movement keys
-	my $sprintSizer = Wx::FlexGridSizer->new(0,2,3,3);
-
-	$sprintSizer->Add( Wx::StaticText->new($self, -1, "Sprint Power"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
-	$sprintSizer->Add( Wx::ComboBox->new(
-			$self, id('SPRINT_PICKER'), '',
-			wxDefaultPosition, wxDefaultSize,
-			[@Profile::SprintPowers],
-			wxCB_READONLY,
-		), 0, wxALL,);
-
-	$sprintSizer->Add( Wx::CheckBox->new($self, id('AUTO_MOUSELOOK'), "Automatically Mouselook When Moving"), 0, wxALL,);
-	$sprintSizer->AddSpacer(1);
-
-	# TODO -- decide what to do with this.
-	# $sprintSizer->Add( Wx::CheckBox->new($self, SPRINT_UNQUEUE, "Exec powexecunqueue"), 0, wxALL,);
-
-	for ( ('Autorun','Follow Target','Non-SoD Mode','Sprint-Only SoD Mode') ){
-		$self->addLabeledButton($sprintSizer, $_, '');
-	}
-
-	$sprintSizer->Add( Wx::CheckBox->new($self, id('SPRINT_SOD'), "Enable Sprint SoD"), 0, wxALL,);
-	$sprintSizer->AddSpacer(1);
-
-	$self->addLabeledButton($sprintSizer, 'SoD Mode Toggle', '');
-
-	$sprintSizer->Add( Wx::CheckBox->new($self, id('CHANGE_TRAVEL_CAMERA'), "Change Camera Distance When Travel Power Active"), 0, wxALL,);
-	$sprintSizer->AddSpacer(1);
-
-### TODO -- these next few are supposed to be spinboxes or something, not buttons
-	$sprintSizer->Add( Wx::StaticText->new($self, -1, "Base Camera Distance"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
-	$sprintSizer->Add( Wx::Button->    new($self, id('BASE_CAMERA_DISTANCE'), ""), 0, wxEXPAND,);
-
-	$sprintSizer->Add( Wx::StaticText->new($self, -1, "Travelling Camera Distance"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
-	$sprintSizer->Add( Wx::Button->    new($self, id('TRAVEL_CAMERA_DISTANCE'), ""), 0, wxEXPAND,);
-
-	$sprintSizer->Add( Wx::CheckBox->new($self, id('CHANGE_TRAVEL_DETAIL'), "Change Graphic Detail When Travel Power Active"), 0, wxALL,);
-	$sprintSizer->AddSpacer(1);
-
-	$sprintSizer->Add( Wx::StaticText->new($self, -1, "Base Detail Level"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
-	$sprintSizer->Add( Wx::Button->    new($self, id('BASE_DETAIL_LEVEL'), ""), 0, wxEXPAND,);
-
-	$sprintSizer->Add( Wx::StaticText->new($self, -1, "Travelling Detail Level"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
-	$sprintSizer->Add( Wx::Button->    new($self, id('TRAVEL_DETAIL_LEVEL'), ""), 0, wxEXPAND,);
-### TODO end "supposed to be spinboxes"
-
-	$sprintSizer->Add( Wx::CheckBox->new($self, id('HIDE_WINDOWS_TELEPORTING'), "Hide Windows When Teleporting"), 0, wxALL,);
-	$sprintSizer->AddSpacer(1);
-
-	$sprintSizer->Add( Wx::CheckBox->new($self, id('SEND_SOD_SELF_TELLS'), "Send Self-Tells When Changing SoD Modes"), 0, wxALL,);
-	$sprintSizer->AddSpacer(1);
-
-	$topSizer->Add($sprintSizer);
-
-
-	##### SuperSpeed
-
-	my $superSpeedSizer = Wx::FlexGridSizer->new(0,2,3,3);
-
-	$self->addLabeledButton($superSpeedSizer, 'Toggle Super Speed', '');
-
-	$superSpeedSizer->Add( Wx::CheckBox->new($self, id('SS_ONLY_WHEN_MOVING'), "Only Super Speed When Moving"), 0, wxALL,);
-	$superSpeedSizer->AddSpacer(1);
-
-	$superSpeedSizer->Add( Wx::CheckBox->new($self, id('SS_SJ_MODE'), "Enable Super Speed + Super Jump Mode"), 0, wxALL,);
-	$superSpeedSizer->AddSpacer(1);
-
-	$topSizer->Add($superSpeedSizer);
-
-	##### SuperJump
-
-	my $superJumpSizer = Wx::FlexGridSizer->new(0,2,3,3);
-
-	$self->addLabeledButton($superJumpSizer, 'Toggle Jump Mode', '');
-
-	$superJumpSizer->Add( Wx::CheckBox->new($self, id('SJ_SIMPLE_TOGGLE'), "Use Simple CJ / SJ Mode Toggle"), 0, wxALL,);
-	$superJumpSizer->AddSpacer(1);
-
-	$topSizer->Add($superJumpSizer);
-
-
-	##### Fly
-	my $flySizer = Wx::FlexGridSizer->new(0,2,3,3);
-
-	$self->addLabeledButton($flySizer, 'Toggle Fly Mode', '');
-	$self->addLabeledButton($flySizer, 'Toggle Group Fly Mode', '');
-
-	$topSizer->Add($flySizer);
-
-	##### Teleport
-	my $teleportSizer = Wx::FlexGridSizer->new(0,2,3,3);
-
-	my $teleportPowerName = 'Teleport';
-	# if (at == peacebringer) "Dwarf Step Key"
-	# if (at == warshade) "Shadow Step / Dwarf Step Key"
-
-	$self->addLabeledButton($teleportSizer, "$teleportPowerName Combo Key", '');
-	$self->addLabeledButton($teleportSizer, "$teleportPowerName Reset Key", '');
-	$self->addLabeledButton($teleportSizer, "$teleportPowerName Mode", '');
-
-	# if (player has hover): {
-		$teleportSizer->Add( Wx::CheckBox->new($self, id('TP_HOVER_WHEN_TP'), "Auto-Hover When Teleporting"), 0, wxALL,);
-		$teleportSizer->AddSpacer(1);
-	# }
-
-	# if (player has team-tp) {
-		$self->addLabeledButton($teleportSizer, "Team Teleport Combo Key", '');
-		$self->addLabeledButton($teleportSizer, "Team Teleport Reset Key", '');
-
-		# if (player has group fly) {
-			$teleportSizer->Add( Wx::CheckBox->new($self, id('TP_GROUP_FLY_WHEN_TP_TEAM'), "Auto-Group-Fly When Team Teleporting"), 0, wxALL,);
-			$teleportSizer->AddSpacer(1);
-
-		# }
-	# }
-	$topSizer->Add($teleportSizer);
-
-	##### Temp
-
-	my $tempSizer = Wx::FlexGridSizer->new(0,2,3,3);
-
-	# if (temp travel powers exist)?  Should this be "custom"?
-	$self->addLabeledButton($tempSizer, 'Toggle Temp Mode', '');
-
-	# TODO - this is supposed to be a spinbox or something to set which power tray
-	$tempSizer->Add( Wx::StaticText->new($self, -1, "Temp Travel Power Tray"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
-	$tempSizer->Add( Wx::Button->    new($self, id('TEMP_POWERTRAY'), ""), 0, wxEXPAND,);
-
-	$topSizer->Add($tempSizer);
-
-	my $kheldianSizer = Wx::FlexGridSizer->new(0,2,3,3);
-
-	$self->addLabeledButton($kheldianSizer, 'Toggle Nova Form', '');
-
-	# TODO -- spinbox!
-	$kheldianSizer->Add( Wx::StaticText->new($self, -1, "Nova Powertray"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
-	$kheldianSizer->Add( Wx::Button->    new($self, id('KHELD_NOVA_POWERTRAY'), ""), 0, wxEXPAND,);
-
-	$self->addLabeledButton($kheldianSizer, 'Toggle Dwarf Form', '');
-
-	# TODO -- spinbox!
-	$kheldianSizer->Add( Wx::StaticText->new($self, -1, "Dwarf Powertray"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
-	$kheldianSizer->Add( Wx::Button->    new($self, id('KHELD_DWARF_POWERTRAY'), ""), 0, wxEXPAND,);
-
-	# do we want a key to change directly to human form, instead of toggles?
-	$self->addLabeledButton($kheldianSizer, 'Human Form', '');
-
-	# TODO -- spinbox!
-	$kheldianSizer->Add( Wx::StaticText->new($self, -1, "Human Powertray"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
-	$kheldianSizer->Add( Wx::Button->    new($self, id('KHELD_HUMAN_POWERTRAY'), ""), 0, wxEXPAND,);
-
-	$topSizer->Add($kheldianSizer);
-
-	$self->SetSizer($topSizer);
-
-	return $self;
-}
-
-
-sub bindsettings {
-	my $profile = shift;
+	my $profile = $Profile::current;
 
 	$profile->{'SoD'} ||= {
 
@@ -335,9 +143,197 @@ sub bindsettings {
 	$SoD->{'Temp'}->{'TraySwitch'} ||= "UNBOUND";
 	$SoD->{'TempModeKey'} ||= "UNBOUND";
 
-	$SoD->{'dialog'} ||= makeSoDDialog();
-	$SoD->{'dialog'}->show();
+	my $topSizer = Wx::FlexGridSizer->new(0,2,10,10);
+
+	$topSizer->Add(
+		Wx::CheckBox->new( $self, id('USE_SOD'), "Enable Speed On Demand Binds" ),
+		0,
+		wxALL,
+		10,
+	);
+	$topSizer->AddSpacer(1);
+
+	##### GENERAL MOVEMENT KEYS
+	# general movement keys
+	my $generalSizer = Wx::FlexGridSizer->new(0,2,3,3);
+
+	for ( qw(Up Down Forward Back Left Right) ){
+		$self->addLabeledButton($generalSizer, $_, $SoD->{$_});
+	}
+
+	$generalSizer->Add( Wx::CheckBox->new($self, id('MOUSECHORD_SOD'), "Use Mousechord as SoD Forward"), 0, wxALL,);
+	$generalSizer->AddSpacer(1);
+
+	# TODO!  fill this picker with only the appropriate bits.
+	$generalSizer->Add( Wx::StaticText->new($self, -1, "Default Movement Mode"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$generalSizer->Add( Wx::ComboBox->new(
+			$self, id('DEFAULT_MOVEMENT_MODE'), '',
+			wxDefaultPosition, wxDefaultSize,
+			['No SoD','Sprint','Super Speed','Jump','Fly'],
+			wxCB_READONLY,
+		), 0, wxALL,);
+
+	$topSizer->Add($generalSizer);
+
+
+	# general movement keys
+	my $sprintSizer = Wx::FlexGridSizer->new(0,2,3,3);
+
+	$sprintSizer->Add( Wx::StaticText->new($self, -1, "Sprint Power"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$sprintSizer->Add( Wx::ComboBox->new(
+			$self, id('SPRINT_PICKER'), '',
+			wxDefaultPosition, wxDefaultSize,
+			[@Profile::SprintPowers],
+			wxCB_READONLY,
+		), 0, wxALL,);
+
+	$sprintSizer->Add( Wx::CheckBox->new($self, id('AUTO_MOUSELOOK'), "Automatically Mouselook When Moving"), 0, wxALL,);
+	$sprintSizer->AddSpacer(1);
+
+	# TODO -- decide what to do with this.
+	# $sprintSizer->Add( Wx::CheckBox->new($self, SPRINT_UNQUEUE, "Exec powexecunqueue"), 0, wxALL,);
+
+	for ( qw(AutoRun Follow NonSoDMode) ){ # TODO - lost "Sprint-Only SoD Mode" b/c couldn't find the name in %$Labels
+		$self->addLabeledButton($sprintSizer, $_, '');
+	}
+
+	$sprintSizer->Add( Wx::CheckBox->new($self, id('SPRINT_SOD'), "Enable Sprint SoD"), 0, wxALL,);
+	$sprintSizer->AddSpacer(1);
+
+	$self->addLabeledButton($sprintSizer, 'Toggle', '');
+
+	$sprintSizer->Add( Wx::CheckBox->new($self, id('CHANGE_TRAVEL_CAMERA'), "Change Camera Distance When Travel Power Active"), 0, wxALL,);
+	$sprintSizer->AddSpacer(1);
+
+### TODO -- these next few are supposed to be spinboxes or something, not buttons
+	$sprintSizer->Add( Wx::StaticText->new($self, -1, "Base Camera Distance"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$sprintSizer->Add( Wx::Button->    new($self, id('BASE_CAMERA_DISTANCE'), ""), 0, wxEXPAND,);
+
+	$sprintSizer->Add( Wx::StaticText->new($self, -1, "Travelling Camera Distance"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$sprintSizer->Add( Wx::Button->    new($self, id('TRAVEL_CAMERA_DISTANCE'), ""), 0, wxEXPAND,);
+
+	$sprintSizer->Add( Wx::CheckBox->new($self, id('CHANGE_TRAVEL_DETAIL'), "Change Graphic Detail When Travel Power Active"), 0, wxALL,);
+	$sprintSizer->AddSpacer(1);
+
+	$sprintSizer->Add( Wx::StaticText->new($self, -1, "Base Detail Level"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$sprintSizer->Add( Wx::Button->    new($self, id('BASE_DETAIL_LEVEL'), ""), 0, wxEXPAND,);
+
+	$sprintSizer->Add( Wx::StaticText->new($self, -1, "Travelling Detail Level"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$sprintSizer->Add( Wx::Button->    new($self, id('TRAVEL_DETAIL_LEVEL'), ""), 0, wxEXPAND,);
+### TODO end "supposed to be spinboxes"
+
+	$sprintSizer->Add( Wx::CheckBox->new($self, id('HIDE_WINDOWS_TELEPORTING'), "Hide Windows When Teleporting"), 0, wxALL,);
+	$sprintSizer->AddSpacer(1);
+
+	$sprintSizer->Add( Wx::CheckBox->new($self, id('SEND_SOD_SELF_TELLS'), "Send Self-Tells When Changing SoD Modes"), 0, wxALL,);
+	$sprintSizer->AddSpacer(1);
+
+	$topSizer->Add($sprintSizer);
+
+
+	##### SuperSpeed
+
+	my $superSpeedSizer = Wx::FlexGridSizer->new(0,2,3,3);
+
+	$self->addLabeledButton($superSpeedSizer, 'SSMode', '');
+
+	$superSpeedSizer->Add( Wx::CheckBox->new($self, id('SS_ONLY_WHEN_MOVING'), "Only Super Speed When Moving"), 0, wxALL,);
+	$superSpeedSizer->AddSpacer(1);
+
+	$superSpeedSizer->Add( Wx::CheckBox->new($self, id('SS_SJ_MODE'), "Enable Super Speed + Super Jump Mode"), 0, wxALL,);
+	$superSpeedSizer->AddSpacer(1);
+
+	$topSizer->Add($superSpeedSizer);
+
+	##### SuperJump
+
+	my $superJumpSizer = Wx::FlexGridSizer->new(0,2,3,3);
+
+	$self->addLabeledButton($superJumpSizer, 'JumpMode', '');
+
+	$superJumpSizer->Add( Wx::CheckBox->new($self, id('SJ_SIMPLE_TOGGLE'), "Use Simple CJ / SJ Mode Toggle"), 0, wxALL,);
+	$superJumpSizer->AddSpacer(1);
+
+	$topSizer->Add($superJumpSizer);
+
+
+	##### Fly
+	my $flySizer = Wx::FlexGridSizer->new(0,2,3,3);
+
+	$self->addLabeledButton($flySizer, 'FlyMode', '');
+	$self->addLabeledButton($flySizer, 'GFlyMode', '');
+
+	$topSizer->Add($flySizer);
+
+	##### Teleport
+	my $teleportSizer = Wx::FlexGridSizer->new(0,2,3,3);
+
+	my $teleportPowerName = 'Teleport';
+	# if (at == peacebringer) "Dwarf Step Key"
+	# if (at == warshade) "Shadow Step / Dwarf Step Key"
+
+	$self->addLabeledButton($teleportSizer, "TPCombo", '');
+	$self->addLabeledButton($teleportSizer, "TPReset", '');
+	$self->addLabeledButton($teleportSizer, "TPMode", '');
+
+	# if (player has hover): {
+		$teleportSizer->Add( Wx::CheckBox->new($self, id('TP_HOVER_WHEN_TP'), "Auto-Hover When Teleporting"), 0, wxALL,);
+		$teleportSizer->AddSpacer(1);
+	# }
+
+	# if (player has team-tp) {
+		$self->addLabeledButton($teleportSizer, "TTPCombo", '');
+		$self->addLabeledButton($teleportSizer, "TTPReset", '');
+
+		# if (player has group fly) {
+			$teleportSizer->Add( Wx::CheckBox->new($self, id('TP_GROUP_FLY_WHEN_TP_TEAM'), "Auto-Group-Fly When Team Teleporting"), 0, wxALL,);
+			$teleportSizer->AddSpacer(1);
+
+		# }
+	# }
+	$topSizer->Add($teleportSizer);
+
+	##### Temp
+
+	my $tempSizer = Wx::FlexGridSizer->new(0,2,3,3);
+
+	# if (temp travel powers exist)?  Should this be "custom"?
+	$self->addLabeledButton($tempSizer, 'TempMode', '');
+
+	# TODO - this is supposed to be a spinbox or something to set which power tray
+	$tempSizer->Add( Wx::StaticText->new($self, -1, "Temp Travel Power Tray"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$tempSizer->Add( Wx::Button->    new($self, id('TEMP_POWERTRAY'), ""), 0, wxEXPAND,);
+
+	$topSizer->Add($tempSizer);
+
+	my $kheldianSizer = Wx::FlexGridSizer->new(0,2,3,3);
+
+	$self->addLabeledButton($kheldianSizer, 'NovaMode', '');
+
+	# TODO -- spinbox!
+	$kheldianSizer->Add( Wx::StaticText->new($self, -1, "Nova Powertray"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$kheldianSizer->Add( Wx::Button->    new($self, id('KHELD_NOVA_POWERTRAY'), ""), 0, wxEXPAND,);
+
+	$self->addLabeledButton($kheldianSizer, 'DwarfMode', '');
+
+	# TODO -- spinbox!
+	$kheldianSizer->Add( Wx::StaticText->new($self, -1, "Dwarf Powertray"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$kheldianSizer->Add( Wx::Button->    new($self, id('KHELD_DWARF_POWERTRAY'), ""), 0, wxEXPAND,);
+
+	# do we want a key to change directly to human form, instead of toggles?
+	$self->addLabeledButton($kheldianSizer, 'HumanMode', '');
+
+	# TODO -- spinbox!
+	$kheldianSizer->Add( Wx::StaticText->new($self, -1, "Human Powertray"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$kheldianSizer->Add( Wx::Button->    new($self, id('KHELD_HUMAN_POWERTRAY'), ""), 0, wxEXPAND,);
+
+	$topSizer->Add($kheldianSizer);
+
+	$self->SetSizer($topSizer);
+
+	return $self;
 }
+
 
 sub makeSoDFile {
 	my $params = shift;
@@ -2321,5 +2317,6 @@ sub sodSetDownFix {
 	makeModeKey($profile,$t,$bl,$tglfile,$turnoff,undef,true);
 	$curfile->SetBind($key,'+down'.$feedback.'$$bindloadfile '.$filename);
 }
+
 
 1;
