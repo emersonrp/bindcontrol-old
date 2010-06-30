@@ -7,11 +7,7 @@ use parent "BCPlugins";
 
 use BindFile;
 
-use Wx qw( wxDefaultSize wxDefaultPosition wxID_OK wxID_CANCEL wxID_YES wxID_ANY );
-use Wx qw( wxVERTICAL wxHORIZONTAL wxALL wxLEFT wxRIGHT wxTOP wxBOTTOM wxCENTER wxEXPAND );
-use Wx qw( wxALIGN_RIGHT wxALIGN_BOTTOM wxALIGN_CENTER wxALIGN_CENTER_VERTICAL wxALIGN_CENTER_HORIZONTAL );
-use Wx qw( wxCB_READONLY );
-
+use Wx qw( :everything );
 
 sub new {
 
@@ -113,7 +109,7 @@ sub new {
 
 	my $useCB = Wx::CheckBox->new( $self, -1, 'Enable Mastermind Pet Binds');
 	$useCB->SetToolTip(Wx::ToolTip->new('Check this to enable the Mastermind Pet Action Binds'));
-	$sizer->Add($useCB, 0, wxALL);
+	$sizer->Add($useCB, 0, wxALL, 10);
 
 # TODO - add checkbox handler to hide/show (enable/disable?) the bodyguard options
 # TODO -- actually, automagically enable/disable these depending on whether any pets have their
@@ -121,7 +117,7 @@ sub new {
 	my $bgCB = Wx::CheckBox->new( $self, -1, 'Enable Bodyguard Mode Binds');
 	$bgCB->SetToolTip(Wx::ToolTip->new('Check this to enable the Bodyguard Mode Binds'));
 	$bgCB->SetValue($MMP->{'PetBodyguardMode'});
-	$sizer->Add($bgCB, 0, wxALL);
+	$sizer->Add($bgCB, 0, wxALL, 10);
 
 	$sizer->AddSpacer(10);
 
@@ -135,7 +131,7 @@ sub new {
 		my $al = Wx::StaticText->new($self, -1, $k->{'label'});
 		my $ab = Wx::Button->    new($self, $basename, $MMP->{$basename});
 
-		my $cl = Wx::StaticText->new($self, -1, "Response to $k->{'label'}");
+		my $cl = Wx::StaticText->new($self, -1, "Respond via:");
 		my $cm = Wx::ComboBox->  new($self, "${basename}RespPicker", $MMP->{"${basename}ResponseMethod"},
 				wxDefaultPosition, wxDefaultSize, $ChatOptions, wxCB_READONLY);
 		my $cr = Wx::TextCtrl->  new($self, "${basename}Response",   $MMP->{"${basename}Response"});
@@ -181,22 +177,19 @@ sub new {
 	}
 	$sizer->Add($PetNames);
 
-# TODO -- add this stuff to a single "Credits" tab somewhere kthx
-	$sizer->Add(
-		Wx::StaticText->new(
-			$self, -1,
-			"The Original Mastermind Control Binds\n" .
-			"were created in CoV Beta by Khaiba\n" .
-			"a.k.a. Sandolphan\n" .
-			"Bodyguard code inspired directly from\n" .
-			"Sandolphan's Bodyguard binds.\n" .
-			"Thugs added by Konoko!\n"), 0, wxALL, 5
-	);
-
 	$self->SetSizerAndFit($sizer);
 
 	return $self;
 }
+
+sub HelpText { qq|
+	The Original Mastermind Control Binds
+	were created in CoV Beta by Khaiba
+	a.k.a. Sandolphan
+	Bodyguard code inspired directly from
+	Sandolphan's Bodyguard binds.
+	Thugs added by Konoko!
+|;}
 
 sub mmBGSelBind {
 	my ($profile,$file,$petaction,$saybg,$minpow,$ltspow,$bospow) = @_;

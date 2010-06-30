@@ -143,7 +143,7 @@ sub new {
 
 	my $topSizer = Wx::FlexGridSizer->new(0,2,10,10);
 
-	$topSizer->Add( Wx::CheckBox->new( $self, id('USE_SOD'), "Enable Speed On Demand Binds" ));
+	$topSizer->Add( Wx::CheckBox->new( $self, id('USE_SOD'), "Enable Speed On Demand Binds" ), 0, wxTOP|wxLEFT, 10);
 	$topSizer->AddSpacer(1);
 
 	my $leftColumn = Wx::BoxSizer->new(wxVERTICAL);
@@ -157,8 +157,6 @@ sub new {
 		$self->addLabeledButton($movementSizer, $_, $SoD->{$_});
 	}
 
-	$movementSizer->Add( Wx::CheckBox->new($self, id('MOUSECHORD_SOD'), "Use Mousechord as SoD Forward"));
-	$movementSizer->AddSpacer(1);
 
 	# TODO!  fill this picker with only the appropriate bits.
 	$movementSizer->Add( Wx::StaticText->new($self, -1, "Default Movement Mode"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
@@ -170,13 +168,14 @@ sub new {
 		));
 
 	$movementBox->Add($movementSizer, 0, wxALIGN_RIGHT);
+	$movementBox->Add( Wx::CheckBox->new($self, id('MOUSECHORD_SOD'), "Use Mousechord as SoD Forward"), 0, wxALIGN_RIGHT|wxALL, 5);
 	$leftColumn->Add($movementBox, 0, wxEXPAND);
 
 
 	##### GENERAL SETTINGS
 	my $generalBox   = Wx::StaticBoxSizer->new(Wx::StaticBox->new($self, -1, 'General Settings'), wxVERTICAL);
 
-	$generalBox->Add( Wx::CheckBox->new($self, id('AUTO_MOUSELOOK'), "Automatically Mouselook When Moving"), 0, wxALL, 3);
+	$generalBox->Add( Wx::CheckBox->new($self, id('AUTO_MOUSELOOK'), "Automatically Mouselook When Moving"), 0, wxALL, 5);
 
 	my $generalSizer = Wx::FlexGridSizer->new(0,2,3,3);
 	$generalSizer->Add( Wx::StaticText->new($self, -1, "Sprint Power"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
@@ -197,11 +196,12 @@ sub new {
 
 	$self->addLabeledButton($generalSizer, 'Toggle', $SoD->{'Toggle'});
 
-	$generalBox->Add($generalSizer, 0, wxALIGN_RIGHT|wxALL, 3);
+	$generalBox->Add($generalSizer, 0, wxALIGN_RIGHT|wxALL, 5);
 
-	$generalBox->Add( Wx::CheckBox->new($self, id('SPRINT_SOD'), "Enable Sprint SoD"), 0, wxALL, 3);
-	$generalBox->Add( Wx::CheckBox->new($self, id('CHANGE_TRAVEL_CAMERA'), "Change Camera Distance When Travel Power Active"), 0, wxALL, 3);
+	$generalBox->Add( Wx::CheckBox->new($self, id('SPRINT_SOD'),           "Enable Sprint SoD"),                               0, wxALL, 5);
+	$generalBox->Add( Wx::CheckBox->new($self, id('CHANGE_TRAVEL_CAMERA'), "Change Camera Distance When Travel Power Active"), 0, wxALL, 5);
 
+	# camera spinboxes
 	my $cSizer = Wx::FlexGridSizer->new(0,2,3,3);
 	$cSizer->Add( Wx::StaticText->new($self, -1, "Base Camera Distance"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
 	my $baseSpin = Wx::SpinCtrl->new($self, 0, id('BASE_CAMERA_DISTANCE'));
@@ -215,10 +215,11 @@ sub new {
 	$travSpin->SetRange(1, 100);
 	$cSizer->Add( $travSpin, 0, wxEXPAND );
 
-	$generalBox->Add( $cSizer, 0, wxALIGN_RIGHT|wxALL, 3);
+	$generalBox->Add( $cSizer, 0, wxALIGN_RIGHT|wxALL, 5);
 
-	$generalBox->Add( Wx::CheckBox->new($self, id('CHANGE_TRAVEL_DETAIL'), "Change Graphic Detail When Travel Power Active"), 0, wxALL, 3);
+	$generalBox->Add( Wx::CheckBox->new($self, id('CHANGE_TRAVEL_DETAIL'), "Change Graphic Detail When Travel Power Active"), 0, wxALL, 5);
 
+	# detail spinboxes
 	my $dSizer = Wx::FlexGridSizer->new(0,2,3,3);
 	$dSizer->Add( Wx::StaticText->new($self, -1, "Base Detail Level"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
 	my $baseDetail = Wx::SpinCtrl->new($self, 0, id('BASE_DETAIL_LEVEL'));
@@ -232,10 +233,10 @@ sub new {
 	$travDetail->SetRange(1, 100);
 	$dSizer->Add( $travDetail, 0, wxEXPAND );
 
-	$generalBox->Add( $dSizer, 0, wxALIGN_RIGHT|wxALL, 3);
+	$generalBox->Add( $dSizer, 0, wxALIGN_RIGHT|wxALL, 5);
 
-	$generalBox->Add( Wx::CheckBox->new($self, id('HIDE_WINDOWS_TELEPORTING'), "Hide Windows When Teleporting"), 0, wxALL, 3);
-	$generalBox->Add( Wx::CheckBox->new($self, id('SEND_SOD_SELF_TELLS'), "Send Self-Tells When Changing SoD Modes"), 0, wxALL, 3);
+	$generalBox->Add( Wx::CheckBox->new($self, id('HIDE_WINDOWS_TELEPORTING'), "Hide Windows When Teleporting"), 0, wxALL, 5);
+	$generalBox->Add( Wx::CheckBox->new($self, id('SEND_SOD_SELF_TELLS'), "Send Self-Tells When Changing SoD Modes"), 0, wxALL, 5);
 
 	$leftColumn->Add($generalBox, 0, wxEXPAND);
 
@@ -280,33 +281,32 @@ sub new {
 
 	##### TELEPORT
 	my $teleportBox   = Wx::StaticBoxSizer->new(Wx::StaticBox->new($self, -1, 'Teleport'), wxVERTICAL);
-	my $teleportSizer = Wx::FlexGridSizer->new(0,2,3,3);
 
-	my $teleportPowerName = 'Teleport';
 	# if (at == peacebringer) "Dwarf Step"
 	# if (at == warshade) "Shadow Step / Dwarf Step"
 
+	my $teleportSizer = Wx::FlexGridSizer->new(0,2,3,3);
 	$self->addLabeledButton($teleportSizer, "TPMode", $SoD->{'TP'}->{'Bind'});
 	$self->addLabeledButton($teleportSizer, "TPCombo", $SoD->{'TP'}->{'Combo'});
 	$self->addLabeledButton($teleportSizer, "TPReset", $SoD->{'TP'}->{'Reset'});
+	$teleportBox->Add( $teleportSizer, 0, wxALL|wxALIGN_RIGHT, 5 );
 
 	# if (player has hover): {
-		$teleportSizer->Add( Wx::CheckBox->new($self, id('TP_HOVER_WHEN_TP'), "Auto-Hover When Teleporting"));
-		$teleportSizer->AddSpacer(1);
+		$teleportBox->Add( Wx::CheckBox->new($self, id('TP_HOVER_WHEN_TP'), "Auto-Hover When Teleporting"), wxALIGN_RIGHT|wxALL, 5);
 	# }
 
 	# if (player has team-tp) {
-		$self->addLabeledButton($teleportSizer, "TTPMode", $SoD->{'TTP'}->{'Bind'});
-		$self->addLabeledButton($teleportSizer, "TTPCombo", $SoD->{'TTP'}->{'Combo'});
-		$self->addLabeledButton($teleportSizer, "TTPReset", $SoD->{'TTP'}->{'Reset'});
+		my $tteleportSizer = Wx::FlexGridSizer->new(0,2,3,3);
+		$self->addLabeledButton($tteleportSizer, "TTPMode", $SoD->{'TTP'}->{'Bind'});
+		$self->addLabeledButton($tteleportSizer, "TTPCombo", $SoD->{'TTP'}->{'Combo'});
+		$self->addLabeledButton($tteleportSizer, "TTPReset", $SoD->{'TTP'}->{'Reset'});
+		$teleportBox->Add( $tteleportSizer, 0, wxALL|wxALIGN_RIGHT, 5 );
 
 		# if (player has group fly) {
-			$teleportSizer->Add( Wx::CheckBox->new($self, id('TP_GROUP_FLY_WHEN_TP_TEAM'), "Auto-Group-Fly When Team Teleporting"));
-			$teleportSizer->AddSpacer(1);
+			$teleportBox->Add( Wx::CheckBox->new($self, id('TP_GROUP_FLY_WHEN_TP_TEAM'), "Auto-Group-Fly When Team Teleporting"), wxALIGN_RIGHT|wxALL, 5);
 
 		# }
 	# }
-	$teleportBox->Add($teleportSizer, 0, wxALIGN_RIGHT);
 	$rightColumn->Add($teleportBox, 0, wxEXPAND);
 
 	##### TEMP TRAVEL POWERS

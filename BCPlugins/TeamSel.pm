@@ -7,10 +7,7 @@ use parent "BCPlugins";
 
 use BindFile;
 
-use Wx qw( wxDefaultSize wxDefaultPosition wxID_OK wxID_CANCEL wxID_YES wxID_ANY );
-use Wx qw( wxVERTICAL wxHORIZONTAL wxALL wxLEFT wxRIGHT wxTOP wxBOTTOM wxCENTER wxEXPAND );
-use Wx qw( wxALIGN_RIGHT wxALIGN_BOTTOM wxALIGN_CENTER wxALIGN_CENTER_VERTICAL wxALIGN_CENTER_HORIZONTAL );
-use Wx qw( wxCB_READONLY );
+use Wx qw( :everything );
 
 use Wx::Event qw(EVT_BUTTON);
 use Utility qw(id);
@@ -57,7 +54,7 @@ sub new {
 	);
 	$picker->SetToolTip( Wx::ToolTip->new('Choose the order in which teammates and pets are selected with sequential keypresses') );
 	$sizer->Add( Wx::StaticText->new($self, -1, "Select Order"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL );
-	$sizer->Add( $picker, 0, wxALL );
+	$sizer->Add( $picker, 0, wxALL, 10 );
 
 	for my $selectid (1..8) {
 

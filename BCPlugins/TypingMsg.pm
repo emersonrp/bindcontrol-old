@@ -5,7 +5,7 @@ use strict;
 package BCPlugins::TypingMsg;
 use parent 'BCPlugins';
 
-use Wx qw( wxALIGN_RIGHT wxALIGN_CENTER_VERTICAL wxEXPAND );
+use Wx qw( :everything );
 
 use Utility qw(id);
 

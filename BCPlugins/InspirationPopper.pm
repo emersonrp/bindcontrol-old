@@ -5,11 +5,7 @@ package BCPlugins::InspirationPopper;
 use strict;
 use parent "BCPlugins";
 
-use Wx qw( wxDefaultSize wxDefaultPosition wxDefaultValidator );
-use Wx qw( wxID_OK wxID_CANCEL wxID_YES wxID_ANY );
-use Wx qw( wxVERTICAL wxHORIZONTAL wxALL wxLEFT wxRIGHT wxTOP wxBOTTOM wxCENTER wxEXPAND );
-use Wx qw( wxALIGN_RIGHT wxALIGN_BOTTOM wxALIGN_CENTER wxALIGN_CENTER_VERTICAL wxALIGN_CENTER_HORIZONTAL );
-use Wx qw( wxCB_READONLY );
+use Wx qw( :everything );
 
 use Utility qw(id);
 
@@ -94,13 +90,13 @@ sub new {
 
 	my $useCB = Wx::CheckBox->new( $self, -1, 'Enable Inspiration Popper Binds (prefer largest)');
 	$useCB->SetToolTip(Wx::ToolTip->new('Check this to enable the Inspiration Popper Binds, (largest used first)'));
-	$sizer->Add($useCB, 0, wxALL);
+	$sizer->Add($useCB, 0, wxALL, 10);
 
 	$sizer->Add($InspRows);
 
 	my $useRevCB = Wx::CheckBox->new( $self, -1, 'Enable Reverse Inspiration Popper Binds (prefer smallest)');
 	$useCB->SetToolTip(Wx::ToolTip->new('Check this to enable the Reverse Inspiration Popper Binds, (smallest used first)'));
-	$sizer->Add($useRevCB, 0, wxALL);
+	$sizer->Add($useRevCB, 0, wxALL, 10);
 
 	$sizer->Add($RevInspRows);
 

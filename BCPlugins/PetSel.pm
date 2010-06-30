@@ -5,7 +5,7 @@ use strict;
 package BCPlugins::PetSel;
 use parent "BCPlugins";
 
-use Wx qw( wxALIGN_RIGHT wxALIGN_CENTER_VERTICAL wxEXPAND );
+use Wx qw( :everything );
 
 use BindFile;
 use Utility qw(id);
