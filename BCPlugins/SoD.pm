@@ -31,6 +31,9 @@ sub new {
 		Back => "S",
 		Left => "A",
 		Right => "D",
+		TurnLeft => "Q",
+		TurnRight => "E",
+
 		RunMode => "C",
 		FlyMode => "F",
 		AutoRun => "R",
@@ -153,7 +156,7 @@ sub new {
 	my $movementBox   = Wx::StaticBoxSizer->new(Wx::StaticBox->new($self, -1, 'Movement Keys'), wxVERTICAL);
 	my $movementSizer = Wx::FlexGridSizer->new(0,2,3,3);
 
-	for ( qw(Up Down Forward Back Left Right) ){
+	for ( qw(Up Down Forward Back Left Right TurnLeft TurnRight) ){
 		$self->addLabeledButton($movementSizer, $_, $SoD->{$_});
 	}
 
@@ -243,17 +246,15 @@ sub new {
 
 	##### SUPER SPEED
 	my $superSpeedBox   = Wx::StaticBoxSizer->new(Wx::StaticBox->new($self, -1, 'Super Speed'), wxVERTICAL);
-	my $superSpeedSizer = Wx::FlexGridSizer->new(0,2,3,3);
 
+	my $superSpeedSizer = Wx::FlexGridSizer->new(0,2,3,3);
 	$self->addLabeledButton($superSpeedSizer, 'SSMode', $SoD->{'SSMode'});
 
-	$superSpeedSizer->Add( Wx::CheckBox->new($self, id('SS_ONLY_WHEN_MOVING'), "Only Super Speed When Moving"));
-	$superSpeedSizer->AddSpacer(1);
-
-	$superSpeedSizer->Add( Wx::CheckBox->new($self, id('SS_SJ_MODE'), "Enable Super Speed + Super Jump Mode"));
-	$superSpeedSizer->AddSpacer(1);
-
 	$superSpeedBox->Add($superSpeedSizer, 0, wxALIGN_RIGHT);
+
+	$superSpeedBox->Add( Wx::CheckBox->new($self, id('SS_ONLY_WHEN_MOVING'), "Only Super Speed When Moving"));
+	$superSpeedBox->Add( Wx::CheckBox->new($self, id('SS_SJ_MODE'), "Enable Super Speed + Super Jump Mode"));
+
 	$rightColumn->Add($superSpeedBox, 0, wxEXPAND);
 
 	##### SUPER JUMP
@@ -262,10 +263,9 @@ sub new {
 
 	$self->addLabeledButton($superJumpSizer, 'JumpMode', $SoD->{'JumpMode'});
 
-	$superJumpSizer->Add( Wx::CheckBox->new($self, id('SJ_SIMPLE_TOGGLE'), "Use Simple CJ / SJ Mode Toggle"));
-	$superJumpSizer->AddSpacer(1);
+	$superJumpBox->Add( $superJumpSizer, 0, wxALIGN_RIGHT );
+	$superJumpBox->Add( Wx::CheckBox->new($self, id('SJ_SIMPLE_TOGGLE'), "Use Simple CJ / SJ Mode Toggle"));
 
-	$superJumpBox->Add($superJumpSizer, 0, wxALIGN_RIGHT);
 	$rightColumn->Add($superJumpBox, 0, wxEXPAND);
 
 
@@ -286,24 +286,24 @@ sub new {
 	# if (at == warshade) "Shadow Step / Dwarf Step"
 
 	my $teleportSizer = Wx::FlexGridSizer->new(0,2,3,3);
-	$self->addLabeledButton($teleportSizer, "TPMode", $SoD->{'TP'}->{'Bind'});
+	$self->addLabeledButton($teleportSizer, "TPMode",  $SoD->{'TP'}->{'Bind'});
 	$self->addLabeledButton($teleportSizer, "TPCombo", $SoD->{'TP'}->{'Combo'});
 	$self->addLabeledButton($teleportSizer, "TPReset", $SoD->{'TP'}->{'Reset'});
 	$teleportBox->Add( $teleportSizer, 0, wxALL|wxALIGN_RIGHT, 5 );
 
 	# if (player has hover): {
-		$teleportBox->Add( Wx::CheckBox->new($self, id('TP_HOVER_WHEN_TP'), "Auto-Hover When Teleporting"), wxALIGN_RIGHT|wxALL, 5);
+		$teleportBox->Add( Wx::CheckBox->new($self, id('TP_HOVER_WHEN_TP'), "Auto-Hover When Teleporting"));
 	# }
 
 	# if (player has team-tp) {
 		my $tteleportSizer = Wx::FlexGridSizer->new(0,2,3,3);
-		$self->addLabeledButton($tteleportSizer, "TTPMode", $SoD->{'TTP'}->{'Bind'});
+		$self->addLabeledButton($tteleportSizer, "TTPMode",  $SoD->{'TTP'}->{'Bind'});
 		$self->addLabeledButton($tteleportSizer, "TTPCombo", $SoD->{'TTP'}->{'Combo'});
 		$self->addLabeledButton($tteleportSizer, "TTPReset", $SoD->{'TTP'}->{'Reset'});
 		$teleportBox->Add( $tteleportSizer, 0, wxALL|wxALIGN_RIGHT, 5 );
 
 		# if (player has group fly) {
-			$teleportBox->Add( Wx::CheckBox->new($self, id('TP_GROUP_FLY_WHEN_TP_TEAM'), "Auto-Group-Fly When Team Teleporting"), wxALIGN_RIGHT|wxALL, 5);
+			$teleportBox->Add( Wx::CheckBox->new($self, id('TP_GROUP_FLY_WHEN_TP_TEAM'), "Auto-Group-Fly When Team Teleporting"));
 
 		# }
 	# }
@@ -323,7 +323,7 @@ sub new {
 	$tempSizer->Add( $tempTraySpin, 0, wxEXPAND );
 
 	$tempBox->Add($tempSizer, 0, wxALIGN_RIGHT);
-	$leftColumn->Add($tempBox, 0, wxEXPAND);
+	$rightColumn->Add($tempBox, 0, wxEXPAND);
 
 	##### KHELDIAN TRAVEL POWERS
 	my $kheldianBox   = Wx::StaticBoxSizer->new(Wx::StaticBox->new($self, -1, 'Nova / Dwarf Travel Powers'), wxVERTICAL);

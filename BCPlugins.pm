@@ -60,6 +60,8 @@ sub Labels {
 	return  {
 		Left => 'Strafe Left',
 		Right => 'Strafe Right',
+		TurnLeft => 'Turn Left',
+		TurnRight => 'Turn Right',
 		AutoRun => 'Auto Run',
 		Follow => 'Follow Target',
 		NonSoDMode => 'Non-SoD Mode',
