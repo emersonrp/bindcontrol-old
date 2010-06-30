@@ -92,15 +92,15 @@ sub new {
 	$self->SetMenuBar($MenuBar);
 
 	# MENUBAR EVENTS
-	EVT_MENU( $self, id('MENUITEM_NEWPROF'), \&newProfileWindow );
-	EVT_MENU( $self, id('MENUITEM_LOADPROF'), sub {return 1;} );
-	EVT_MENU( $self, id('MENUITEM_SAVEPROF'), sub {return 1;} );
-	EVT_MENU( $self, id('MENUITEM_PREFS'), sub {return 1;} );
-	EVT_MENU( $self, id('MENUITEM_EXIT'), sub {shift->Close(1)} );
-	EVT_MENU( $self, id('MENUITEM_MANUAL'), sub {return 1;} );
-	EVT_MENU( $self, id('MENUITEM_FAQ'), sub {return 1;} );
-	EVT_MENU( $self, id('MENUITEM_LICENSE'), sub {return 1;} );
-	EVT_MENU( $self, id('MENUITEM_ABOUT'), \&showAboutBox );
+	EVT_MENU( $self, id('MENUITEM_NEWPROF'),  \&newProfileWindow );
+	EVT_MENU( $self, id('MENUITEM_LOADPROF'), sub {1} );
+	EVT_MENU( $self, id('MENUITEM_SAVEPROF'), sub {1} );
+	EVT_MENU( $self, id('MENUITEM_PREFS'),    sub {1} );
+	EVT_MENU( $self, id('MENUITEM_EXIT'),     \&exitApplication );
+	EVT_MENU( $self, id('MENUITEM_MANUAL'),   sub {1} );
+	EVT_MENU( $self, id('MENUITEM_FAQ'),      sub {1} );
+	EVT_MENU( $self, id('MENUITEM_LICENSE'),  sub {1} );
+	EVT_MENU( $self, id('MENUITEM_ABOUT'),    \&showAboutBox );
 
 
 	# TODO - read in the config for the window (size, location, etc)
@@ -117,5 +117,7 @@ sub new {
 }
 
 sub showAboutBox { return Wx::AboutBox(our $aboutDialogInfo); }
+
+sub exitApplication { shift->Close(1); }
 
 1;

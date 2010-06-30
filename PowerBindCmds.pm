@@ -6,19 +6,15 @@ package PowerBindCmds;
 
 sub match1arg {
 	my ($s,$arg1,$arg2match) = @_;
-	$arg2match ||= "(.*)";
-	my ($a,$b) = $s =~ /^([^ ]*) $arg2match/;
-	return unless $a;
-	if (lc $a eq lc $arg1) { return $b }
+	$arg2match ||= "(\S*)";
+	if ($s =~ /^$arg1 ($arg2match)/i) { return $1; }
 }
 
 sub match2arg {
 	my ($s,$arg1,$arg2match,$arg3match) = @_;
-	$arg2match ||= "(.*)";
-	$arg3match ||= "(.*)";
-	my ($a,$b,$c) = $s =~ /^([^ ]*) $arg2match $arg3match/;
-	return unless $a;
-	if (lc $a eq lc $arg1) { return ($b,$c) }
+	$arg2match ||= "(\S*)";
+	$arg3match ||= "(\S*)";
+	if ($s =~ /^$arg1 ($arg2match) ($arg3match)/i) { return ($1, $2); }
 }
 
 ################################################################################
@@ -328,26 +324,7 @@ Powerbinder::addCmd("Custom Bind",&newCustomBind,&formCustomBind,&makeCustomBind
 ################################################################################
 
 ################################################################################
-### TODO -- put this in GameData.pm
-my @emotelist = qw|
-	afraid alakazam alakazamreact angry assumepositionwall atease attack backflip batsmash
-	batsmashreact bb bbaltitude bbbeat bbcatchme bbdance bbdiscofreak bbdogwalk bbelectrovibe
-	bbheavydude bbinfooverload bbjumpy bbkickit bblooker bbmeaty bbmoveon bbnotorious bbpeace
-	bbquickie bbraver bbshuffle bbspaz bbtechnoid bbvenus bbwahwah bbwinditup bbyellow
-	beatchest biglaugh bigwave blankfiller boombox bow bowdown burp buzzoff champion cheer
-	chicken clap coin cointoss cower crack crossarms curseyou dance dice disagree
-	dontattack drat drink dropboombox drumdance dustoff elaugh elegantbow evillaugh explain
-	fancybow fear flashlight flex flex1 flex2 flex3 flexa flexb flexc flip flipcoin
-	frustrated getsome goaway grief hand handsup hi holdtorch huh jumpingjacks kata kissit
-	kneel knuckle knuckles laptop laugh laugh2 laughtoo lecture ledgesit lotus martialarts
-	militarysalute muahahaha newspaper no nod noooo overhere panhandle paper peerin plot
-	point praise protest raisehand research researchlow roar rock rolldice salute scared
-	scheme scissors score1 score2 score3 score4 score5 score6 score7 score8 score9 score10
-	screen shucks sit slap slapreact slash slashthroat sleep smack smackyou sorry stop
-	surrender talk talktohand tarzan taunt taunt1 taunt2 taunta tauntb thanks thankyou thewave
-	threathand thumbsup touchscreen type typing victory villainlaugh villainouslaugh walllean
-	wave wavefist welcome what whistle wings winner yata yatayata yes yoga yourewelcome"
-|;
+our @GameData::Emotes;
 
 sub formEmoteBind {
 	my ($t,$profile,$refreshcb) = @_;
@@ -464,15 +441,8 @@ Powerbinder::addCmd("Use Inspiration From Row/Column",&newInspExecTray,&formInsp
 ################################################################################
 
 ################################################################################
-# TODO TODO TODO move this to GameData.pm
-my @insps = ("Insight","Keen Insight","Uncanny Insight",
-	"Respite","Dramatic Improvement","Resurgance",
-	"Enrage","Focused Rage","Righteous Rage",
-	"Catch a Breath","Take a Breather","Second Wind",
-	"Luck","Good Luck","Phenomenal Luck",
-	"Break Free","Emerge","Escape",
-	"Sturdy","Rugged","Robust",
-);
+
+our %GameData::Inspirations;
 
 sub formInspExecName {
 	my ($t,$profile,$refreshcb) = @_;

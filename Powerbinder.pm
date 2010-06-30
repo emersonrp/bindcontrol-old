@@ -2,6 +2,7 @@
 use strict;
 
 package Powerbinder;
+use PowerBindCmds;
 
 our $cmds = {};
 our $cmdlist = [];
@@ -9,11 +10,11 @@ sub addCmd {
 	my ($label,$new,$form,$make,$match,$c,$clist) = @_;
 	$c ||= $cmds;
 	$clist ||= $cmdlist;
-	$c->{'label'} = {};
-	$c->{'label'}->{'new'} = $new;
-	$c->{'label'}->{'form'} = $form;
-	$c->{'label'}->{'make'} = $make;
-	$c->{'label'}->{'match'} = $match;
+	$c->{$label} = {};
+	$c->{$label}->{'new'} = $new;
+	$c->{$label}->{'form'} = $form;
+	$c->{$label}->{'make'} = $make;
+	$c->{$label}->{'match'} = $match;
 	push @$clist, $label;
 }
 
