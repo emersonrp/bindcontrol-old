@@ -45,11 +45,12 @@ sub HelpText { qq|Help not currently implemented here.|; }
 sub addLabeledButton {
     my ($self, $sizer, $label, $value, $tooltip) = @_;
 
+
     my $button = Wx::Button->new($self, Utility::id($label), $value);
     $button->SetToolTip( Wx::ToolTip->new($tooltip)) if $tooltip;
 
-    $sizer->Add( Wx::StaticText->new($self, -1, ($Labels->{$label} || $label)), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
-    $sizer->Add( $button, 0, wxEXPAND,);
+    $sizer->Add( Wx::StaticText->new($self, -1, ($Labels->{$label} || $label)), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
+    $sizer->Add( $button, 0, wxEXPAND );
 }
 
 
@@ -68,10 +69,11 @@ sub Labels {
 		FlyMode => 'Toggle Fly Mode',
 		GFlyMode => 'Toggle Group Fly Mode',
 
+		TPMode  => 'Teleport Bind',
 		TPCombo => 'Teleport Combo Key',
 		TPReset => 'Teleport Reset Key',
-		TPMode  => 'Teleport Mode',
 
+		TTPMode  => 'Team Teleport Bind',
 		TTPCombo => 'Team Teleport Combo Key',
 		TTPReset => 'Team Teleport Reset Key',
 
