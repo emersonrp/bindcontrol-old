@@ -19,6 +19,8 @@ sub new {
 		$self->AddPage($plugin, $plugin->{'TabTitle'});
 	}
 
+	$self->SetSelection(1);
+
 	return $self;
 }
 

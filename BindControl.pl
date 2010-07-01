@@ -36,10 +36,8 @@ sub OnInit{
 ###################
 package BCMainWindow;
 
-use Wx qw(wxVERTICAL wxHORIZONTAL wxDefaultSize wxDefaultPosition
-		wxTAB_TRAVERSAL wxEXPAND wxALL wxLB_SORT :id);
-
-use Wx::Event qw( EVT_MENU );
+use Wx qw( :everything );
+use Wx::Event;
 
 use Utility qw(id);
 use Module::Pluggable instantiate => 'new', search_path => 'BCPlugins';
@@ -50,13 +48,8 @@ sub new {
 
     my $class = shift;
 
-    my $self = $class->SUPER::new(
-        undef,         # No parent means "top-level window".
-        -1,            # No need to assign a window ID
-        "BindControl",   # Window title
-    );
+    my $self = $class->SUPER::new( undef, -1, "BindControl" );
 
-    # "Profile" Menu
 	my $ProfMenu = Wx::Menu->new();
 
 	$ProfMenu->Append(id('MENUITEM_NEWPROF'), "New Profile...", "Create a new profile");
@@ -92,15 +85,15 @@ sub new {
 	$self->SetMenuBar($MenuBar);
 
 	# MENUBAR EVENTS
-	EVT_MENU( $self, id('MENUITEM_NEWPROF'),  \&newProfileWindow );
-	EVT_MENU( $self, id('MENUITEM_LOADPROF'), sub {1} );
-	EVT_MENU( $self, id('MENUITEM_SAVEPROF'), sub {1} );
-	EVT_MENU( $self, id('MENUITEM_PREFS'),    sub {1} );
-	EVT_MENU( $self, id('MENUITEM_EXIT'),     \&exitApplication );
-	EVT_MENU( $self, id('MENUITEM_MANUAL'),   sub {1} );
-	EVT_MENU( $self, id('MENUITEM_FAQ'),      sub {1} );
-	EVT_MENU( $self, id('MENUITEM_LICENSE'),  sub {1} );
-	EVT_MENU( $self, id('MENUITEM_ABOUT'),    \&showAboutBox );
+	Wx::Event::EVT_MENU( $self, id('MENUITEM_NEWPROF'),  \&newProfileWindow );
+	Wx::Event::EVT_MENU( $self, id('MENUITEM_LOADPROF'), sub {1} );
+	Wx::Event::EVT_MENU( $self, id('MENUITEM_SAVEPROF'), sub {1} );
+	Wx::Event::EVT_MENU( $self, id('MENUITEM_PREFS'),    sub {1} );
+	Wx::Event::EVT_MENU( $self, id('MENUITEM_EXIT'),     \&exitApplication );
+	Wx::Event::EVT_MENU( $self, id('MENUITEM_MANUAL'),   sub {1} );
+	Wx::Event::EVT_MENU( $self, id('MENUITEM_FAQ'),      sub {1} );
+	Wx::Event::EVT_MENU( $self, id('MENUITEM_LICENSE'),  sub {1} );
+	Wx::Event::EVT_MENU( $self, id('MENUITEM_ABOUT'),    \&showAboutBox );
 
 
 	# TODO - read in the config for the window (size, location, etc)

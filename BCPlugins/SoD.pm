@@ -5,10 +5,9 @@ use strict;
 package BCPlugins::SoD;
 use parent "BCPlugins";
 
-use BindFile;
-use Profile;
 use Utility qw(id);
 use Wx qw( :everything );
+use Wx::Event qw( :everything );
 
 use constant true => 1;
 
@@ -159,6 +158,9 @@ sub new {
 	for ( qw(Up Down Forward Back Left Right TurnLeft TurnRight) ){
 		$self->addLabeledButton($movementSizer, $_, $SoD->{$_});
 	}
+
+	# TODO test of getting the keybinding working
+	EVT_BUTTON( $self, id('Up'), \&UI::KeyBindDialog::makeWindow );
 
 
 	# TODO!  fill this picker with only the appropriate bits.
@@ -2348,6 +2350,38 @@ sub sodSetDownFix {
 	makeModeKey($profile,$t,$bl,$tglfile,$turnoff,undef,true);
 	$curfile->SetBind($key,'+down'.$feedback.'$$bindloadfile '.$filename);
 }
+
+
+UI::Labels::Add(
+	{
+		Left => 'Strafe Left',
+		Right => 'Strafe Right',
+		TurnLeft => 'Turn Left',
+		TurnRight => 'Turn Right',
+		AutoRun => 'Auto Run',
+		Follow => 'Follow Target',
+		NonSoDMode => 'Non-SoD Mode',
+		Toggle => 'SoD Mode Toggle',
+		JumpMode => 'Toggle Jump Mode',
+		SSMode => 'Toggle Super Speed Mode',
+		FlyMode => 'Toggle Fly Mode',
+		GFlyMode => 'Toggle Group Fly Mode',
+
+		TPMode  => 'Teleport Bind',
+		TPCombo => 'Teleport Combo Key',
+		TPReset => 'Teleport Reset Key',
+
+		TTPMode  => 'Team Teleport Bind',
+		TTPCombo => 'Team Teleport Combo Key',
+		TTPReset => 'Team Teleport Reset Key',
+
+		TempMode => 'Toggle Temp Mode',
+
+		NovaMode => 'Toggle Nova Form',
+		DwarfMode => 'Toggle Dwarf Form',
+		HumanMode => 'Human Form',
+	}
+);
 
 
 1;

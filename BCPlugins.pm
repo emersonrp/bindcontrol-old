@@ -6,9 +6,10 @@ use Wx qw( :everything );
 
 use parent -norequire, 'Wx::Panel';
 
+use BindFile;
+use UI::KeyBindDialog;
+use UI::Labels;
 use Utility;
-
-my $Labels = Labels(); # TODO do we want a more general place for ID<->Label mapping?
 
 sub new {
 	my ($proto, $parent) = @_;
@@ -49,43 +50,10 @@ sub addLabeledButton {
     my $button = Wx::Button->new($self, Utility::id($label), $value);
     $button->SetToolTip( Wx::ToolTip->new($tooltip)) if $tooltip;
 
-    $sizer->Add( Wx::StaticText->new($self, -1, ($Labels->{$label} || $label)), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
+    $sizer->Add( Wx::StaticText->new($self, -1, ($UI::Labels::Labels{$label} || $label)), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
     $sizer->Add( $button, 0, wxEXPAND );
 }
 
-
-
-
-sub Labels { 
-	return  {
-		Left => 'Strafe Left',
-		Right => 'Strafe Right',
-		TurnLeft => 'Turn Left',
-		TurnRight => 'Turn Right',
-		AutoRun => 'Auto Run',
-		Follow => 'Follow Target',
-		NonSoDMode => 'Non-SoD Mode',
-		Toggle => 'SoD Mode Toggle',
-		JumpMode => 'Toggle Jump Mode',
-		SSMode => 'Toggle Super Speed Mode',
-		FlyMode => 'Toggle Fly Mode',
-		GFlyMode => 'Toggle Group Fly Mode',
-
-		TPMode  => 'Teleport Bind',
-		TPCombo => 'Teleport Combo Key',
-		TPReset => 'Teleport Reset Key',
-
-		TTPMode  => 'Team Teleport Bind',
-		TTPCombo => 'Team Teleport Combo Key',
-		TTPReset => 'Team Teleport Reset Key',
-
-		TempMode => 'Toggle Temp Mode',
-
-		NovaMode => 'Toggle Nova Form',
-		DwarfMode => 'Toggle Dwarf Form',
-		HumanMode => 'Human Form',
-	};
-}
 
 
 1;
