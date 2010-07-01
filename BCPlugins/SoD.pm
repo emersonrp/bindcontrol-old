@@ -159,10 +159,6 @@ sub new {
 		$self->addLabeledButton($movementSizer, $_, $SoD->{$_});
 	}
 
-	# TODO test of getting the keybinding working
-	EVT_BUTTON( $self, id('Up'), \&UI::KeyBindDialog::makeWindow );
-
-
 	# TODO!  fill this picker with only the appropriate bits.
 	$movementSizer->Add( Wx::StaticText->new($self, -1, "Default Movement Mode"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
 	$movementSizer->Add( Wx::ComboBox->new(

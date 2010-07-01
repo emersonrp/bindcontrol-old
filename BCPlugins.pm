@@ -3,6 +3,7 @@
 package BCPlugins;
 use strict;
 use Wx qw( :everything );
+use Wx::Event;
 
 use parent -norequire, 'Wx::Panel';
 
@@ -52,6 +53,14 @@ sub addLabeledButton {
 
     $sizer->Add( Wx::StaticText->new($self, -1, ($UI::Labels::Labels{$label} || $label)), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
     $sizer->Add( $button, 0, wxEXPAND );
+
+	Wx::Event::EVT_BUTTON( $self, Utility::id($label),
+		sub {
+			Wx::Window::FindWindowById(Utility::id($label))->SetLabel(
+				UI::KeyBindDialog::makeWindow($self, $label, $value)
+			);
+		}
+	);
 }
 
 

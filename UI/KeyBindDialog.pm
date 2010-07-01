@@ -25,11 +25,11 @@ sub new {
 
 	my $a = Wx::StaticText->new( $self, -1, "Press the Key Combo you'd like to use for $UI::Labels::Labels{$ID}" );
 	my $b = Wx::StaticText->new( $self, -1, "(Escape to cancel)" );
-	my $c = Wx::StaticText->new( $self, -1, $Current, wxDefaultPosition, [100, 100], wxALIGN_CENTER|wxST_NO_AUTORESIZE);
+	my $c = Wx::StaticText->new( $self, Utility::id('KeyBindDialogFeedback'), $Current, wxDefaultPosition, [100,100], wxALIGN_CENTER|wxALIGN_CENTER_VERTICAL|wxEXPAND);
 
 	$sizer->Add( $a, 0, wxALIGN_CENTER );
 	$sizer->Add( $b, 0, wxALIGN_CENTER );
-	$sizer->Add( $c );
+	$sizer->Add( $c, 1, wxALIGN_CENTER|wxALIGN_CENTER_VERTICAL|wxEXPAND);
 
 
 	# Wrap everything in a vbox to add some padding
@@ -38,33 +38,70 @@ sub new {
 
 	# clearly I'm thinking of this the wrong way.
 	for ($a, $b, $c, $self) {
-		Wx::Event::EVT_KEY_DOWN   ( $_, \&handleKey    );
-		Wx::Event::EVT_KEY_UP     ( $_, \&handleKey    );
-		Wx::Event::EVT_CHAR       ( $_, \&handleKey    );
+		Wx::Event::EVT_KEY_DOWN   ( $_, \&handleBind );
+		Wx::Event::EVT_KEY_UP     ( $_, \&handleBind );
+		Wx::Event::EVT_CHAR       ( $_, \&handleBind );
 
-		Wx::Event::EVT_LEFT_DOWN  ( $_, \&handleButton );
-		Wx::Event::EVT_MIDDLE_DOWN( $_, \&handleButton );
-		Wx::Event::EVT_RIGHT_DOWN ( $_, \&handleButton );
-		Wx::Event::EVT_AUX1_DOWN  ( $_, \&handleButton );
-		Wx::Event::EVT_AUX2_DOWN  ( $_, \&handleButton );
+		Wx::Event::EVT_LEFT_DOWN  ( $_, \&handleBind );
+		Wx::Event::EVT_MIDDLE_DOWN( $_, \&handleBind );
+		Wx::Event::EVT_RIGHT_DOWN ( $_, \&handleBind );
+		Wx::Event::EVT_AUX1_DOWN  ( $_, \&handleBind );
+		Wx::Event::EVT_AUX2_DOWN  ( $_, \&handleBind );
 	}
 
 	$self->SetSizer($vbox);
 	$self->Fit;
 	$self->CentreOnParent;
 
+	$self->SetKeymap();
+
 	return $self;
 }
 
 
 # Private method to handle on character pressed event
-sub handleKey {
+sub handleBind {
 	my ($self, $event) = @_;
-	my $code  = $event->GetKeyCode;
 
-	if ($code == Wx::WXK_ESCAPE) {
-		my $target = $self->GetParent || $self;
-		$target->EndModal(wxCANCEL);
+	return if $self->{'Handling'};  # don't take further input once we've poked a valid key
+
+	$self = $self->GetParent || $self;
+
+	my $evtType = $event->GetEventType;
+	my $KeyToBind;
+
+	if ($evtType == wxEVT_KEY_DOWN) {
+		my $code = eval { $event->GetKeyCode; };
+		# press escape to cancel
+		if ($code == Wx::WXK_ESCAPE) { $self->EndModal(wxCANCEL); }
+		$KeyToBind = $self->{'keymap'}->{$code};
+	} else {
+		$KeyToBind = [
+			'', # 'button zero'
+			'LBUTTON',
+			'MBUTTON',
+			'RBUTTON',
+			'BUTTON4',
+			'BUTTON5',
+		]->[eval { $event->GetButton }];
+	}
+
+	my $keybind;
+	# check for each modifier key
+	if ($event->ControlDown()) { $keybind .= 'CTRL-'; }
+	if ($event->ShiftDown())   { $keybind .= 'SHIFT-'; }
+	if ($event->AltDown())     { $keybind .= 'ALT-'; }
+
+	$keybind .= $KeyToBind;
+
+	Wx::Window::FindWindowById(Utility::id('KeyBindDialogFeedback'))->SetLabel("$keybind");
+	$self->Layout();
+
+	if ($KeyToBind) {
+		# $self->{'Handling'}++; # Don't take further input kthx
+		# TODO - blink the selection like a menu selection, then return it.
+
+		# $self->EndModal($keybind);
 	}
 
 	$event->Skip(1);
@@ -72,83 +109,89 @@ sub handleKey {
 	return;
 }
 
-sub handleButton {
-	my ($self, $event) = @_;
-	my $button = $event->GetButton;
-
-	$event->Skip(1);
-
-	return;
-}
-
-sub keymap {
-	my ( $self, $sizer, $ID, $Current ) = @_;
-
+# This keymap code was adapted from PADRE < http://padre.perlide.org/ >.
+sub SetKeymap {
+	my $self = shift;
 	# key choice list
 	my %keymap = (
-		'00None'      => -1,
-		'01Backspace' => Wx::WXK_BACK,
-		'02Tab'       => Wx::WXK_TAB,
-		'03Space'     => Wx::WXK_SPACE,
-		'04Up'        => Wx::WXK_UP,
-		'05Down'      => Wx::WXK_DOWN,
-		'06Left'      => Wx::WXK_LEFT,
-		'07Right'     => Wx::WXK_RIGHT,
-		'08Insert'    => Wx::WXK_INSERT,
-		'09Delete'    => Wx::WXK_DELETE,
-		'10Home'      => Wx::WXK_HOME,
-		'11End'       => Wx::WXK_END,
-		'12Page up'   => Wx::WXK_PAGEUP,
-		'13Page down' => Wx::WXK_PAGEDOWN,
-		'14Enter'     => Wx::WXK_RETURN,
-		'15Escape'    => Wx::WXK_ESCAPE,
-		'21Numpad 0'  => Wx::WXK_NUMPAD0,
-		'22Numpad 1'  => Wx::WXK_NUMPAD1,
-		'23Numpad 2'  => Wx::WXK_NUMPAD2,
-		'24Numpad 3'  => Wx::WXK_NUMPAD3,
-		'25Numpad 4'  => Wx::WXK_NUMPAD4,
-		'26Numpad 5'  => Wx::WXK_NUMPAD5,
-		'27Numpad 6'  => Wx::WXK_NUMPAD6,
-		'28Numpad 7'  => Wx::WXK_NUMPAD7,
-		'29Numpad 8'  => Wx::WXK_NUMPAD8,
-		'30Numpad 9'  => Wx::WXK_NUMPAD9,
-		'31Numpad *'  => Wx::WXK_MULTIPLY,
-		'32Numpad +'  => Wx::WXK_ADD,
-		'33Numpad -'  => Wx::WXK_SUBTRACT,
-		'34Numpad .'  => Wx::WXK_DECIMAL,
-		'35Numpad /'  => Wx::WXK_DIVIDE,
-		'36F1'        => Wx::WXK_F1,
-		'37F2'        => Wx::WXK_F2,
-		'38F3'        => Wx::WXK_F3,
-		'39F4'        => Wx::WXK_F4,
-		'40F5'        => Wx::WXK_F5,
-		'41F6'        => Wx::WXK_F6,
-		'42F7'        => Wx::WXK_F7,
-		'43F8'        => Wx::WXK_F8,
-		'44F9'        => Wx::WXK_F9,
-		'45F10'       => Wx::WXK_F10,
-		'46F11'       => Wx::WXK_F11,
-		'47F12'       => Wx::WXK_F12,
+		Wx::WXK_BACK() => 'BACKSPACE',
+		Wx::WXK_TAB() => 'TAB',
+		Wx::WXK_SPACE() => 'SPACE',
+		Wx::WXK_UP() => 'UP',
+		Wx::WXK_DOWN() => 'DOWN',
+		Wx::WXK_LEFT() => 'LEFT',
+		Wx::WXK_RIGHT() => 'RIGHT',
+		Wx::WXK_INSERT() => 'INSERT',
+		Wx::WXK_DELETE() => 'DELETE',
+		Wx::WXK_HOME() => 'HOME',
+		Wx::WXK_END() => 'END',
+		Wx::WXK_CAPITAL() => 'CAPITAL',
+		Wx::WXK_PAGEUP() => 'PAGEUP',
+		Wx::WXK_PAGEDOWN() => 'PAGEDOWN',
+		Wx::WXK_PRINT() => 'SYSRQ',
+		Wx::WXK_SCROLL() => 'SCROLL',
+		Wx::WXK_MENU() => 'APPS',
+		Wx::WXK_PAUSE() => 'PAUSE',
+		Wx::WXK_NUMPAD0() => 'NUMPAD0',
+		Wx::WXK_NUMPAD1() => 'NUMPAD1',
+		Wx::WXK_NUMPAD2() => 'NUMPAD2',
+		Wx::WXK_NUMPAD3() => 'NUMPAD3',
+		Wx::WXK_NUMPAD4() => 'NUMPAD4',
+		Wx::WXK_NUMPAD5() => 'NUMPAD5',
+		Wx::WXK_NUMPAD6() => 'NUMPAD6',
+		Wx::WXK_NUMPAD7() => 'NUMPAD7',
+		Wx::WXK_NUMPAD8() => 'NUMPAD8',
+		Wx::WXK_NUMPAD9() => 'NUMPAD9',
+		Wx::WXK_NUMPAD_MULTIPLY() => 'MULTIPLY',
+		Wx::WXK_NUMPAD_ADD() => 'ADD',
+		Wx::WXK_NUMPAD_SUBTRACT() => 'SUBTRACT',
+		Wx::WXK_NUMPAD_DECIMAL() => 'DECIMAL',
+		Wx::WXK_NUMPAD_DIVIDE() => 'DIVIDE',
+		Wx::WXK_NUMPAD_ENTER() => 'NUMPADENTER',
+		Wx::WXK_F1() => 'F1',
+		Wx::WXK_F2() => 'F2',
+		Wx::WXK_F3() => 'F3',
+		Wx::WXK_F4() => 'F4',
+		Wx::WXK_F5() => 'F5',
+		Wx::WXK_F6() => 'F6',
+		Wx::WXK_F7() => 'F7',
+		Wx::WXK_F8() => 'F8',
+		Wx::WXK_F9() => 'F9',
+		Wx::WXK_F10() => 'F10',
+		Wx::WXK_F11() => 'F11',
+		Wx::WXK_F12() => 'F12',
+		Wx::WXK_F13() => 'F13',
+		Wx::WXK_F14() => 'F14',
+		Wx::WXK_F15() => 'F15',
+		Wx::WXK_F16() => 'F16',
+		Wx::WXK_F17() => 'F17',
+		Wx::WXK_F18() => 'F18',
+		Wx::WXK_F19() => 'F19',
+		Wx::WXK_F20() => 'F20',
+		Wx::WXK_F21() => 'F21',
+		Wx::WXK_F22() => 'F22',
+		Wx::WXK_F23() => 'F23',
+		Wx::WXK_F24() => 'F24',
+		ord('~') => 'TILDE',
+		ord('-') => '-',
+		ord('=') => 'EQUALS',
+		ord('[') => '[',
+		ord(']') => ']',
+		ord("\\") => "\\",
+		ord(';') => ';',
+		ord("'") => "'",
+		ord(',') => 'COMMA',
+		ord('.') => '.',
+		ord('/') => '/', 
+		
 	);
 
 	# Add alphanumerics
 	for my $alphanum ( 'A' .. 'Z', '0' .. '9' ) {
-		$keymap{ '20' . $alphanum } = ord($alphanum);
+		$keymap{ord($alphanum)} = $alphanum;
 	}
 
-	# Add symbols
-	for my $symbol ( '~', '-', '=', '[', ']', ';', '\'', ',', '.', '/' ) {
-		$keymap{ '50' . $symbol } = ord($symbol);
-	}
+	$self->{'keymap'} = \%keymap;
 
-	my @keys = sort keys %keymap;
-	for my $key (@keys) {
-		$key =~ s/^\d{2}//;
-	}
-
-	# Store it for later usage
-	$self->{keys} = \@keys;
-
-	return;
 }
 1;
