@@ -3,19 +3,22 @@
 package UI::KeyBindDialog;
 
 use strict;
+use feature 'state';
 use Wx qw( :everything );
 use parent -norequire, 'Wx::Dialog';
 
-sub makeWindow {
-	my $win = UI::KeyBindDialog->new(@_);
-	$win->Show();
+sub showWindow {
+	state $win ||= UI::KeyBindDialog->new(@_);
+	$win->Populate(@_);
+
+	return $win->{'binding'} if ($win->ShowModal() == wxOK);
 }
 
 sub new {
-	my ($class, $main, $ID, $Current) = @_;
+	my ($class, $main) = @_;
 
 	# Create the Wx dialog
-	my $self = $class->SUPER::new( $main, -1, "$UI::Labels::Labels{$ID} Key Binding", wxDefaultPosition, wxDefaultSize, wxWANTS_CHARS);
+	my $self = $class->SUPER::new( $main, -1, '', wxDefaultPosition, wxDefaultSize, wxWANTS_CHARS);
 
 	# Minimum dialog size
 	# $self->SetMinSize( [ 517, 550 ] );
@@ -23,9 +26,9 @@ sub new {
 	# Create sizer that will host all controls
 	my $sizer = Wx::BoxSizer->new(wxVERTICAL);
 
-	my $a = Wx::StaticText->new( $self, -1, "Press the Key Combo you'd like to use for $UI::Labels::Labels{$ID}" );
+	my $a = Wx::StaticText->new( $self, Utility::id('KeyBindDescription'), '');
 	my $b = Wx::StaticText->new( $self, -1, "(Escape to cancel)" );
-	my $c = Wx::StaticText->new( $self, Utility::id('KeyBindDialogFeedback'), $Current, wxDefaultPosition, [100,100], wxALIGN_CENTER|wxALIGN_CENTER_VERTICAL|wxEXPAND);
+	my $c = Wx::StaticText->new( $self, Utility::id('KeyBindDialogFeedback'), '', wxDefaultPosition, [100,100], wxALIGN_CENTER|wxALIGN_CENTER_VERTICAL|wxEXPAND);
 
 	$sizer->Add( $a, 0, wxALIGN_CENTER );
 	$sizer->Add( $b, 0, wxALIGN_CENTER );
@@ -50,20 +53,25 @@ sub new {
 	}
 
 	$self->SetSizer($vbox);
-	$self->Fit;
-	$self->CentreOnParent;
 
 	$self->SetKeymap();
 
 	return $self;
 }
 
+sub Populate {
+	my ($self, $parent, $ID, $Current) = @_;
+
+	Wx::Window::FindWindowById(Utility::id('KeyBindDescription'))->SetLabel("Press the Key Combo you'd like to use for $UI::Labels::Labels{$ID}");
+	Wx::Window::FindWindowById(Utility::id('KeyBindDialogFeedback'))->SetLabel($Current);
+	$self->Fit;
+	$self->CentreOnParent;
+}
+
 
 # Private method to handle on character pressed event
 sub handleBind {
 	my ($self, $event) = @_;
-
-	return if $self->{'Handling'};  # don't take further input once we've poked a valid key
 
 	$self = $self->GetParent || $self;
 
@@ -86,22 +94,21 @@ sub handleBind {
 		]->[eval { $event->GetButton }];
 	}
 
-	my $keybind;
+	my $binding;
 	# check for each modifier key
-	if ($event->ControlDown()) { $keybind .= 'CTRL-'; }
-	if ($event->ShiftDown())   { $keybind .= 'SHIFT-'; }
-	if ($event->AltDown())     { $keybind .= 'ALT-'; }
+	if ($event->ControlDown()) { $binding .= 'CTRL-'; }
+	if ($event->ShiftDown())   { $binding .= 'SHIFT-'; }
+	if ($event->AltDown())     { $binding .= 'ALT-'; }
 
-	$keybind .= $KeyToBind;
-
-	Wx::Window::FindWindowById(Utility::id('KeyBindDialogFeedback'))->SetLabel("$keybind");
+	$binding .= $KeyToBind;
+	Wx::Window::FindWindowById(Utility::id('KeyBindDialogFeedback'))->SetLabel("$binding");
 	$self->Layout();
 
 	if ($KeyToBind) {
 		# $self->{'Handling'}++; # Don't take further input kthx
 		# TODO - blink the selection like a menu selection, then return it.
-
-		# $self->EndModal($keybind);
+		$self->{'binding'} = $binding;
+		$self->EndModal(wxOK);
 	}
 
 	$event->Skip(1);

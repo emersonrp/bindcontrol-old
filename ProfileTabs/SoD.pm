@@ -2,8 +2,8 @@
 
 use strict;
 
-package BCPlugins::SoD;
-use parent "BCPlugins";
+package ProfileTabs::SoD;
+use parent "ProfileTabs::ProfileTab";
 
 use Utility qw(id);
 use Wx qw( :everything );

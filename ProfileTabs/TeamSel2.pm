@@ -2,8 +2,8 @@
 
 use strict;
 
-package BCPlugins::TeamSel2;
-use parent 'BCPlugins';
+package ProfileTabs::TeamSel2;
+use parent "ProfileTabs::ProfileTab";
 
 sub bindsettings {
 	my ($profile) = @_;

@@ -1,5 +1,6 @@
 # UI / logic for the 'general' panel
-package General;
+package ProfileTabs::General;
+use parent "ProfileTabs::ProfileTab";
 
 use strict;
 use Wx qw(wxVERTICAL wxHORIZONTAL
@@ -16,12 +17,11 @@ use Profile;
 
 use Utility qw(id);
 
-use parent -norequire, 'Wx::Panel';
 
 sub new {
-	my ($class, $parentwindow) = @_;
+	my ($class, $parent) = @_;
 
-	my $self = $class->SUPER::new($parentwindow);
+	my $self = $class->SUPER::new($parent);
 
 	my $profile = $Profile::current;
 
@@ -92,7 +92,9 @@ sub new {
 	EVT_COMBOBOX( $self, id('PICKER_PRIMARY'),   \&Profile::pickPrimaryPowerSet );
 	EVT_COMBOBOX( $self, id('PICKER_SECONDARY'), \&Profile::pickSecondaryPowerSet );
 
-	Profile::fillPickers();
+	# Profile::fillPickers();
+
+	$self->{'TabTitle'} = 'General';
 
 	return $self;
 

@@ -2,8 +2,8 @@
 
 use strict;
 
-package BCPlugins::Mastermind;
-use parent "BCPlugins";
+package ProfileTabs::Mastermind;
+use parent "ProfileTabs::ProfileTab";
 
 use BindFile;
 

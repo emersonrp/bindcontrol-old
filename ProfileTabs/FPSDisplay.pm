@@ -2,8 +2,8 @@
 
 use strict;
 
-package BCPlugins::FPSDisplay;
-use parent "BCPlugins";
+package ProfileTabs::FPSDisplay;
+use parent "ProfileTabs::ProfileTab";
 
 use Wx qw( :everything );
 

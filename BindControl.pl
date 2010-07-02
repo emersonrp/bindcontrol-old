@@ -35,14 +35,12 @@ sub OnInit{
 # Main Window Class
 ###################
 package BCMainWindow;
+use parent -norequire, 'Wx::Frame';
 
 use Wx qw( :everything );
 use Wx::Event;
 
 use Utility qw(id);
-use Module::Pluggable instantiate => 'new', search_path => 'BCPlugins';
-
-use parent -norequire, 'Wx::Frame';
 
 sub new {
 

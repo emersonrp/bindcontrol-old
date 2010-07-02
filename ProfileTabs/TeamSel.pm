@@ -2,8 +2,8 @@
 
 use strict;
 
-package BCPlugins::TeamSel;
-use parent "BCPlugins";
+package ProfileTabs::TeamSel;
+use parent "ProfileTabs::ProfileTab";
 
 use BindFile;
 

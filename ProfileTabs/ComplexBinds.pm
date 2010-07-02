@@ -4,8 +4,8 @@ use strict;
 
 use BindFile;
 
-package BCPlugins::ComplexBinds;
-use parent "BCPlugins";
+package ProfileTabs::ComplexBinds;
+use parent "ProfileTabs::ProfileTab";
 
 sub addCBind {
 	my ($cbinds,$n,$profile) = @_;

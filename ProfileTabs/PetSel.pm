@@ -2,8 +2,8 @@
 
 use strict;
 
-package BCPlugins::PetSel;
-use parent "BCPlugins";
+package ProfileTabs::PetSel;
+use parent "ProfileTabs::ProfileTab";
 
 use Wx qw( :everything );
 

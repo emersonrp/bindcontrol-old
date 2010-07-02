@@ -2,8 +2,8 @@
 
 use strict;
 
-package BCPlugins::SimpleBinds;
-use parent "BCPlugins";
+package ProfileTabs::SimpleBinds;
+use parent "ProfileTabs::ProfileTab";
 
 sub addSBind {
 #	my (sbinds,n,profile) #  this returns an IUP vbox/hbox to be inserted into the SBind Dialog box

@@ -2,8 +2,8 @@
 
 use strict;
 
-package BCPlugins::BufferBinds;
-use parent "BCPlugins";
+package ProfileTabs::BufferBinds;
+use parent "ProfileTabs::ProfileTab";
 
 use BindFile;
 

@@ -2,8 +2,8 @@
 
 use strict;
 
-package BCPlugins::TypingMsg;
-use parent 'BCPlugins';
+package ProfileTabs::TypingMsg;
+use parent "ProfileTabs::ProfileTab";
 
 use Wx qw( :everything );
 

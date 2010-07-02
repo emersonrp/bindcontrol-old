@@ -1,6 +1,8 @@
 #!/usr/bin/perl
 
-package BCPlugins;
+# base class for all the individual tabs
+package ProfileTabs::ProfileTab;
+
 use strict;
 use Wx qw( :everything );
 use Wx::Event;
@@ -17,7 +19,7 @@ sub new {
 	my $class = ref $proto || $proto;
 	my $self = $class->SUPER::new($parent);
 
-	($self->{'TabTitle'} = ref $self) =~ s/BCPlugins:://;
+	($self->{'TabTitle'} = ref $self) =~ s/ProfileTab:://;
 
 	return $self;
 }
@@ -57,12 +59,10 @@ sub addLabeledButton {
 	Wx::Event::EVT_BUTTON( $self, Utility::id($label),
 		sub {
 			Wx::Window::FindWindowById(Utility::id($label))->SetLabel(
-				UI::KeyBindDialog::makeWindow($self, $label, $value)
+				UI::KeyBindDialog::showWindow($self, $label, $value)
 			);
 		}
 	);
 }
-
-
 
 1;

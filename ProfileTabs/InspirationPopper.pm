@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-package BCPlugins::InspirationPopper;
-
 use strict;
-use parent "BCPlugins";
+
+package ProfileTabs::InspirationPopper;
+use parent "ProfileTabs::ProfileTab";
 
 use Wx qw( :everything );
 
