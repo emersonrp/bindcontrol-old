@@ -19,7 +19,7 @@ sub new {
 	my $class = ref $proto || $proto;
 	my $self = $class->SUPER::new($parent);
 
-	($self->{'TabTitle'} = ref $self) =~ s/ProfileTab:://;
+	($self->{'TabTitle'} = ref $self) =~ s/ProfileTabs:://;
 
 	return $self;
 }
