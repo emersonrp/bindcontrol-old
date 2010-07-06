@@ -3,14 +3,8 @@ package ProfileTabs::General;
 use parent "ProfileTabs::ProfileTab";
 
 use strict;
-use Wx qw(wxVERTICAL wxHORIZONTAL
-		wxTOP wxBOTTOM wxLEFT wxRIGHT wxALL
-		wxALIGN_LEFT wxALIGN_RIGHT wxALIGN_CENTER wxALIGN_CENTER_VERTICAL
-		wxDefaultSize wxDefaultPosition wxDefaultValidator
-		wxTAB_TRAVERSAL wxEXPAND wxCB_READONLY
-		wxDIRP_USE_TEXTCTRL
-);
-use Wx::Event qw( EVT_COMBOBOX );
+use Wx qw( :everything );
+use Wx::Event qw( :everything );
 
 use GameData;
 use Profile;
@@ -25,10 +19,12 @@ sub new {
 
 	my $profile = $Profile::current;
 
-	my $a = $profile->{'Archetype'};
-	my $o = $profile->{'Origin'};
-	my $p = $profile->{'Primary'};
-	my $s = $profile->{'Secondary'};
+	my $general = $profile->{'General'};
+
+	my $a = $general->{'Archetype'};
+	my $o = $general->{'Origin'};
+	my $p = $general->{'Primary'};
+	my $s = $general->{'Secondary'};
 
 	my $topSizer = Wx::FlexGridSizer->new(0,2,5,5);
 
@@ -76,13 +72,22 @@ sub new {
  		), 0, wxALL,);
 
 	$topSizer->Add( Wx::StaticText->new( $self, -1, "Binds Directory:"), 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT,);
-	my $dirPicker = Wx::DirPickerCtrl->new(
-			$self, -1, $profile->{'BindsDir'}, 
+	$topSizer->Add( Wx::DirPickerCtrl->new(
+			$self, -1, $general->{'BindsDir'}, 
 			'Select Binds Directory',
 			wxDefaultPosition, wxDefaultSize,
 			wxDIRP_USE_TEXTCTRL|wxALL,
-		);
-	$topSizer->Add($dirPicker, 0, wxALL|wxEXPAND,);
+		), 0, wxALL|wxEXPAND,);
+
+	$self->addLabeledButton($topSizer, 'Reset Key', '', 'This key is used by certain modules to reset binds to a sane state.');
+
+	$topSizer->Add ( Wx::CheckBox->new($self, id('Enable Reset Feedback'), 'Enable Reset Feedback'), 0, wxALL);
+	$topSizer->AddSpacer(5);
+
+
+	$topSizer->Add( Wx::Button->new( $self, id('Write Binds Button'), 'Write Binds!' ), 0, wxALL|wxEXPAND);
+
+	EVT_BUTTON( $self, id('Write Binds Button'), \&BindFile::WriteBindFiles );
 
 
 	$self->SetSizer($topSizer);
@@ -91,8 +96,6 @@ sub new {
 	EVT_COMBOBOX( $self, id('PICKER_ORIGIN'),    \&Profile::pickOrigin );
 	EVT_COMBOBOX( $self, id('PICKER_PRIMARY'),   \&Profile::pickPrimaryPowerSet );
 	EVT_COMBOBOX( $self, id('PICKER_SECONDARY'), \&Profile::pickSecondaryPowerSet );
-
-	# Profile::fillPickers();
 
 	$self->{'TabTitle'} = 'General';
 

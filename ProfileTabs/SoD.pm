@@ -51,7 +51,7 @@ sub new {
 		Unqueue => true,
 		AutoMouseLook => undef,
 		Toggle => "LCTRL+M",
-		enable => undef,
+		Enable => undef,
 	};
 
 	my $SoD = $profile->{'SoD'};
@@ -119,12 +119,12 @@ sub new {
 	$SoD->{'Dwarf'}->{'Mode'} ||= "G";
 	$SoD->{'Dwarf'}->{'Tray'} ||= "5";
 
-	if ($profile->{'Archetype'} eq "Peacebringer") {
+	if ($profile->{'General'}->{'Archetype'} eq "Peacebringer") {
 		$SoD->{'Nova'}->{'Nova'} = "Bright Nova";
 		$SoD->{'Dwarf'}->{'Dwarf'} = "White Dwarf";
 		$SoD->{'HumanFormShield'} ||= "Shining Shield";
 
-	} elsif ($profile->{'Archetype'} eq "Warshade") {
+	} elsif ($profile->{'General'}->{'Archetype'} eq "Warshade") {
 		$SoD->{'Nova'}->{'Nova'} = "Dark Nova";
 		$SoD->{'Dwarf'}->{'Dwarf'} = "Black Dwarf";
 		$SoD->{'HumanFormShield'} ||= "Gravity Shield";
@@ -141,8 +141,6 @@ sub new {
 	$SoD->{'Detail'} ||= {};
 	$SoD->{'Detail'}->{'Base'}       ||= "100";
 	$SoD->{'Detail'}->{'Travelling'} ||= "50";
-
-	$SoD->{'DefaultMode'} ||= "Base";
 
 	#  Temp Travel Powers
 	$SoD->{'Temp'} ||= {};
@@ -376,28 +374,29 @@ sub makeSoDFile {
 
 	my $profile = $params->{'profile'};
 	my $t = $params->{'t'};
-	my $bl = $params->{'bl'};
-	my $bla = $params->{'bla'};
-	my $blf = $params->{'blf'};
-	my $path = $params->{'path'};
-	my $pathr = $params->{'pathr'};
-	my $pathf = $params->{'pathf'};
-	my $mobile = $params->{'mobile'};
-	my $stationary = $params->{'stationary'};
-	my $modestr = $params->{'modestr'};
-	my $flight = $params->{'flight'};
-	my $fix = $params->{'fix'};
-	my $turnoff = $params->{'turnoff'};
-	my $pathbo = $params->{'pathbo'};
-	my $pathsd = $params->{'pathsd'};
-	my $blbo = $params->{'blbo'};
-	my $blsd = $params->{'blsd'};
-	my $sssj = $params->{'sssj'};
+
+	my $bl = $params->{'bl'} || '';
+	my $bla = $params->{'bla'} || '';
+	my $blf = $params->{'blf'} || '';
+	my $path = $params->{'path'} || '';
+	my $pathr = $params->{'pathr'} || '';
+	my $pathf = $params->{'pathf'} || '';
+	my $mobile = $params->{'mobile'} || '';
+	my $stationary = $params->{'stationary'} || '';
+	my $modestr = $params->{'modestr'} || '';
+	my $flight = $params->{'flight'} || '';
+	my $fix = $params->{'fix'} || '';
+	my $turnoff = $params->{'turnoff'} || '';
+	my $pathbo = $params->{'pathbo'} || '';
+	my $pathsd = $params->{'pathsd'} || '';
+	my $blbo = $params->{'blbo'} || '';
+	my $blsd = $params->{'blsd'} || '';
+	my $sssj = $params->{'sssj'} || '';
 
 	# TODO TODO TODO hmm what?
 	# if $modestr == "QFly" then return end
 
-	my $SoD = $Profile::SoD;
+	my $SoD = $Profile::current->{'SoD'};
 	my $curfile;
 
 	# this wants to be $turnoff ||= $mobile, $stationary once we know what those are.  arrays?  hashes?
@@ -405,15 +404,15 @@ sub makeSoDFile {
 
 	if (($SoD->{'Default'} eq $modestr) and ($t->{'totalkeys'} == 0)) {
 
-		$curfile = $profile->{'resetfile'};
+		$curfile = $profile->{'General'}->{'ResetFile'};
 		sodDefaultResetKey($mobile,$stationary);
 
-		sodUpKey     ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,undef,undef,undef,$sssj);
-		sodDownKey   ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,undef,undef,undef,$sssj);
-		sodForwardKey($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,undef,undef,undef,$sssj);
-		sodBackKey   ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,undef,undef,undef,$sssj);
-		sodLeftKey   ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,undef,undef,undef,$sssj);
-		sodRightKey  ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,undef,undef,undef,$sssj);
+		sodUpKey     ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,'','','',$sssj);
+		sodDownKey   ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,'','','',$sssj);
+		sodForwardKey($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,'','','',$sssj);
+		sodBackKey   ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,'','','',$sssj);
+		sodLeftKey   ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,'','','',$sssj);
+		sodRightKey  ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,'','','',$sssj);
 
 		if ($modestr eq "NonSoD") { makeNonSoDModeKey($profile,$t,"r", $curfile,{$mobile,$stationary}); }
 		if ($modestr eq "Base")   { makeBaseModeKey  ($profile,$t,"r", $curfile,$turnoff,$fix); }
@@ -429,18 +428,18 @@ sub makeSoDFile {
 		sodFollowKey($t,$blf,$curfile,$SoD,$mobile);
 	}
 
-	if (($flight eq "Fly") and $pathbo) {
+	if ($flight and ($flight eq "Fly") and $pathbo) {
 		#  blast off
 		my $curfile = BindFile->new($pathbo . SpXWSAD($t) . ".txt");
 
 		sodResetKey($curfile,$profile,$path,actPower_toggle(undef,true,$stationary,$mobile));
 
-		sodUpKey     ($t,$blbo,$curfile,$SoD,$mobile,$stationary,$flight,undef,undef,"bo",$sssj);
-		sodDownKey   ($t,$blbo,$curfile,$SoD,$mobile,$stationary,$flight,undef,undef,"bo",$sssj);
-		sodForwardKey($t,$blbo,$curfile,$SoD,$mobile,$stationary,$flight,undef,undef,"bo",$sssj);
-		sodBackKey   ($t,$blbo,$curfile,$SoD,$mobile,$stationary,$flight,undef,undef,"bo",$sssj);
-		sodLeftKey   ($t,$blbo,$curfile,$SoD,$mobile,$stationary,$flight,undef,undef,"bo",$sssj);
-		sodRightKey  ($t,$blbo,$curfile,$SoD,$mobile,$stationary,$flight,undef,undef,"bo",$sssj);
+		sodUpKey     ($t,$blbo,$curfile,$SoD,$mobile,$stationary,$flight,'','',"bo",$sssj);
+		sodDownKey   ($t,$blbo,$curfile,$SoD,$mobile,$stationary,$flight,'','',"bo",$sssj);
+		sodForwardKey($t,$blbo,$curfile,$SoD,$mobile,$stationary,$flight,'','',"bo",$sssj);
+		sodBackKey   ($t,$blbo,$curfile,$SoD,$mobile,$stationary,$flight,'','',"bo",$sssj);
+		sodLeftKey   ($t,$blbo,$curfile,$SoD,$mobile,$stationary,$flight,'','',"bo",$sssj);
+		sodRightKey  ($t,$blbo,$curfile,$SoD,$mobile,$stationary,$flight,'','',"bo",$sssj);
 
 		# if ($modestr eq "Base") { makeBaseModeKey($profile,$t,"r",$curfile,$turnoff,$fix); }
 		$t->{'ini'} = "-down$$";
@@ -486,12 +485,12 @@ sub makeSoDFile {
 
 		sodResetKey($curfile,$profile,$path,actPower_toggle(undef,true,$stationary,$mobile));
 
-		sodUpKey     ($t,$blsd,$curfile,$SoD,$mobile,$stationary,$flight,undef,undef,"sd",$sssj);
-		sodDownKey   ($t,$blsd,$curfile,$SoD,$mobile,$stationary,$flight,undef,undef,"sd",$sssj);
-		sodForwardKey($t,$blsd,$curfile,$SoD,$mobile,$stationary,$flight,undef,undef,"sd",$sssj);
-		sodBackKey   ($t,$blsd,$curfile,$SoD,$mobile,$stationary,$flight,undef,undef,"sd",$sssj);
-		sodLeftKey   ($t,$blsd,$curfile,$SoD,$mobile,$stationary,$flight,undef,undef,"sd",$sssj);
-		sodRightKey  ($t,$blsd,$curfile,$SoD,$mobile,$stationary,$flight,undef,undef,"sd",$sssj);
+		sodUpKey     ($t,$blsd,$curfile,$SoD,$mobile,$stationary,$flight,'','',"sd",$sssj);
+		sodDownKey   ($t,$blsd,$curfile,$SoD,$mobile,$stationary,$flight,'','',"sd",$sssj);
+		sodForwardKey($t,$blsd,$curfile,$SoD,$mobile,$stationary,$flight,'','',"sd",$sssj);
+		sodBackKey   ($t,$blsd,$curfile,$SoD,$mobile,$stationary,$flight,'','',"sd",$sssj);
+		sodLeftKey   ($t,$blsd,$curfile,$SoD,$mobile,$stationary,$flight,'','',"sd",$sssj);
+		sodRightKey  ($t,$blsd,$curfile,$SoD,$mobile,$stationary,$flight,'','',"sd",$sssj);
 
 		$t->{'ini'} = "-down$$";
 		# if ($modestr eq "Base") { makeBaseModeKey($profile,$t,"r",$curfile,$turnoff,$fix); }
@@ -508,19 +507,19 @@ sub makeSoDFile {
 
 	sodResetKey($curfile,$profile,$path,actPower_toggle(undef,true,$stationary,$mobile));
 
-	sodUpKey     ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,undef,undef,undef,$sssj);
-	sodDownKey   ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,undef,undef,undef,$sssj);
-	sodForwardKey($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,undef,undef,undef,$sssj);
-	sodBackKey   ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,undef,undef,undef,$sssj);
-	sodLeftKey   ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,undef,undef,undef,$sssj);
-	sodRightKey  ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,undef,undef,undef,$sssj);
+	sodUpKey     ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,'','','',$sssj);
+	sodDownKey   ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,'','','',$sssj);
+	sodForwardKey($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,'','','',$sssj);
+	sodBackKey   ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,'','','',$sssj);
+	sodLeftKey   ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,'','','',$sssj);
+	sodRightKey  ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,'','','',$sssj);
 
 	if (($flight eq "Fly") and $pathbo) {
 		#  Base to set down
 		if ($modestr eq "NonSoD") { makeNonSoDModeKey($profile,$t,"r",$curfile,{$mobile,$stationary},&sodSetDownFix); }
 		if ($modestr eq "Base")   { makeBaseModeKey($profile,$t,"r",$curfile,$turnoff,&sodSetDownFix); }
 		# if ($t->{'BaseModeKey'}) {
-			# $curfile->SetBind($t->{'BaseModeKey'},"+down$$down 1".actPower(undef,true,$mobile).$t->{'detailhi'}.$t->{'runcamdist'}.$t->{'blsd'} . SpXWSAD($t) . ".txt")
+			# $curfile->SetBind($t->{'BaseModeKey'},"+down$$down 1".actPower_name(undef,true,$mobile).$t->{'detailhi'}.$t->{'runcamdist'}.$t->{'blsd'} . SpXWSAD($t) . ".txt")
 		#}
 		if ($modestr eq "Run")     { makeRunModeKey   ($profile,$t,"s", $curfile,$turnoff,&sodSetDownFix); }
 		if ($modestr eq "Fly")     { makeFlyModeKey   ($profile,$t,"bo",$curfile,$turnoff,$fix); }
@@ -550,12 +549,12 @@ sub makeSoDFile {
 
 	sodResetKey($curfile,$profile,$path,actPower_toggle(undef,true,$stationary,$mobile));
 
-	sodUpKey     ($t,$bla,$curfile,$SoD,$mobile,$stationary,$flight,true,undef,undef,$sssj);
-	sodDownKey   ($t,$bla,$curfile,$SoD,$mobile,$stationary,$flight,true,undef,undef,$sssj);
-	sodForwardKey($t,$bla,$curfile,$SoD,$mobile,$stationary,$flight,$bl, undef,undef,$sssj);
-	sodBackKey   ($t,$bla,$curfile,$SoD,$mobile,$stationary,$flight,$bl, undef,undef,$sssj);
-	sodLeftKey   ($t,$bla,$curfile,$SoD,$mobile,$stationary,$flight,true,undef,undef,$sssj);
-	sodRightKey  ($t,$bla,$curfile,$SoD,$mobile,$stationary,$flight,true,undef,undef,$sssj);
+	sodUpKey     ($t,$bla,$curfile,$SoD,$mobile,$stationary,$flight,true,'','',$sssj);
+	sodDownKey   ($t,$bla,$curfile,$SoD,$mobile,$stationary,$flight,true,'','',$sssj);
+	sodForwardKey($t,$bla,$curfile,$SoD,$mobile,$stationary,$flight,$bl, '','',$sssj);
+	sodBackKey   ($t,$bla,$curfile,$SoD,$mobile,$stationary,$flight,$bl, '','',$sssj);
+	sodLeftKey   ($t,$bla,$curfile,$SoD,$mobile,$stationary,$flight,true,'','',$sssj);
+	sodRightKey  ($t,$bla,$curfile,$SoD,$mobile,$stationary,$flight,true,'','',$sssj);
 
 	if (($flight eq "Fly") and $pathbo) {
 		if ($modestr eq "NonSoD") { makeNonSoDModeKey($profile,$t,"ar",$curfile,{$mobile,$stationary},&sodSetDownFix); }
@@ -580,12 +579,12 @@ sub makeSoDFile {
 
    	sodResetKey($curfile,$profile,$path,actPower_toggle(undef,true,$stationary,$mobile));
    
-   	sodUpKey     ($t,$blf,$curfile,$SoD,$mobile,$stationary,$flight,undef,$bl,undef,$sssj);
-   	sodDownKey   ($t,$blf,$curfile,$SoD,$mobile,$stationary,$flight,undef,$bl,undef,$sssj);
-   	sodForwardKey($t,$blf,$curfile,$SoD,$mobile,$stationary,$flight,undef,$bl,undef,$sssj);
-   	sodBackKey   ($t,$blf,$curfile,$SoD,$mobile,$stationary,$flight,undef,$bl,undef,$sssj);
-   	sodLeftKey   ($t,$blf,$curfile,$SoD,$mobile,$stationary,$flight,undef,$bl,undef,$sssj);
-   	sodRightKey  ($t,$blf,$curfile,$SoD,$mobile,$stationary,$flight,undef,$bl,undef,$sssj);
+   	sodUpKey     ($t,$blf,$curfile,$SoD,$mobile,$stationary,$flight,'',$bl,'',$sssj);
+   	sodDownKey   ($t,$blf,$curfile,$SoD,$mobile,$stationary,$flight,'',$bl,'',$sssj);
+   	sodForwardKey($t,$blf,$curfile,$SoD,$mobile,$stationary,$flight,'',$bl,'',$sssj);
+   	sodBackKey   ($t,$blf,$curfile,$SoD,$mobile,$stationary,$flight,'',$bl,'',$sssj);
+   	sodLeftKey   ($t,$blf,$curfile,$SoD,$mobile,$stationary,$flight,'',$bl,'',$sssj);
+   	sodRightKey  ($t,$blf,$curfile,$SoD,$mobile,$stationary,$flight,'',$bl,'',$sssj);
    
    	if (($flight eq "Fly") and $pathbo) {
    		if ($modestr eq "NonSoD") { makeNonSoDModeKey($profile,$t,"fr",$curfile,{$mobile,$stationary},&sodSetDownFix); }
@@ -608,6 +607,38 @@ sub makeSoDFile {
 
 sub SpXWSAD { my $t = shift;  return "$t->{'space'}$t->{'X'}$t->{'W'}$t->{'S'}$t->{'A'}$t->{'D'}"; }
 
+sub makeNonSoDModeKey{
+	my ($p,$t,$bl,$c,$to) = @_;
+	return makeModeKey({profile=>$p,t=>$t,bl=>$bl,curfile=>$c,turnoff=>$to,modestr=>'NonSoD'});
+}
+sub makeBaseModeKey  {
+	my ($p,$t,$bl,$c,$to,$fix) = @_;
+	return makeModeKey({profile=>$p,t=>$t,bl=>$bl,curfile=>$c,turnoff=>$to,modestr=>'Base',fix=>$fix});
+}
+sub makeFlyModeKey   {
+	my ($p,$t,$bl,$c,$to,$fix) = @_;
+	return makeModeKey({profile=>$p,t=>$t,bl=>$bl,curfile=>$c,turnoff=>$to,modestr=>'Fly',fix=>$fix});
+}
+sub makeGFlyModeKey  {
+	my ($p,$t,$bl,$c,$to,$fix) = @_;
+	return makeModeKey({profile=>$p,t=>$t,bl=>$bl,curfile=>$c,turnoff=>$to,modestr=>'GFly',fix=>$fix});
+}
+sub makeRunModeKey   {
+	my ($p,$t,$bl,$c,$to,$fix) = @_;
+	return makeModeKey({profile=>$p,t=>$t,bl=>$bl,curfile=>$c,turnoff=>$to,modestr=>'Run',fix=>$fix});
+}
+sub makeJumpModeKey  {
+	my ($p,$t,$bl,$c,$to,$path) = @_;
+	return makeModeKey({profile=>$p,t=>$t,bl=>$bl,curfile=>$c,turnoff=>$to,modestr=>'Jump',path=>$path});
+}
+sub makeTempModeKey  {
+	my ($p,$t,$bl,$c,$to,$path) = @_;
+	return makeModeKey({profile=>$p,t=>$t,bl=>$bl,curfile=>$c,turnoff=>$to,modestr=>'Temp',path=>$path});
+}
+sub makeQFlyModeKey  {
+	my ($p,$t,$bl,$c,$to,$modestr) = @_;
+	return makeModeKey({profile=>$p,t=>$t,bl=>$bl,curfile=>$c,turnoff=>$to,modestr=>$modestr});
+}
 sub makeModeKey {
 	my $params = shift;
 
@@ -694,7 +725,7 @@ sub makeModeKey {
 			my $bindload = $bln.$txtend;
 
 			if ($fix) {
-				&$fix($profile,$t,$key,&makeNonSoDModeKey,"n",$bl,$curfile,$turnoff,"",$feedback);
+				&$fix($profile,$t,$key,\&makeNonSoDModeKey,"n",$bl,$curfile,$turnoff,"",$feedback);
 			} else {
 				$curfile->SetBind($key,$ini.$actpower.$up.$dow.$for.$bac.$lef.$rig.$dethi.$runcam.$feedback.$bindload)
 			}
@@ -704,14 +735,14 @@ sub makeModeKey {
 			my $bindload = $blan.$txtend;
 
 			if ($fix) {
-				&$fix($profile,$t,$key,&makeNonSoDModeKey,"n",$bl,$curfile,$turnoff,"a",$feedback);
+				&$fix($profile,$t,$key,\&makeNonSoDModeKey,"n",$bl,$curfile,$turnoff,"a",$feedback);
 			} else {
 				$curfile->SetBind($key,$ini.$actpower.$dethi.$runcam.'$$up 0'.$dow.$lef.$rig.$feedback.$bindload)
 			}
 		} else {
 
 			if ($fix) {
-				&$fix($profile,$t,$key,&makeNonSoDModeKey,"n",$bl,$curfile,$turnoff,"f",$feedback);
+				&$fix($profile,$t,$key,\&makeNonSoDModeKey,"n",$bl,$curfile,$turnoff,"f",$feedback);
 			} else {
 				$curfile->SetBind($key,$ini.$actpower.$dethi.$runcam.'$$up 0'.$feedback.$blfn.$txtend)
 			}
@@ -720,7 +751,7 @@ sub makeModeKey {
 	} elsif ($keytype eq 'TempModeKey') {
 
 		my $trayslot = "1 ".$SoD->{'Temp'}->{'Tray'};
-		my $actpower = actPower(undef,true,$trayslot,$turnoff);
+		my $actpower = actPower_name(undef,true,$trayslot,$turnoff);
 
 		if ($SoD->{'Feedback'}) { $feedback = '$$t $name, Temp Mode' }
 
@@ -771,20 +802,20 @@ sub makeModeKey {
 			# if ($t->{'horizkeys'} > 0) { $turnon = "+down".substr($t->{'on'},2).$sprint.$turnoff } else { $turnon = "+down" }
 			if ($t->{'horizkeys'} <= 0) { $actpower = actPower_toggle(true,true,undef,$turnoff) }
 			if ($fix) {
-				&$fix($profile,$t,$key,&makeBaseModeKey,"r",$bl,$curfile,$turnoff,"",$feedback);
+				&$fix($profile,$t,$key,\&makeBaseModeKey,"r",$bl,$curfile,$turnoff,"",$feedback);
 			} else {
 				$curfile->SetBind($key,$ini.$actpower.$up.$dow.$for.$bac.$lef.$rig.$dethi.$runcam.$feedback.$bindload);
 			}
 		} elsif ($bl eq "ar") {
 			my $bindload = $blgr.$txtend;
 			if ($fix) {
-				&$fix($profile,$t,$key,&makeBaseModeKey,"r",$bl,$curfile,$turnoff,"a",$feedback);
+				&$fix($profile,$t,$key,\&makeBaseModeKey,"r",$bl,$curfile,$turnoff,"a",$feedback);
 			} else {
 				$curfile->SetBind($key,$ini.$actpower.$dethi.$runcam.'$$up 0'.$dow.$lef.$rig.$feedback.$bindload);
 			}
 		} else {
 			if ($fix) {
-				&$fix($profile,$t,$key,&makeBaseModeKey,"r",$bl,$curfile,$turnoff,"f",$feedback);
+				&$fix($profile,$t,$key,\&makeBaseModeKey,"r",$bl,$curfile,$turnoff,"f",$feedback);
 			} else {
 				$curfile->SetBind($key,$ini.$actpower.$dethi.$runcam.'$$up 0'.$feedback.$blfr.$txtend);
 			}
@@ -798,14 +829,14 @@ sub makeModeKey {
 			if ($bl eq "s") {
 				my $bindload = $bls.$txtend;
 				if ($fix) {
-					&$fix($profile,$t,$key,&makeRunModeKey,"s",$bl,$curfile,$turnoff,"",$feedback);
+					&$fix($profile,$t,$key,\&makeRunModeKey,"s",$bl,$curfile,$turnoff,"",$feedback);
 				} else {
 					$curfile->SetBind($key,$ini.$actpower.$up.$dow.$for.$bac.$lef.$rig.$detlo.$flycam.$feedback.$bindload);
 				}
 			} elsif ($bl eq "as") {
 				my $bindload = $blas.$txtend;
 				if ($fix) {
-					&$fix($profile,$t,$key,&makeRunModeKey,"s",$bl,$curfile,$turnoff,"a",$feedback);
+					&$fix($profile,$t,$key,\&makeRunModeKey,"s",$bl,$curfile,$turnoff,"a",$feedback);
 				} elsif ($feedback == "") {
 					$curfile->SetBind($key,$ini.$actpower.$up.$dow.$lef.$rig.$detlo.$flycam.$feedback.$bindload);
 				} else {
@@ -816,7 +847,7 @@ sub makeModeKey {
 				}
 			} else {
 				if ($fix) {
-					&$fix($profile,$t,$key,&makeRunModeKey,"s",$bl,$curfile,$turnoff,"f",$feedback);
+					&$fix($profile,$t,$key,\&makeRunModeKey,"s",$bl,$curfile,$turnoff,"f",$feedback);
 				} else {
 					$curfile->SetBind($key,$ini.$actpower.'$$up 0'.$detlo.$flycam.$feedback.$blfs.$txtend);
 				}
@@ -824,7 +855,7 @@ sub makeModeKey {
 		}
 	} elsif ($keytype eq 'JumpModeKey') {
 
-		my $actpower = actPower(undef,true,$t->{'jump'},$turnoff).'$$up 1';
+		my $actpower = actPower_name(undef,true,$t->{'jump'},$turnoff).'$$up 1';
 
 		if ($t->{'canjmp'} > 0 and not $SoD->{'Jump'}->{'Simple'}) {
 
@@ -832,7 +863,7 @@ sub makeModeKey {
 			if ($bl eq "j") {
 				my $bindload = $blj.$txtend;
 				my $a;
-				if (($t->{'horizkeys'} + $t->{'space'}) <= 0) { $actpower = actPower(undef,true,$t->{'cjmp'},$turnoff) }
+				if (($t->{'horizkeys'} + $t->{'space'}) <= 0) { $actpower = actPower_name(undef,true,$t->{'cjmp'},$turnoff) }
 				my $filename = $fbl.$jtxtend;
 				my $togglefile = BindFile->new($fbl.$jtxtend);
 				$togglefile->SetBind($key,'-down'.$actpower.$detlo.$flycam.$bindload);
@@ -861,7 +892,7 @@ sub makeModeKey {
 			if ($bl eq "bo") {
 				my $bindload = $blbo.$txtend;
 				if ($fix) {
-					&$fix($profile,$t,$key,&makeFlyModeKey,"f",$bl,$curfile,$turnoff,"",$feedback);
+					&$fix($profile,$t,$key,\&makeFlyModeKey,"f",$bl,$curfile,$turnoff,"",$feedback);
 				} else {
 					$curfile->SetBind($key,'+down$$'.$actpower.'$$up 1$$down 0'.$for.$bac.$lef.$rig.$detlo.$flycam.$feedback.$bindload);
 				}
@@ -870,20 +901,20 @@ sub makeModeKey {
 				my $bindload = $blr.$txtend;
 				if ($t->{'totalkeys'} == 0) { $actpower = actPower_toggle(true,true,$t->{'hover'},$turnoff); }
 				if ($fix) {
-					&$fix($profile,$t,$key,&makeFlyModeKey,"f",$bl,$curfile,$turnoff,"",$feedback);
+					&$fix($profile,$t,$key,\&makeFlyModeKey,"f",$bl,$curfile,$turnoff,"",$feedback);
 				} else {
 					$curfile->SetBind($key,$ini.$actpower.$up.$dow.$lef.$rig.$detlo.$flycam.$feedback.$bindload);
 				}
 			} elsif ($bl eq "af") {
 				my $bindload = $blaf.$txtend;
 				if ($fix) {
-					&$fix($profile,$t,$key,&makeFlyModeKey,"f",$bl,$curfile,$turnoff,"a",$feedback);
+					&$fix($profile,$t,$key,\&makeFlyModeKey,"f",$bl,$curfile,$turnoff,"a",$feedback);
 				} else {
 					$curfile->SetBind($key,$ini.$actpower.$detlo.$flycam.$dow.$lef.$rig.$feedback.$bindload);
 				}
 			} else {
 				if ($fix) {
-					&$fix($profile,$t,$key,&makeFlyModeKey,"f",$bl,$curfile,$turnoff,"f",$feedback);
+					&$fix($profile,$t,$key,\&makeFlyModeKey,"f",$bl,$curfile,$turnoff,"f",$feedback);
 				} else {
 					$curfile->SetBind($key,$ini.$actpower.$up.$dow.$for.$bac.$lef.$rig.$detlo.$flycam.$feedback.$blff.$txtend);
 				}
@@ -897,20 +928,20 @@ sub makeModeKey {
 			if ($bl eq "gbo") {
 				my $bindload = $blgbo.$txtend;
 				if ($fix) {
-					&$fix($profile,$t,$key,&makeGFlyModeKey,"gf",$bl,$curfile,$turnoff,"");
+					&$fix($profile,$t,$key,\&makeGFlyModeKey,"gf",$bl,$curfile,$turnoff,"");
 				} else {
 					$curfile->SetBind($key,$ini.'$$up 1$$down 0'.$actpower.$for.$bac.$lef.$rig.$detlo.$flycam.$bindload);
 				}
 			} elsif ($bl eq "gaf") {
 				my $bindload = $blgaf.$txtend;
 				if ($fix) {
-					&$fix($profile,$t,$key,&makeGFlyModeKey,"gf",$bl,$curfile,$turnoff,"a");
+					&$fix($profile,$t,$key,\&makeGFlyModeKey,"gf",$bl,$curfile,$turnoff,"a");
 				} else {
 					$curfile->SetBind($key,$ini.$detlo.$flycam.$up.$dow.$lef.$rig.$bindload);
 				}
 			} else {
 				if ($fix) {
-					&$fix($profile,$t,$key,&makeGFlyModeKey,"gf",$bl,$curfile,$turnoff,"f");
+					&$fix($profile,$t,$key,\&makeGFlyModeKey,"gf",$bl,$curfile,$turnoff,"f");
 				} else {
 					if ($bl eq "gf") {
 						$curfile->SetBind($key,$ini.$actpower.$detlo.$flycam.$blgff.$txtend);
@@ -929,7 +960,7 @@ sub iupMessage { print STDERR "ZOMG SOMEBODY IMPLEMENT A WARNING DIALOG!!!\n"; }
 
 sub makebind {
 	my $profile = shift;
-	my $resetfile = $profile->{'resetfile'};
+	my $resetfile = $profile->{'General'}->{'ResetFile'};
 	my $SoD = $profile->{'SoD'};
 
 	# $resetfile->SetBind(petselec$t->{'sel5'} . ' "petselect 5')
@@ -1003,7 +1034,7 @@ sub makebind {
 		$t->{'jump'} = "Super Jump";
 	}
 
-	if ($profile->{'Archetype'} eq "Peacebringer") {
+	if ($profile->{'General'}->{'Archetype'} eq "Peacebringer") {
 		if ($SoD->{'Fly'}->{'Hover'}) {
 			$t->{'canhov'} = 1;
 			$t->{'canfly'} = 1;
@@ -1015,7 +1046,7 @@ sub makebind {
 			$t->{'hover'} = "Energy Flight";
 			$t->{'flyx'} = "Energy Flight";
 		}
-	 } elsif (not ($profile->{'Archetype'} eq "Warshade")) {
+	 } elsif (not ($profile->{'General'}->{'Archetype'} eq "Warshade")) {
 		if ($SoD->{'Fly'}->{'Hover'} and not $SoD->{'Fly'}->{'Fly'}) {
 			$t->{'canhov'} = 1;
 			$t->{'hover'} = "Hover";
@@ -1036,7 +1067,7 @@ sub makebind {
 			if ($SoD->{'TP'}->{'TPHover'}) { $t->{'tphover'} = '$$powexectoggleon Hover' }
 		}
 	}
-	if (($profile->{'Archetype'} eq "Peacebringer") and $SoD->{'Fly'}->{'QFly'}) {
+	if (($profile->{'General'}->{'Archetype'} eq "Peacebringer") and $SoD->{'Fly'}->{'QFly'}) {
 		$t->{'canqfly'} = 1;
 	}
 	# if ($SoD->{'Fly'}->{'GFly'}) {
@@ -1077,7 +1108,7 @@ sub makebind {
 
 		my $sdname = 'subdir' . lc $_;
 		my $pathname = 'path' . lc $_;
-		$t->{$sdname} = "$Profile::basepath\\$_";
+		$t->{$sdname} = "$profile->{'General'}->{'BindsDir'}\\$_";
 		$t->{$pathname} = "$t->{$sdname}\\$_";
 		$t->{'bl' . lc $_} = '$$bindloadfile ' . $t->{$pathname};
 
@@ -1087,54 +1118,54 @@ sub makebind {
 	$t->{'turn'} = "+down";  # a non functioning bind used only to activate the keydown/keyup functions of +commands;
 	
 	if ($SoD->{'Base'}) {
-		cbMakeDirectory($t->{'subdirr'});
-		cbMakeDirectory($t->{'subdirar'});
-		cbMakeDirectory($t->{'subdirfr'});
+		BindFile::MakeDirectory($t->{'subdirr'});
+		BindFile::MakeDirectory($t->{'subdirar'});
+		BindFile::MakeDirectory($t->{'subdirfr'});
 	}
 
 	if ($t->{'canhov'}+$t->{'canfly'}>0) {
-		cbMakeDirectory($t->{'subdirf'});
-		cbMakeDirectory($t->{'subdiraf'});
-		cbMakeDirectory($t->{'subdirff'});
-		cbMakeDirectory($t->{'subdirbo'});
+		BindFile::MakeDirectory($t->{'subdirf'});
+		BindFile::MakeDirectory($t->{'subdiraf'});
+		BindFile::MakeDirectory($t->{'subdirff'});
+		BindFile::MakeDirectory($t->{'subdirbo'});
 	}
 
 	# if ($t->{'canqfly'}>0) {
-		# cbMakeDirectory($t->{'subdirq'});
-		# cbMakeDirectory($t->{'subdiraq'});
-		# cbMakeDirectory($t->{'subdirfq'});
+		# BindFile::MakeDirectory($t->{'subdirq'});
+		# BindFile::MakeDirectory($t->{'subdiraq'});
+		# BindFile::MakeDirectory($t->{'subdirfq'});
 	# }
 
 	if ($t->{'canjmp'}>0) {
-		cbMakeDirectory($t->{'subdirj'});
-		cbMakeDirectory($t->{'subdiraj'});
-		cbMakeDirectory($t->{'subdirfj'});
+		BindFile::MakeDirectory($t->{'subdirj'});
+		BindFile::MakeDirectory($t->{'subdiraj'});
+		BindFile::MakeDirectory($t->{'subdirfj'});
 	}
 
 	if ($t->{'canss'}>0) {
-		cbMakeDirectory($t->{'subdirs'});
-		cbMakeDirectory($t->{'subdiras'});
-		cbMakeDirectory($t->{'subdirfs'});
+		BindFile::MakeDirectory($t->{'subdirs'});
+		BindFile::MakeDirectory($t->{'subdiras'});
+		BindFile::MakeDirectory($t->{'subdirfs'});
 	}
 	
 	# [[if ($t->{'cangfly'}>0) {
-	#	cbMakeDirectory($t->{'subdirga'});
-	#	cbMakeDirectory($t->{'subdirgaf'});
-	#	cbMakeDirectory($t->{'subdirgff'});
-	#	cbMakeDirectory($t->{'subdirgbo'});
-	#	cbMakeDirectory($t->{'subdirgsd'});
+	#	BindFile::MakeDirectory($t->{'subdirga'});
+	#	BindFile::MakeDirectory($t->{'subdirgaf'});
+	#	BindFile::MakeDirectory($t->{'subdirgff'});
+	#	BindFile::MakeDirectory($t->{'subdirgbo'});
+	#	BindFile::MakeDirectory($t->{'subdirgsd'});
 	#} ]]
 	
 	if ($SoD->{'NonSoD'} or $t->{'canqfly'} > 0) {
-		cbMakeDirectory($t->{'subdirn'});
-		cbMakeDirectory($t->{'subdiran'});
-		cbMakeDirectory($t->{'subdirfn'});
+		BindFile::MakeDirectory($t->{'subdirn'});
+		BindFile::MakeDirectory($t->{'subdiran'});
+		BindFile::MakeDirectory($t->{'subdirfn'});
 	}
 	
 	if ($SoD->{'Temp'}->{'Enable'}) {
-		cbMakeDirectory($t->{'subdirt'});
-		cbMakeDirectory($t->{'subdirat'});
-		cbMakeDirectory($t->{'subdirft'});
+		BindFile::MakeDirectory($t->{'subdirt'});
+		BindFile::MakeDirectory($t->{'subdirat'});
+		BindFile::MakeDirectory($t->{'subdirft'});
 	}
 	
 	#  temporarily set $SoD->{'Default'} to "NonSoD"
@@ -1379,18 +1410,18 @@ sub makebind {
 	if ($SoD->{'TRight'} and uc $SoD->{'TRight'} eq "UNBOUND") { $resetfile->SetBind($SoD->{'TRight'},"+turnright") }
 	
 	if ($SoD->{'Temp'} and $SoD->{'Temp'}->{'Enable'}) {
-		my $temptogglefile1 = BindFile->new($Profile::basepath."\\temptoggle1.txt");
-		my $temptogglefile2 = BindFile->new($Profile::basepath."\\temptoggle2.txt");
-		$temptogglefile2->SetBind($SoD->{'Temp'}->{'TraySwitch'},'-down$$gototray 1'.'$$bindloadfile '.$Profile::basepath."\\temptoggle1.txt");
-		$temptogglefile1->SetBind($SoD->{'Temp'}->{'TraySwitch'},'+down$$gototray '.$SoD->{'Temp'}->{'Tray'}.'$$bindloadfile '.$Profile::basepath."\\temptoggle2.txt");
-		$resetfile->SetBind($SoD->{'Temp'}->{'TraySwitch'},'+down$$gototray '.$SoD->{'Temp'}->{'Tray'}.'$$bindloadfile '.$Profile::basepath."\\temptoggle2.txt");
+		my $temptogglefile1 = BindFile->new($profile->{'General'}->{'BindsDir'}."\\temptoggle1.txt");
+		my $temptogglefile2 = BindFile->new($profile->{'General'}->{'BindsDir'}."\\temptoggle2.txt");
+		$temptogglefile2->SetBind($SoD->{'Temp'}->{'TraySwitch'},'-down$$gototray 1'.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}."\\temptoggle1.txt");
+		$temptogglefile1->SetBind($SoD->{'Temp'}->{'TraySwitch'},'+down$$gototray '.$SoD->{'Temp'}->{'Tray'}.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}."\\temptoggle2.txt");
+		$resetfile->SetBind($SoD->{'Temp'}->{'TraySwitch'},'+down$$gototray '.$SoD->{'Temp'}->{'Tray'}.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}."\\temptoggle2.txt");
 	}
 
 	my ($dwarfTPPower, $normalTPPower, $teamTPPower);
-	if ($profile->{'Archetype'} eq "Warshade") {
+	if ($profile->{'General'}->{'Archetype'} eq "Warshade") {
 		$dwarfTPPower = "powexecname Black Dwarf Step";
 		$normalTPPower = "powexecname Shadow Step";
-	 } elsif ($profile->{'Archetype'} eq "Peacebringer") {
+	 } elsif ($profile->{'General'}->{'Archetype'} eq "Peacebringer") {
 		$dwarfTPPower = "powexecname White Dwarf Step";
 	 } else {
 		$normalTPPower = "powexecname Teleport";
@@ -1404,7 +1435,7 @@ sub makebind {
 		$novapbind = cbPBindToString($SoD->{'Human'}->{'NovaPBind'},$profile);
 		$dwarfpbind = cbPBindToString($SoD->{'Human'}->{'DwarfPBind'},$profile);
 	}
-	if (($profile->{'Archetype'} eq "Peacebringer") or ($profile->{'Archetype'} eq "Warshade")) {
+	if (($profile->{'General'}->{'Archetype'} eq "Peacebringer") or ($profile->{'General'}->{'Archetype'} eq "Warshade")) {
 		if ($humanBindKey) {
 			$resetfile->SetBind($humanBindKey,$humanpbind);
 		}
@@ -1416,18 +1447,18 @@ sub makebind {
 	my $Dwarf = $SoD->{'Dwarf'};
 
 	if ($Nova and $Nova->{'Enable'}) {
-		$resetfile->SetBind($Nova->{'ModeKey'},'t $name, Changing to '.$Nova->{'Nova'}.' Form$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0'.$t->{'on'}.$Nova->{'Nova'}.'$$gototray '.$Nova->{'Tray'}.'$$bindloadfile '.$Profile::basepath."\\nova.txt");
+		$resetfile->SetBind($Nova->{'ModeKey'},'t $name, Changing to '.$Nova->{'Nova'}.' Form$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0'.$t->{'on'}.$Nova->{'Nova'}.'$$gototray '.$Nova->{'Tray'}.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}."\\nova.txt");
 
-		my $novafile = BindFile->new($Profile::basepath."\\nova.txt");
+		my $novafile = BindFile->new($profile->{'General'}->{'BindsDir'}."\\nova.txt");
 
 		if ($Dwarf and $Dwarf->{'Enable'}) {
-			$novafile->SetBind($Dwarf->{'ModeKey'},'t $name, Changing to '.$Dwarf->{'Dwarf'}.' Form$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0'.$t->{'off'}.$Nova->{'Nova'}.$t->{'on'}.$Dwarf->{'Dwarf'}.'$$gototray '.$Dwarf->{'Tray'}.'$$bindloadfile '.$Profile::basepath."\\dwarf.txt");
+			$novafile->SetBind($Dwarf->{'ModeKey'},'t $name, Changing to '.$Dwarf->{'Dwarf'}.' Form$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0'.$t->{'off'}.$Nova->{'Nova'}.$t->{'on'}.$Dwarf->{'Dwarf'}.'$$gototray '.$Dwarf->{'Tray'}.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}."\\dwarf.txt");
 		}
 		$humanBindKey ||= $Nova->{'ModeKey'};
 
 		my $humpower = $SoD->{'UseHumanFormPower'} ? '$$powexectoggleon '.$SoD->{'HumanFormShield'} : '';
 
-		$novafile->SetBind($humanBindKey,'t $name, Changing to Human Form, SoD Mode$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleoff '.$Nova->{'Nova'}.$humpower.'$$gototray 1$$bindloadfile '.$Profile::basepath."\\rese$t->{'txt'}");
+		$novafile->SetBind($humanBindKey,'t $name, Changing to Human Form, SoD Mode$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleoff '.$Nova->{'Nova'}.$humpower.'$$gototray 1$$bindloadfile '.$profile->{'General'}->{'BindsDir'}."\\rese$t->{'txt'}");
 
 		undef $humanBindKey if ($humanBindKey eq $Nova->{'ModeKey'});
 
@@ -1452,20 +1483,20 @@ sub makebind {
 			$novafile->SetBind($SoD->{'TP'}->{'ResetKey'},'nop');
 		}
 		$novafile->SetBind($SoD->{'FollowKey'},"follow");
-		# $novafile->SetBind($SoD->{'ToggleKey'},'t $name, Changing to Human Form, Normal Mode$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleoff '.$Nova->{'Nova'}.'$$gototray 1$$bindloadfile '.$Profile::basepath."\\rese$t->{'txt'}")
+		# $novafile->SetBind($SoD->{'ToggleKey'},'t $name, Changing to Human Form, Normal Mode$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleoff '.$Nova->{'Nova'}.'$$gototray 1$$bindloadfile '.$profile->{'General'}->{'BindsDir'}."\\rese$t->{'txt'}")
 	}
 
 	if ($Dwarf and $Dwarf->{'Enable'}) {
-		$resetfile->SetBind($Dwarf->{'ModeKey'},'t $name, Changing to '.$Dwarf->{'Dwarf'}.' Form$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleon '.$Dwarf->{'Dwarf'}.'$$gototray '.$Dwarf->{'Tray'}.'$$bindloadfile '.$Profile::basepath."\\dwarf.txt");
-		my $dwrffile = BindFile->new($Profile::basepath."\\dwarf.txt");
+		$resetfile->SetBind($Dwarf->{'ModeKey'},'t $name, Changing to '.$Dwarf->{'Dwarf'}.' Form$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleon '.$Dwarf->{'Dwarf'}.'$$gototray '.$Dwarf->{'Tray'}.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}."\\dwarf.txt");
+		my $dwrffile = BindFile->new($profile->{'General'}->{'BindsDir'}."\\dwarf.txt");
 		if ($Nova and $Nova->{'Enable'}) {
-			$dwrffile->SetBind($Nova->{'ModeKey'},'t $name, Changing to '.$Nova->{'Nova'}.' Form$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleoff '.$Dwarf->{'Dwarf'}.'$$powexectoggleon '.$Nova->{'Nova'}.'$$gototray '.$Nova->{'Tray'}.'$$bindloadfile '.$Profile::basepath."\\nova.txt");
+			$dwrffile->SetBind($Nova->{'ModeKey'},'t $name, Changing to '.$Nova->{'Nova'}.' Form$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleoff '.$Dwarf->{'Dwarf'}.'$$powexectoggleon '.$Nova->{'Nova'}.'$$gototray '.$Nova->{'Tray'}.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}."\\nova.txt");
 		}
 
 		$humanBindKey ||= $Dwarf->{'ModeKey'};
 		my $humpower = $SoD->{'UseHumanFormPower'} ? '$$powexectoggleon '.$SoD->{'HumanFormShield'} : '';
 
-		$dwrffile->SetBind($humanBindKey,'t $name, Changing to Human Form, SoD Mode$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleoff '.$Dwarf->{'Dwarf'}.$humpower.'$$gototray 1$$bindloadfile '.$Profile::basepath."\\rese$t->{'txt'}");
+		$dwrffile->SetBind($humanBindKey,'t $name, Changing to Human Form, SoD Mode$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleoff '.$Dwarf->{'Dwarf'}.$humpower.'$$gototray 1$$bindloadfile '.$profile->{'General'}->{'BindsDir'}."\\rese$t->{'txt'}");
 
 		$dwrffile->SetBind($Dwarf->{'ModeKey'},$dwarfpbind) if ($dwarfpbind);
 		makeQFlyModeKey($profile,$t,"r",$dwrffile,$Dwarf->{'Dwarf'},"Dwarf") if ($t->{'canqfly'});
@@ -1483,22 +1514,22 @@ sub makebind {
 		$dwrffile->SetBind('mousechord "'."+down$$+forward")    if ($SoD->{'MouseChord'});
 
 		if ($SoD->{'TP'} and $SoD->{'TP'}->{'Enable'}) {
-			$dwrffile->SetBind($SoD->{'TP'}->{'ComboKey'},'+down$$'.$dwarfTPPower.$t->{'detaillo'}.$t->{'flycamdist'}.$windowhide.'$$bindloadfile '.$Profile::basepath.'\\dtp\\tp_on1.txt');
+			$dwrffile->SetBind($SoD->{'TP'}->{'ComboKey'},'+down$$'.$dwarfTPPower.$t->{'detaillo'}.$t->{'flycamdist'}.$windowhide.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'\\dtp\\tp_on1.txt');
 			$dwrffile->SetBind($SoD->{'TP'}->{'BindKey'},'nop');
-			$dwrffile->SetBind($SoD->{'TP'}->{'ResetKey'},substr($t->{'detailhi'},2).$t->{'runcamdist'}.$windowshow.'$$bindloadfile '.$Profile::basepath.'\\dtp\\tp_off.txt');
+			$dwrffile->SetBind($SoD->{'TP'}->{'ResetKey'},substr($t->{'detailhi'},2).$t->{'runcamdist'}.$windowshow.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'\\dtp\\tp_off.txt');
 			#  Create tp directory
-			cbMakeDirectory($Profile::basepath.'\\dtp');
+			BindFile::MakeDirectory($profile->{'General'}->{'BindsDir'}.'\\dtp');
 			#  Create tp_off file
-			my $tp_off = BindFile->new($Profile::basepath.'\\dtp\\tp_off.txt');
-			$tp_off->SetBind($SoD->{'TP'}->{'ComboKey'},'+down$$'.$dwarfTPPower.$t->{'detaillo'}.$t->{'flycamdist'}.$windowhide.'$$bindloadfile '.$Profile::basepath.'\\dtp\\tp_on1.txt');
+			my $tp_off = BindFile->new($profile->{'General'}->{'BindsDir'}.'\\dtp\\tp_off.txt');
+			$tp_off->SetBind($SoD->{'TP'}->{'ComboKey'},'+down$$'.$dwarfTPPower.$t->{'detaillo'}.$t->{'flycamdist'}.$windowhide.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'\\dtp\\tp_on1.txt');
 			$tp_off->SetBind($SoD->{'TP'}->{'BindKey'},'nop');
-			my $tp_on1 = BindFile->new($Profile::basepath.'\\dtp\\tp_on1.txt');
-			$tp_on1->SetBind($SoD->{'TP'}->{'ComboKey'},'-down$$powexecunqueue'.$t->{'detailhi'}.$t->{'runcamdist'}.$windowshow.'$$bindloadfile '.$Profile::basepath.'\\dtp\\tp_off.txt');
-			$tp_on1->SetBind($SoD->{'TP'}->{'BindKey'},'+down$$bindloadfile '.$Profile::basepath.'\\dtp\\tp_on2.txt');
-			my $tp_on2 = BindFile->new($Profile::basepath.'\\dtp\\tp_on2.txt');
-			$tp_on2->SetBind($SoD->{'TP'}->{'BindKey'},'-down$$'.$dwarfTPPower.'$$bindloadfile '.$Profile::basepath.'\\dtp\\tp_on1.txt');
+			my $tp_on1 = BindFile->new($profile->{'General'}->{'BindsDir'}.'\\dtp\\tp_on1.txt');
+			$tp_on1->SetBind($SoD->{'TP'}->{'ComboKey'},'-down$$powexecunqueue'.$t->{'detailhi'}.$t->{'runcamdist'}.$windowshow.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'\\dtp\\tp_off.txt');
+			$tp_on1->SetBind($SoD->{'TP'}->{'BindKey'},'+down$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'\\dtp\\tp_on2.txt');
+			my $tp_on2 = BindFile->new($profile->{'General'}->{'BindsDir'}.'\\dtp\\tp_on2.txt');
+			$tp_on2->SetBind($SoD->{'TP'}->{'BindKey'},'-down$$'.$dwarfTPPower.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'\\dtp\\tp_on1.txt');
 		}
-		# $dwrffile->SetBind($SoD->{'ToggleKey'},'t $name, Changing to Human Form, Normal Mode$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleoff '.$Dwarf->{'Dwarf'}.'$$gototray 1$$bindloadfile '.$Profile::basepath."\\rese$t->{'txt'}");
+		# $dwrffile->SetBind($SoD->{'ToggleKey'},'t $name, Changing to Human Form, Normal Mode$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleoff '.$Dwarf->{'Dwarf'}.'$$gototray 1$$bindloadfile '.$profile->{'General'}->{'BindsDir'}."\\rese$t->{'txt'}");
 	}
 
 	if ($SoD->{'Jump'}->{'Simple'}) {
@@ -1516,44 +1547,44 @@ sub makebind {
 		$resetfile->SetBind($SoD->{'TP'}->{'BindKey'},'nop');
 		$resetfile->SetBind($SoD->{'TP'}->{'ResetKey'},'nop');
 	}
-	if ($SoD->{'TP'} and $SoD->{'TP'}->{'Enable'} and not ($profile->{'Archetype'} eq "Peacebringer") and $normalTPPower) {
+	if ($SoD->{'TP'} and $SoD->{'TP'}->{'Enable'} and not ($profile->{'General'}->{'Archetype'} eq "Peacebringer") and $normalTPPower) {
 		my $tphovermodeswitch = "";
 		if ($t->{'tphover'} eq "") {
 			$tphovermodeswitch = $t->{'blr'}."000000.txt";
 		}
-		$resetfile->SetBind($SoD->{'TP'}->{'ComboKey'},'+down$$'.$normalTPPower.$t->{'detaillo'}.$t->{'flycamdist'}.$windowhide.'$$bindloadfile '.$Profile::basepath.'\\tp\\tp_on1.txt');
+		$resetfile->SetBind($SoD->{'TP'}->{'ComboKey'},'+down$$'.$normalTPPower.$t->{'detaillo'}.$t->{'flycamdist'}.$windowhide.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'\\tp\\tp_on1.txt');
 		$resetfile->SetBind($SoD->{'TP'}->{'BindKey'},'nop');
-		$resetfile->SetBind($SoD->{'TP'}->{'ResetKey'},substr($t->{'detailhi'},2).$t->{'runcamdist'}.$windowshow.'$$bindloadfile '.$Profile::basepath.'\\tp\\tp_off.txt'.$tphovermodeswitch);
+		$resetfile->SetBind($SoD->{'TP'}->{'ResetKey'},substr($t->{'detailhi'},2).$t->{'runcamdist'}.$windowshow.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'\\tp\\tp_off.txt'.$tphovermodeswitch);
 		#  Create tp directory
-		cbMakeDirectory($Profile::basepath.'\\tp');
+		BindFile::MakeDirectory($profile->{'General'}->{'BindsDir'}.'\\tp');
 		#  Create tp_off file
-		my $tp_off = BindFile->new($Profile::basepath.'\\tp\\tp_off.txt');
-		$tp_off->SetBind($SoD->{'TP'}->{'ComboKey'},'+down$$'.$normalTPPower.$t->{'detaillo'}.$t->{'flycamdist'}.$windowhide.'$$bindloadfile '.$Profile::basepath.'\\tp\\tp_on1.txt');
+		my $tp_off = BindFile->new($profile->{'General'}->{'BindsDir'}.'\\tp\\tp_off.txt');
+		$tp_off->SetBind($SoD->{'TP'}->{'ComboKey'},'+down$$'.$normalTPPower.$t->{'detaillo'}.$t->{'flycamdist'}.$windowhide.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'\\tp\\tp_on1.txt');
 		$tp_off->SetBind($SoD->{'TP'}->{'BindKey'},'nop');
-		my $tp_on1 = BindFile->new($Profile::basepath.'\\tp\\tp_on1.txt');
+		my $tp_on1 = BindFile->new($profile->{'General'}->{'BindsDir'}.'\\tp\\tp_on1.txt');
 		my $zoomin = $t->{'detailhi'}.$t->{'runcamdist'};
 		if ($t->{'tphover'}) { $zoomin = "" }
-		$tp_on1->SetBind($SoD->{'TP'}->{'ComboKey'},'-down$$powexecunqueue'.$zoomin.$windowshow.'$$bindloadfile '.$Profile::basepath.'\\tp\\tp_off.txt'.$tphovermodeswitch);
-		$tp_on1->SetBind($SoD->{'TP'}->{'BindKey'},'+down'.$t->{'tphover'}.'$$bindloadfile '.$Profile::basepath.'\\tp\\tp_on2.txt');
-		my $tp_on2 = BindFile->new($Profile::basepath.'\\tp\\tp_on2.txt');
-		$tp_on2->SetBind($SoD->{'TP'}->{'BindKey'},'-down$$'.$normalTPPower.'$$bindloadfile '.$Profile::basepath.'\\tp\\tp_on1.txt');
+		$tp_on1->SetBind($SoD->{'TP'}->{'ComboKey'},'-down$$powexecunqueue'.$zoomin.$windowshow.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'\\tp\\tp_off.txt'.$tphovermodeswitch);
+		$tp_on1->SetBind($SoD->{'TP'}->{'BindKey'},'+down'.$t->{'tphover'}.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'\\tp\\tp_on2.txt');
+		my $tp_on2 = BindFile->new($profile->{'General'}->{'BindsDir'}.'\\tp\\tp_on2.txt');
+		$tp_on2->SetBind($SoD->{'TP'}->{'BindKey'},'-down$$'.$normalTPPower.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'\\tp\\tp_on1.txt');
 	}
-	if ($SoD->{'TTP'} and $SoD->{'TTP'}->{'Enable'} and not ($profile->{'Archetype'} eq "Peacebringer") and $teamTPPower) {
+	if ($SoD->{'TTP'} and $SoD->{'TTP'}->{'Enable'} and not ($profile->{'General'}->{'Archetype'} eq "Peacebringer") and $teamTPPower) {
 		my $tphovermodeswitch = "";
-		$resetfile->SetBind($SoD->{'TTP'}->{'ComboKey'},'+down$$'.$teamTPPower.$t->{'detaillo'}.$t->{'flycamdist'}.$windowhide.'$$bindloadfile '.$Profile::basepath.'\\ttp\\ttp_on1.txt');
+		$resetfile->SetBind($SoD->{'TTP'}->{'ComboKey'},'+down$$'.$teamTPPower.$t->{'detaillo'}.$t->{'flycamdist'}.$windowhide.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'\\ttp\\ttp_on1.txt');
 		$resetfile->SetBind($SoD->{'TTP'}->{'BindKey'},'nop');
-		$resetfile->SetBind($SoD->{'TTP'}->{'ResetKey'},substr($t->{'detailhi'},2).$t->{'runcamdist'}.$windowshow.'$$bindloadfile '.$Profile::basepath.'\\ttp\\ttp_off.txt'.$tphovermodeswitch);
+		$resetfile->SetBind($SoD->{'TTP'}->{'ResetKey'},substr($t->{'detailhi'},2).$t->{'runcamdist'}.$windowshow.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'\\ttp\\ttp_off.txt'.$tphovermodeswitch);
 		#  Create tp directory
-		cbMakeDirectory($Profile::basepath.'\\ttp');
+		BindFile::MakeDirectory($profile->{'General'}->{'BindsDir'}.'\\ttp');
 		#  Create tp_off file
-		my $ttp_off = BindFile->new($Profile::basepath.'\\ttp\\ttp_off.txt');
-		$ttp_off->SetBind($SoD->{'TTP'}->{'ComboKey'},'+down$$'.$teamTPPower.$t->{'detaillo'}.$t->{'flycamdist'}.$windowhide.'$$bindloadfile '.$Profile::basepath.'\\ttp\\ttp_on1.txt');
+		my $ttp_off = BindFile->new($profile->{'General'}->{'BindsDir'}.'\\ttp\\ttp_off.txt');
+		$ttp_off->SetBind($SoD->{'TTP'}->{'ComboKey'},'+down$$'.$teamTPPower.$t->{'detaillo'}.$t->{'flycamdist'}.$windowhide.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'\\ttp\\ttp_on1.txt');
 		$ttp_off->SetBind($SoD->{'TTP'}->{'BindKey'},'nop');
-		my $ttp_on1 = BindFile->new($Profile::basepath.'\\ttp\\ttp_on1.txt');
-		$ttp_on1->SetBind($SoD->{'TTP'}->{'ComboKey'},'-down$$powexecunqueue'.$t->{'detailhi'}.$t->{'runcamdist'}.$windowshow.'$$bindloadfile '.$Profile::basepath.'\\ttp\\ttp_off.txt'.$tphovermodeswitch);
-		$ttp_on1->SetBind($SoD->{'TTP'}->{'BindKey'},'+down'.'$$bindloadfile '.$Profile::basepath.'\\ttp\\ttp_on2.txt');
-		my $ttp_on2 = BindFile->new($Profile::basepath.'\\ttp\\ttp_on2.txt');
-		$ttp_on2->SetBind($SoD->{'TTP'}->{'BindKey'},'-down$$'.$teamTPPower.'$$bindloadfile '.$Profile::basepath.'\\ttp\\ttp_on1.txt');
+		my $ttp_on1 = BindFile->new($profile->{'General'}->{'BindsDir'}.'\\ttp\\ttp_on1.txt');
+		$ttp_on1->SetBind($SoD->{'TTP'}->{'ComboKey'},'-down$$powexecunqueue'.$t->{'detailhi'}.$t->{'runcamdist'}.$windowshow.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'\\ttp\\ttp_off.txt'.$tphovermodeswitch);
+		$ttp_on1->SetBind($SoD->{'TTP'}->{'BindKey'},'+down'.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'\\ttp\\ttp_on2.txt');
+		my $ttp_on2 = BindFile->new($profile->{'General'}->{'BindsDir'}.'\\ttp\\ttp_on2.txt');
+		$ttp_on2->SetBind($SoD->{'TTP'}->{'BindKey'},'-down$$'.$teamTPPower.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'\\ttp\\ttp_on1.txt');
 	}
 }
 
@@ -1561,17 +1592,18 @@ sub makebind {
 sub sodResetKey {
 	my ($curfile,$p,$path,$turnoff,$moddir) = @_;
 	if (!$moddir) {
-		$curfile->SetBind($p->{'ResetKey'},'up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0'.$turnoff.'$$t $name, SoD Binds Reset'.cbGetBaseReset($p).'$$bindloadfile '.$path.'000000.txt')
+		$curfile->SetBind($p->{'ResetKey'},'up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0'.$turnoff.'$$t $name, SoD Binds Reset'.BindFile::BaseReset($p).'$$bindloadfile '.$path.'000000.txt')
 	} elsif ($moddir eq 'up') {
-		$curfile->SetBind($p->{'ResetKey'},'up 1$$down 0$$forward 0$$backward 0$$left 0$$right 0'.$turnoff.'$$t $name, SoD Binds Reset'.cbGetBaseReset($p).'$$bindloadfile '.$path.'000000.txt')
+		$curfile->SetBind($p->{'ResetKey'},'up 1$$down 0$$forward 0$$backward 0$$left 0$$right 0'.$turnoff.'$$t $name, SoD Binds Reset'.BindFile::BaseReset($p).'$$bindloadfile '.$path.'000000.txt')
 	} elsif ($moddir eq 'down') {
-		$curfile->SetBind($p->{'ResetKey'},'up 0$$down 1$$forward 0$$backward 0$$left 0$$right 0'.$turnoff.'$$t $name, SoD Binds Reset'.cbGetBaseReset($p).'$$bindloadfile '.$path.'000000.txt')
+		$curfile->SetBind($p->{'ResetKey'},'up 0$$down 1$$forward 0$$backward 0$$left 0$$right 0'.$turnoff.'$$t $name, SoD Binds Reset'.BindFile::BaseReset($p).'$$bindloadfile '.$path.'000000.txt')
 	}
 }
 
 sub sodDefaultResetKey {
 	my ($mobile,$stationary) = @_;
-	cbAddReset('up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0'.actPower(undef,true,$stationary,$mobile).'$$t $name, SoD Binds Reset')
+	# TODO -- decide where to keep 'resetstring' and make this sub update it.
+	#cbAddReset('up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0'.actPower_name(undef,true,$stationary,$mobile).'$$t $name, SoD Binds Reset')
 }
 
 
@@ -1632,7 +1664,7 @@ sub sodUpKey {
 	}
 	
 	if ($toggleon or $toggleoff) {
-		$toggle = actPower(undef,true,$toggleon,$toggleoff,$toggleoff2);
+		$toggle = actPower_name(undef,true,$toggleon,$toggleoff,$toggleoff2);
 	}
 
 	my $bindload = $bl.(1-$t->{'space'}).$t->{'X'}.$t->{'W'}.$t->{'S'}.$t->{'A'}.$t->{'D'}.".txt";
@@ -1659,7 +1691,7 @@ sub sodUpKey {
 
 sub sodDownKey {
 	my ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,$autorun,$followbl,$bo,$sssj) = @_;
-	my  $ml; # , aj
+	my $ml = ''; # , aj
 	my ($up, $dowx, $forw, $bac, $lef, $rig) = ($t->{'up'}, $t->{'dowx'}, $t->{'forw'}, $t->{'bac'}, $t->{'lef'}, $t->{'rig'});
 	my ($toggle, $toggleon, $toggleoff);
 	my $actkeys = $t->{'totalkeys'};
@@ -1701,7 +1733,7 @@ sub sodDownKey {
 	}
 	
 	if ($toggleon or $toggleoff) {
-		$toggle = actPower(undef,true,$toggleon,$toggleoff)
+		$toggle = actPower_name(undef,true,$toggleon,$toggleoff)
 	}
 
 	my $bindload = $bl.$t->{'space'}.(1-$t->{'X'}).$t->{'W'}.$t->{'S'}.$t->{'A'}.$t->{'D'}.".txt";
@@ -1780,7 +1812,7 @@ sub sodForwardKey {
 	}
 	
 	if ($toggleon or $toggleoff) { 
-		$toggle = actPower(undef,true,$toggleon,$toggleoff);
+		$toggle = actPower_name(undef,true,$toggleon,$toggleoff);
 	}
 
 	my $bindload = $bl.$t->{'space'}.$t->{'X'}.(1-$t->{'W'}).$t->{'S'}.$t->{'A'}.$t->{'D'}.".txt";
@@ -1821,7 +1853,7 @@ sub sodForwardKey {
 
 sub sodBackKey {
 	my ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,$autorunbl,$followbl,$bo,$sssj) = @_;
-	my $ml;
+	my $ml = '';
 	my ($up, $dow, $forw, $bacx, $lef, $rig) = ($t->{'up'}, $t->{'dow'}, $t->{'forw'}, $t->{'bacx'}, $t->{'lef'}, $t->{'rig'});
 	my ($toggle, $toggleon, $toggleoff);
 	my $actkeys = $t->{'totalkeys'};
@@ -1873,7 +1905,7 @@ sub sodBackKey {
 	}
 	
 	if ($toggleon or $toggleoff) { 
-		$toggle = actPower(undef,true,$toggleon,$toggleoff);
+		$toggle = actPower_name(undef,true,$toggleon,$toggleoff);
 	}
 
 	my $bindload = $bl.$t->{'space'}.$t->{'X'}.$t->{'W'}.(1-$t->{'S'}).$t->{'A'}.$t->{'D'}.".txt";
@@ -1904,7 +1936,7 @@ sub sodBackKey {
 
 sub sodLeftKey {
 	my ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,$autorun,$followbl,$bo,$sssj) = @_;
-	my $ml;
+	my $ml = '';
 	my ($up, $dow, $forw, $bac, $lefx, $rig) = ($t->{'up'}, $t->{'dow'}, $t->{'forw'}, $t->{'bac'}, $t->{'lefx'}, $t->{'rig'});
 	my ($toggle, $toggleon, $toggleoff);
 	my $actkeys = $t->{'totalkeys'};
@@ -1956,7 +1988,7 @@ sub sodLeftKey {
 	}
 	
 	if ($toggleon or $toggleoff) { 
-		$toggle = actPower(undef,true,$toggleon,$toggleoff);
+		$toggle = actPower_name(undef,true,$toggleon,$toggleoff);
 	}
 
 	my $bindload = $bl.$t->{'space'}.$t->{'X'}.$t->{'W'}.$t->{'S'}.(1-$t->{'A'}).$t->{'D'}.".txt";
@@ -1984,7 +2016,7 @@ sub sodLeftKey {
 
 sub sodRightKey {
 	my ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,$autorun,$followbl,$bo,$sssj) = @_;
-	my $ml;
+	my $ml = '';
 	my ($up, $dow, $forw, $bac, $lef, $rigx) = ($t->{'up'}, $t->{'dow'}, $t->{'forw'}, $t->{'bac'}, $t->{'lef'}, $t->{'rigx'});
 	my ($toggle, $toggleon, $toggleoff);
 	my $actkeys = $t->{'totalkeys'};
@@ -2036,7 +2068,7 @@ sub sodRightKey {
 	}
 	
 	if ($toggleon or $toggleoff) { 
-		$toggle = actPower(undef,true,$toggleon,$toggleoff);
+		$toggle = actPower_name(undef,true,$toggleon,$toggleoff);
 	}
 
 	my $bindload = $bl.$t->{'space'}.$t->{'X'}.$t->{'W'}.$t->{'S'}.$t->{'A'}.(1-$t->{'D'}).".txt";
@@ -2066,9 +2098,9 @@ sub sodAutoRunKey {
 	my ($t,$bl,$curfile,$SoD,$mobile,$sssj) = @_;
 	my $bindload = $bl.$t->{'space'}.$t->{'X'}.$t->{'W'}.$t->{'S'}.$t->{'A'}.$t->{'D'}.".txt";
 	if ($sssj and $t->{'space'} == 1) { 
-		$curfile->SetBind($SoD->{'AutoRunKey'},'forward 1$$backward 0'.$t->{'up'}.$t->{'dow'}.$t->{'lef'}.$t->{'rig'}.$t->{'mlon'}.actPower(undef,true,$sssj,$mobile).$bindload);
+		$curfile->SetBind($SoD->{'AutoRunKey'},'forward 1$$backward 0'.$t->{'up'}.$t->{'dow'}.$t->{'lef'}.$t->{'rig'}.$t->{'mlon'}.actPower_name(undef,true,$sssj,$mobile).$bindload);
 	} else {
-		$curfile->SetBind($SoD->{'AutoRunKey'},'forward 1$$backward 0'.$t->{'up'}.$t->{'dow'}.$t->{'lef'}.$t->{'rig'}.$t->{'mlon'}.actPower(undef,true,$mobile).$bindload);
+		$curfile->SetBind($SoD->{'AutoRunKey'},'forward 1$$backward 0'.$t->{'up'}.$t->{'dow'}.$t->{'lef'}.$t->{'rig'}.$t->{'mlon'}.actPower_name(undef,true,$mobile).$bindload);
 	}
 }
 
@@ -2077,21 +2109,21 @@ sub sodAutoRunOffKey {
 	my ($toggle, $toggleon, $toggleoff);
 	if (not $flight and not $sssj) { 
 		if ($t->{'horizkeys'} > 0) { 
-			$toggleon = $t->{'mlon'}.actPower(undef,true,$mobile);
+			$toggleon = $t->{'mlon'}.actPower_name(undef,true,$mobile);
 		} else {
-			$toggleon = $t->{'mloff'}.actPower(undef,true,$stationary,$mobile);
+			$toggleon = $t->{'mloff'}.actPower_name(undef,true,$stationary,$mobile);
 		}
 	} elsif ($sssj) { 
 		if ($t->{'horizkeys'} > 0 or $t->{'space'} == 1) { 
-			$toggleon = $t->{'mlon'}.actPower(undef,true,$mobile,$toggleoff);
+			$toggleon = $t->{'mlon'}.actPower_name(undef,true,$mobile,$toggleoff);
 		} else {
-			$toggleon = $t->{'mloff'}.actPower(undef,true,$stationary,$mobile,$toggleoff);
+			$toggleon = $t->{'mloff'}.actPower_name(undef,true,$stationary,$mobile,$toggleoff);
 		}
 	} else {
 		if ($t->{'totalkeys'} > 0) { 
-			$toggleon = $t->{'mlon'}.actPower(undef,true,$mobile);
+			$toggleon = $t->{'mlon'}.actPower_name(undef,true,$mobile);
 		} else {
-			$toggleon = $t->{'mloff'}.actPower(undef,true,$stationary,$mobile);
+			$toggleon = $t->{'mloff'}.actPower_name(undef,true,$stationary,$mobile);
 		}
 	}
 	my $bindload = $bl.$t->{'space'}.$t->{'X'}.$t->{'W'}.$t->{'S'}.$t->{'A'}.$t->{'D'}.".txt";
@@ -2100,7 +2132,7 @@ sub sodAutoRunOffKey {
 
 sub sodFollowKey {
 	my ($t,$bl,$curfile,$SoD,$mobile) = @_;
-	$curfile->SetBind($SoD->{'FollowKey'},'follow'.actPower(undef,true,$mobile).$bl.$t->{'space'}.$t->{'X'}.$t->{'W'}.$t->{'S'}.$t->{'A'}.$t->{'D'}.'.txt');
+	$curfile->SetBind($SoD->{'FollowKey'},'follow'.actPower_name(undef,true,$mobile).$bl.$t->{'space'}.$t->{'X'}.$t->{'W'}.$t->{'S'}.$t->{'A'}.$t->{'D'}.'.txt');
 }
 
 sub sodFollowOffKey {
@@ -2109,17 +2141,17 @@ sub sodFollowOffKey {
 	if (not $flight) { 
 		if ($t->{'horizkeys'} == 0) { 
 			if ($stationary eq $mobile) { 
-				$toggle = actPower(undef,true,$stationary,$mobile);
+				$toggle = actPower_name(undef,true,$stationary,$mobile);
 			} else {
-				$toggle = actPower(undef,true,$stationary);
+				$toggle = actPower_name(undef,true,$stationary);
 			}
 		}
 	} else {
 		if ($t->{'totalkeys'} == 0) { 
 			if ($stationary eq $mobile) { 
-				$toggle = actPower(undef,true,$stationary,$mobile);
+				$toggle = actPower_name(undef,true,$stationary,$mobile);
 			} else {
-				$toggle = actPower(undef,true,$stationary);
+				$toggle = actPower_name(undef,true,$stationary);
 			}
 		}
 	}
@@ -2130,7 +2162,7 @@ sub bindisused {
 	my ($profile) = @_;
 	return if not defined $profile->{'SoD'};
 	my $SoD = $profile->{'SoD'};
-	return $profile->{$SoD->{'enable'}};
+	return $profile->{$SoD->{'Enable'}};
 }
 
 sub findconflicts {
@@ -2155,15 +2187,15 @@ sub findconflicts {
 	if ($SoD->{'Fly'}->{'Hover'}
 		or $SoD->{'Fly'}->{'Fly'}) { cbCheckConflict($SoD,"FlyModeKey","Fly Mode Key") }
 	if ($SoD->{'Fly'}->{'QFly'}
-		and ($profile->{'Archetype'} eq "Peacebringer")) { cbCheckConflict($SoD,"QFlyModeKey","Q.Fly Mode Key") }
+		and ($profile->{'General'}->{'Archetype'} eq "Peacebringer")) { cbCheckConflict($SoD,"QFlyModeKey","Q.Fly Mode Key") }
 	if ($SoD->{'TP'} and $SoD->{'TP'}->{'Enable'}) {
 		cbCheckConflict($SoD->{'TP'},"ComboKey","TP ComboKey");
 		cbCheckConflict($SoD->{'TP'},"ResetKey","TP ResetKey");
 
 		my $TPQuestion = "Teleport Bind";
-		if ($profile->{'Archetype'} eq "Peacebringer") {
+		if ($profile->{'General'}->{'Archetype'} eq "Peacebringer") {
 			$TPQuestion = "Dwarf Step Bind"
-		 } elsif ($profile->{'Archetype'} eq "Warshade") {
+		 } elsif ($profile->{'General'}->{'Archetype'} eq "Warshade") {
 			$TPQuestion = "Shd/Dwf Step Bind"
 		}
 		cbCheckConflict($SoD->{'TP'},"BindKey",$TPQuestion)
@@ -2179,22 +2211,22 @@ sub findconflicts {
 		cbCheckConflict($SoD->{'Temp'},"TraySwitch","Tray Toggle Key");
 	}
 
-	if (($profile->{'Archetype'} eq "Peacebringer") or ($profile->{'Archetype'} eq "Warshade")) {
-		if ($SoD->{'Nova'}  and $SoD->{'Nova'}->  {'Enable'}) { cbCheckConflict($SoD->{'Nova'},  "ModeKey","Nova Form Bind") }
-		if ($SoD->{'Dwarf'} and $$soD->{'Dwarf'}->{'Enable'}) { cbCheckConflict($$soD->{'Dwarf'},"ModeKey","Dwarf Form Bind") }
+	if (($profile->{'General'}->{'Archetype'} eq "Peacebringer") or ($profile->{'General'}->{'Archetype'} eq "Warshade")) {
+		if ($SoD->{'Nova'}  and $SoD->{'Nova'}-> {'Enable'}) { cbCheckConflict($SoD->{'Nova'},  "ModeKey","Nova Form Bind") }
+		if ($SoD->{'Dwarf'} and $SoD->{'Dwarf'}->{'Enable'}) { cbCheckConflict($SoD->{'Dwarf'},"ModeKey","Dwarf Form Bind") }
 	}
 }
 
 #  toggleon variation
 sub actPower_toggle {
-	my ($start,$unq,$on,%rest) = @_;
+	my ($start,$unq,$on,@rest) = @_;
 	my ($s, $traytest);
 	if (ref $on) {
 		#  deal with power slot stuff..
 		$traytest = $on->{'trayslot'};
 	}
 	my $offpower = {};
-	while (my ($i,$v) = each %rest) {
+	for my $v (@rest) {
 		if (ref $v) {
 			while (my ($j, $w) = each %$v) {
 				if ($w and $w ne 'on' and not $offpower->{$w}) {
@@ -2236,13 +2268,13 @@ sub actPower_toggle {
 }
 
 sub actPower_name {
-	my ($start,$unq,$on,%rest) = @_;
+	my ($start,$unq,$on,@rest) = @_;
 	my ($s, $traytest);
 	if (ref $on) {
 		#  deal with power slot stuff..
 		$traytest = $on->{'trayslot'};
 	}
-	while (my (undef,$v) = each %rest) {
+	for my $v (@rest) {
 		if (!ref $v) {
 			if ($v and $v ne 'on') {
 				$s .= '$$powexecname ' . $v;
@@ -2333,7 +2365,7 @@ sub sodJumpFix {
 	my $tglfile = BindFile->new($filename);
 	$t->{'ini'} = '-down$$';
 	makeModeKey($profile,$t,$bl,$tglfile,$turnoff,undef,true);
-	$curfile->SetBind($key,"+down".$feedback.actPower(undef,true,$t->{'cjmp'}).'$$bindloadfile '.$filename);
+	$curfile->SetBind($key,"+down".$feedback.actPower_name(undef,true,$t->{'cjmp'}).'$$bindloadfile '.$filename);
 }
 
 sub sodSetDownFix {

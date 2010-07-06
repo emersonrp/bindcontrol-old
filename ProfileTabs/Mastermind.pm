@@ -97,7 +97,7 @@ sub new {
 		};
 		$profile->{'MastermindPets'} = $MMP;
 	}
-	if ($profile->{'Archetype'} eq "Mastermind") {
+	if ($profile->{'General'}->{'Archetype'} eq "Mastermind") {
 		# TODO "GameData::ATPrimaries" can probably be replaced with nice hashes.
 		$MMP->{'Primary'} = $Gamedata::ATPrimaries[$profile->{'atnumber'}][$profile->{'primaryset'}];
 		$MMP->{'Primnumber'} = $profile->{'primaryset'};

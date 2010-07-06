@@ -2,6 +2,8 @@
 
 use strict;
 package BindFile;
+use File::Spec;
+use File::Path;
 
 my %BindFiles; # keep all created objects here so we can iterate them when it's time to write them out.
 
@@ -29,7 +31,7 @@ sub new {
 sub SetBind {
 	my ($self,$key,$bindtext) = @_;
 
-	if (not $key)  { die("invalid key: $key"); }
+	if (not $key)  { $key = ''; warn("invalid key: $key, bindtext $bindtext") and return; }
 
 	$bindtext =~ s/^ +//;
 	$bindtext =~ s/ +$//;
@@ -41,5 +43,19 @@ sub SetBind {
 
 	$self->{'binds'}->{$key} = $bindtext;
 }
+
+sub BaseReset { '$$bind_load_file' . $Profile::current->{'BindsDir'} . "\\subreset.txt"; }
+
+sub WriteBindFiles {
+
+# TODO this needs to happen not-here.
+ProfileTabs::SoD::makebind($Profile::current);
+
+	while (my ($filename, $binds) = each %BindFiles) {
+		# print STDERR "Found filename $filename\n";
+	}
+}
+
+sub MakeDirectory { File::Path::make_path(@_); }
 
 1;

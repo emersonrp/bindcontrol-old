@@ -17,18 +17,31 @@ sub addCmd {
 	push @$clist, $label;
 }
 
+
+sub cbPBindToString {
+	my ($a,$profile) = @_;
+	return unless $a;
+	return $a unless ref $a;
+	my $c = $a->{'limit'}->{'cmds'} or $cmds;
+
+	# return join '$$', map { $c[$_->{'type'}]->make($_, $profile) } values $a;
+
+	# TODO -- is the above line the correct interpretation of this?  lua is weird
+# 	local s = ""
+# 	local prefix = ""
+# 	for j,v in ipairs(a) do
+# 		s = s..prefix..c[v.type].make(v,profile)
+# 		prefix = "$$"
+# 	end
+# 	return s
+}
+
+
 # this needs to happen after addCmd() is defined -- this is sort of a bug
 use PowerBindCmds;
 1;
 
 __DATA__
-
-function copyCListToLimit(limit)
-	for i,v in ipairs(cmdlist) do table.insert(limit,v) end
-end
-
---Creation functions for the various types of bind commands here
-dofile("powerbindcmds.lua")
 
 -- Each bind command needs its own set of three functions, a form creation function, a new or creation function, and a makebind function.
 
@@ -75,17 +88,6 @@ function refreshCmds(bind,limit,profile,refreshcb)
 	end
 	bind.dlg.size = nil
 	bind.dlg:show()
-end
-
-local depth = 0
-local function safeDestroy(a)
-	if not a then return end
-	depth = depth + 1
-	print(depth.." "..tostring(a).." "..iup.GetType(a))
-	local _ = iup.GetNextChild(a)
-	while _ do safeDestroy(_) _ = iup.GetNextChild(a) end
-	iup.Destroy(a)
-	depth = depth - 1
 end
 
 function formCommand(t,bind,limit,addtobox,profile,refreshcb)
@@ -183,19 +185,6 @@ function formCommand(t,bind,limit,addtobox,profile,refreshcb)
 	end
 end
 
-function cbPBindToString(a,profile)
-	if not a then return nil end
-	if type(a) == "string" then return a end
-	local c = a.limit.cmds or cmds
-	local s = ""
-	local prefix = ""
-	for j,v in ipairs(a) do
-		s = s..prefix..c[v.type].make(v,profile)
-		prefix = "$$"
-	end
-	return s
-end
-
 function formPowerBinder(bind,limit,profile,refreshcb)
 	-- first create the bind.box vbox, the dialog box, and the new command button at the bottom.
 	bind.box = iup.vbox{}
@@ -247,12 +236,6 @@ function formPowerBinder(bind,limit,profile,refreshcb)
 	end
 	-- then show the dialog.
 	bind.dlg:popup(iup.CENTER,iup.CENTER)
-end
-
-local pbindmt = {}
-
-pbindmt.__concat = function(a,b)
-	return tostring(a)..tostring(b)
 end
 
 function cbParsePBString(bind,str,limit,profile)

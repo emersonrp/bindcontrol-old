@@ -69,8 +69,6 @@ sub new {
 	$tab = ProfileTabs::TypingMsg->new($self);
 	$self->AddPage( $tab, $tab->{'TabTitle'} );
 
-	$self->SetSelection(1);
-
 	return $self;
 }
 

@@ -100,9 +100,7 @@ sub makebind {
 					$selfile->SetBind($TeamSelect->{"sel$j"},"$selmethod " .  ($j - $selnummod)  . '$$bindloadfile ' . "$profile->{'base'}\\teamsel\\sel$j.txt");
 				}
 			}
-			close $selfile;
 		}
-		close $selresetfile;
 	} else {
 		my $selmethod = "teamselect";
 		my $selnummod = 0;

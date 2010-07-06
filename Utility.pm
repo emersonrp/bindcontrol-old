@@ -11,10 +11,7 @@ our @EXPORT_OK = qw( id );
 
 my ($resetfile1, $resetfile2, $resetkey, $numbinds);
 
-sub id {
-	state (%ids, $nextID);
-	$ids{shift()} ||= ++$nextID;
-}
+sub id { state (%ids, $nextID); $ids{shift()} ||= ++$nextID; }
 
 
 sub ColorDefault {
@@ -28,15 +25,12 @@ sub ColorDefault {
 sub Icon {
 	state %Icons;
 	my $iconname = shift;
-	unless ($Icons{$iconname}) {
-		$Icons{$iconname} =
-			Wx::Bitmap->new (
-				Wx::Image->new (
-					"icons/$iconname.png", wxBITMAP_TYPE_ANY, -1,
-				)
-			);
-	}
-	return $Icons{$iconname};
+	return $Icons{$iconname} ||=
+		Wx::Bitmap->new (
+			Wx::Image->new (
+				"icons/$iconname.png", wxBITMAP_TYPE_ANY, -1,
+			)
+		);
 }
 
 1;
@@ -146,46 +140,6 @@ local numbinds = 0
 local progress = 0
 local pbmax = 0
 local conflictbinds
-
-function incProgBar(n)
-	if progressbar then
-		n = n or 1
-		progress = (progress or 0) + n
-		if progress > pbmax then progress = pbmax end
-		progressbar.value = progress
-		iup.Flush()
-		progressdialog.size = nil
-		progressdialog:show()
-	end
-end
-
-function newProgBar(title,barmax,text)
-	pbmax = barmax
-	progressbar = iup.gauge{min=0,max=barmax,value=0,text=text or " "}
-	progressdialog = iup.dialog{progressbar,title=title,maxbox="NO",resize="NO"}
-	progressdialog:show()
-	progress = 0
-end
-
-function setProgBarText(text)
-	progressbar.text = text
-end
-
-function resetProgBar(barmax,text)
-	pbmax = barmax
-	progressbar.value = 0
-	progress = 0
-	progressbar.text=text or " "
-	progressbar.max=barmax
-	iup.Flush()
-end
-
-function delProgBar()
-	progressdialog:hide()
-	progressdialog = nil
-	progressbar = nil
-	cbdlg.bringfront = "YES"
-end
 
 function cbWriteFile(f)
 	local file = assert(io.open(f.filename,f.mode))
@@ -504,7 +458,7 @@ function cbGetBindKey(bkey,desc,profile,label,t,k)
 				if profile.binds_label[curbind.bind] then
 					profile.binds_label[curbind.bind].title = "UNBOUND"
 				end
-				-- if the original key has a visible label indicating it's status, reset it's title.
+				-- if the original key has a visible label indicating its status, reset its title.
 				cbSetDesc(profile,bkey,nil,nil,nil,nil)
 				cbSetDesc(profile,curbind.bind,desc,label,t,k)
 				return curbind.bind
@@ -520,33 +474,6 @@ function cbGetBindKey(bkey,desc,profile,label,t,k)
 		return bkey
 	end
 end
-
---local function dumptable(file,o,depth)
---	depth = depth or 1
---	if type(o) == "number" then
---		file:write(o)
---	elseif type(o) == "string" then
---		file:write(string.format("%q", o))
---	elseif type(o) == "boolean" then
---		if o then file:write("true") else file:write("nil") end
---	elseif type(o) == "table" then
---		file:write("{\n")
---		for k,v in pairs(o) do
---			for i=1,depth do file:write("  ") end
---			file:write("[")
---			dumptable(file,k,0)
---			file:write("] = ")
---			dumptable(file,v,depth+1)
---			file:write(",\n")
---		end
---		for i=2,depth do file:write("  ") end
---		file:write("}")
---	elseif type(o) == "userdata" then
---		file:write("nil") -- because we don't test type til here and we can't serialize userdata.
---	else
---		error("cannot serialize a " .. type(o))
---	end
---end
 
 function profile:saveprofile(saveasnewfile,saveasdefault)
 	cbResolveKeyConflicts(self,true)
@@ -591,100 +518,6 @@ function profile:saveprofile(saveasnewfile,saveasdefault)
 --	end
 end
 
-function cbCheckBoxCB(profile,t,val,cb)
-	return function(_,v)
-		profile.modified = true
-		if v == 1 then
-			t[val] = true
-		else
-			t[val] = nil
-		end
-		if cb then cb() end
-	end
-end
-
-function cbTextBoxCB(profile,t,val,cb)
-	return function(_,c,s)
-		profile.modified = true
-		t[val] = s
-		if cb then cb() end
-		return iup.DEFAULT
-	end
-end
-
-function cbListBoxCB(profile,t,numval,strval,cb)
-	return function(_,str,i,v)
-		profile.modified = true
-		if v == 1 then
-			if numval then
-				t[numval] = i
-			end
-			if strval then
-				t[strval] = str
-			end
-		end
-		if cb then cb() end
-	end
-end
-
-local cbTTip = nil
-function cbToolTip(tip)
-	cbTTip = tip
-end
-
-function cbToggleText(label,togval,txtval,togcb,txtcb,w,h,w2,h2)
-	w = w or 100
-	h = h or 21
-	w2 = w2 or 100
-	h2 = h2 or 21
-	local ttext = iup.text{value = txtval; rastersize = w2.."x"..h2, tip = cbTTip}
-	ttext.action = txtcb
-	if not togval then ttext.active = "NO" end
-
-	local chkval
-	if togval then chkval = "ON" else chkval = "OFF" end
-
-	local ttoggle = iup.toggle{title = label, value = chkval;rastersize = w.."x"..h, tip = cbTTip}
-	ttoggle.action = function(_,v) togcb(_,v) if v == 1 then ttext.active ="YES" else ttext.active="NO" end end
-	cbTTip = nil
-	return iup.hbox{ttoggle,ttext;alignment="ACENTER"}
-end
-
-function cbTextBox(label,val,callback,w,h,w2,h2)
-	w = w or 100
-	h = h or 21
-	w2 = w2 or w
-	h2 = h2 or h
-	local ttext = iup.text{value = val; rastersize = w.."x"..h, tip = cbTTip}
-	ttext.action = callback
-	cbTTip = nil
-	if label then
-		return iup.hbox{iup.label{title = label; rastersize = w2.."x"},ttext;alignment="ACENTER"}, ttext
-	else
-		return ttext
-	end
-end
-
-function cbBindBox(label,t,k,desc,profile,w,h,w2,h2,postcb)
-	local tk = t[k] or "UNBOUND"
-	local val = string.upper(tk)
-	w = w or 100
-	h = h or 21
-	w2 = w2 or 100
-	h2 = h2 or 21
-	desc = desc or label
-	local ttext = iup.label{title = val; rastersize = (w-20).."x"}
-	--ttext.action = callback
-	local tbtn = iup.button{title="..."; rastersize = "20x"..h, tip = cbTTip}
-	tbtn.action = function()
-		ttext.title = cbGetBindKey(t[k],desc,profile,ttext,t,k)
-		if postcb then postcb() end
-		profile.modified = true
-		t[k] = ttext.title
-	end
-	cbTTip = nil
-	return iup.hbox{iup.label{title = label; rastersize = w2.."x"},ttext,tbtn;alignment="ACENTER"}
-end
 
 function cbCheckBind(label,t,k,tgl,desc,profile,w,h,w2,h2,tglcb)
 	local tk = t[k] or "UNBOUND"
@@ -753,85 +586,6 @@ function cbListBox(label,list,numitems,val,callback,w,h,w2,h2,editable)
 	return iup.hbox{iup.label{title = label; rastersize = w2.."x"},tlist;alignment="ACENTER"},tlist
 end
 
-function cbUpdateListBox(listbox,newtable)
-	local k = 1
-	for j,v in ipairs(newtable) do
-		listbox[j] = v
-		k = j + 1
-	end
-	listbox[k] = nil
-	k = k - 1
-	if k > 20 then k = 20 end
-	listbox.visible_items = k
-end
-
-function cbListText(label,list,methodval,txtval,methcb,txtcb,w,h,w2,h2,w3,h3)
-	w = w or 150
-	h = h or 21
-	w2 = w2 or 375
-	h2 = h2 or 21
-	w3 = w3 or 75
-	h3 = h3 or 21
-	local ttext = iup.text{value = txtval; rastersize = w2 .. "x"..h2, tip = cbTTip}
-	ttext.action = txtcb
-
-	local ttable = {}
-	for i = 1,table.getn(list) do ttable[i] = list[i] end
-	ttable.dropdown = "YES"
-	ttable.visible_items = table.getn(list)
-	ttable.value = methodval
-	ttable.rastersize = w3.."x"..h3
-	ttable.tip = "Choose the method used for Chatty feedback for this command."
-	local tmethod = iup.list(ttable)
-	tmethod.action = methcb
-	cbTTip = nil
-	return iup.hbox{iup.label{title=label; rastersize = w.."x"};tmethod;ttext;alignment="ACENTER"}
-end
-
-function cbButton(label,callback,w,h,add)
-	w = w or 200
-	h = h or 21
-	local t = {title = label; rastersize = w.."x"..h, tip = cbTTip}
-	if add then
-		for k,v in pairs(add) do t[k] = v end
-	end
-	local tbtn = iup.button(t)
-	tbtn.action = callback
-	cbTTip = nil
-	return tbtn
-end
-
-function cbCheckBox(label,val,callback,w,h)
-	w = w or 200
-	h = h or 21
-	local chkval
-	if val then chkval = "ON" else chkval = "OFF" end
-	
-	local tchkbox = iup.toggle{title = label, value = chkval;rastersize = w.."x"..h, tip = cbTTip}
-	tchkbox.action = callback
-	cbTTip = nil
-	return tchkbox
-end
-
-function cbDirDlg(profile,label,t,v,title)
-	local w = 100-21
-	local h = 21
-	local val = t[v] or ""
-	local tfilelabel = iup.label{title=val;rastersize=w.."x"}
-	local tdlgbtn = iup.button{title="...";rastersize="21x21";tip=cbTTip}
-	title = title or label
-	tdlgbtn.action = function()
-		local fileDlg = iup.filedlg{dialogtype="DIR",title=title,directory=t[v],allownew="NO"}
-		fileDlg:popup(iup.CURRENT, iup.CURRENT)
-		if fileDlg.status == "0" then
-			t[v] = fileDlg.value
-			tfilelabel.title = fileDlg.value
-		end
-	end
-	cbTTip = nil
-	return iup.hbox{iup.label{title=label; rastersize=(w+21).."x"};tfilelabel;tdlgbtn;alignment="ACENTER"}
-end
-
 function cbPowerList(label,powerlist,t,v,profile,w,h,w2,h2)
 	return cbListBox(label,powerlist,table.getn(powerlist),t[v],
 		function(_,s,i,w)
@@ -873,28 +627,6 @@ function cbTogglePower(label,powerlist,togval,t,v,togcb,profile,w,h,w2,h2)
 	ttoggle.action = function(_,v) togcb(_,v) if v == 1 then tlist.active ="YES" else tlist.active="NO" end end
 	cbTTip = nil
 	return iup.hbox{ttoggle,tlist;alignment="ACENTER"}
-end
-
-function buildColorImage(r,g,b)
-	return iup.image{
-		{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 }, 
-		{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 }, 
-		{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 }, 
-		{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 }, 
-		{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 }, 
-		{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 }, 
-		{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 }, 
-		{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 }, 
-		{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 }, 
-		{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 }, 
-		{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 }, 
-		{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 }, 
-		{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 }, 
-		{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 }, 
-		{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 }, 
-		{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 }, 
-		colors = { r.." "..g.." "..b }
-	}
 end
 
 function cbChatColorOutput(t)
@@ -1042,44 +774,6 @@ function cbImportExportButtons(profile,settings,reloadCB,w,h,w2,h2)
 	return iup.hbox{exportbtn,importbtn}
 end
 
-function cbCleanDlgs(base,dlg)
-	if dlg then
-		if base then
-			base.dialogs[dlg] = nil
-		else
-			dialogs[dlg] = nil
-		end
-	end
-end
-
-function cbShowDialog(dlg,x,y,base,cb)
-	if not base then
-		if x then
-			dlg:showxy(x + mdiClient.x, y + mdiClient.y)
-		else
-			dlg:show()
-		end
-		if cb then
-			dlg.close_cb = function() dialogs[dlg] = nil return cb() end
-		else
-			dlg.close_cb = function() dialogs[dlg] = nil end
-		end
-		dialogs[dlg] = true
-	else
-		if x then
-			dlg:showxy(x + mdiClient.x, y + mdiClient.y)
-		else
-			dlg:show()
-		end
-		if cb then
-			dlg.close_cb = function() base.dialogs[dlg] = nil return cb() end
-		else
-			dlg.close_cb = function() base.dialogs[dlg] = nil end
-		end
-		base.dialogs[dlg] = true
-	end
-end
-
 function cbReloadPowers(t)
 	-- this function loads all the available click powers based on the powerset choices from the profile dialog.
 	-- first start with the basic inherents that everyone can possibly have access to..
@@ -1133,206 +827,3 @@ function cbReloadPowers(t)
 	t.powerset = powerset
 end
 
-function cbNewProfile(name,filename)
-	local t
-	if name == nil then
-		dofile(filename)
-		t = loadup
-		if not t then iup.Message("Error","It appears that the file you chose is either not a CityBinder Profile, or is corrupted or damaged.") return end
-	else
-		if not cbFileExists("default.lua") then
-			cbCopyFile("stddefault.lua","default.lua")
-		end
-		dofile("default.lua")
-		t = loadup
-		t.profile = nil -- make sure we don't have a default filename from earlier versions.
-	end
-	t.primaryset = t.primaryset or 1
-	t.secondaryset = t.secondaryset or 1
-	t.ppset1 = t.ppset1 or 1
-	t.ppset2 = t.ppset2 or 1
-	t.ppset3 = t.ppset3 or 1
-	t.ppset4 = t.ppset4 or 1
-	t.epicset = t.epicset or 1
-
-	setmetatable(t,profile)
-	t.dialogs = {}
-	setmetatable(t.dialogs,dlgs_mt)
-	local dlg = {}
-	
-	cbToolTip("Name your Profile!  This has no effect ingame or out")
-	local tnamehbox = cbTextBox("Profile Name",t.name,function(_,c,v) t.name = v return iup.DEFAULT end)
-	table.insert(dlg,tnamehbox)
-	
-	cbToolTip("This is where your bindfiles will be stored on your computer")
-	--local tbasehbox = cbTextBox("Bind Directory",t.base,function(_,c,v) t.base = v return iup.DEFAULT end)
-	local tbasehbox = cbDirDlg(t,"Bind Directory",t,"base","Bind Directory")
-	table.insert(dlg,tbasehbox)
-	
-	cbToolTip("Select your Character's Primary Powerset")
-	local tprimary,tprimlistbox = cbListBox("Primary",ATPrimaries[t.atnumber],table.getn(ATPrimaries[t.atnumber]),t.primaryset,
-		function(_,str,i,v) t.modified = true if v == 1 then t.primaryset = i cbReloadPowers(t) end end)
-
-	cbToolTip("Select your Character's Secondary Powerset")
-	local tsecondary,tseclistbox = cbListBox("Secondary",ATSecondaries[t.atnumber],table.getn(ATSecondaries[t.atnumber]),t.secondaryset,
-		function(_,str,i,v) t.modified = true if v == 1 then t.secondaryset = i cbReloadPowers(t) end end)
-		
-	cbToolTip("Select your Character's First Power Pool")
-	local tpp1,tpp1listbox = cbListBox("Power Pool 1",ATGeneral[t.atnumber],table.getn(ATGeneral[t.atnumber]),t.ppset1,
-		function(_,str,i,v) t.modified = true if v == 1 then t.ppset1 = i cbReloadPowers(t) end end)
-		
-	cbToolTip("Select your Character's Second Power Pool")
-	local tpp2,tpp2listbox = cbListBox("Power Pool 2",ATGeneral[t.atnumber],table.getn(ATGeneral[t.atnumber]),t.ppset2,
-		function(_,str,i,v) t.modified = true if v == 1 then t.ppset2 = i cbReloadPowers(t) end end)
-		
-	cbToolTip("Select your Character's Third Power Pool")
-	local tpp3,tpp3listbox = cbListBox("Power Pool 3",ATGeneral[t.atnumber],table.getn(ATGeneral[t.atnumber]),t.ppset3,
-		function(_,str,i,v) t.modified = true if v == 1 then t.ppset3 = i cbReloadPowers(t) end end)
-		
-	cbToolTip("Select your Character's Fourth Power Pool")
-	local tpp4,tpp4listbox = cbListBox("Power Pool 4",ATGeneral[t.atnumber],table.getn(ATGeneral[t.atnumber]),t.ppset4,
-		function(_,str,i,v) t.modified = true if v == 1 then t.ppset4 = i cbReloadPowers(t) end end)
-		
-	cbToolTip("Select your Character's Epic/Patron Powerset")
-	local tepic,tepiclistbox = cbListBox("Epic/Patron",ATEpics[t.atnumber],table.getn(ATEpics[t.atnumber]),t.epicset,
-		function(_,str,i,v) t.modified = true if v == 1 then t.epicset = i cbReloadPowers(t) end end)
-		
-	cbToolTip("Select your Character's Archetype")
-	local tathbox = cbListBox("Archetype",{"Blaster","Brute","Controller","Corruptor","Defender","Dominator",
-		"Mastermind","Peacebringer","Scrapper","Stalker","Tanker","Warshade"},12,t.atnumber,
-		function(_,str,i,v)
-			t.modified = true
-			if v == 1 then
-				local kheldswitch = false
-				t.archetype = str
-				if (i == 8 or i == 12) and t.atnumber ~= 8 and t.atnumber ~=12 then
-					kheldswitch = true
-				end
-				if (t.atnumber == 8 or t.atnumber == 12) and i ~= 8 and i ~=12 then
-					kheldswitch = true
-				end
-				t.atnumber = i
-				cbUpdateListBox(tprimlistbox,ATPrimaries[i])
-				--local k = 0
-				--for j,v in pairs(ATPrimaries[i]) do
-					--tprimlistbox[j] = v
-					--k = j + 1
-				--end
-				--tprimlistbox[k] = nil
-				cbUpdateListBox(tseclistbox,ATSecondaries[i])
-				--k = 0
-				--for j,v in pairs(ATSecondaries[i]) do
-					--tseclistbox[j] = v
-					--k = j + 1
-				--end
-				--tseclistbox[k] = nil
-				cbUpdateListBox(tepiclistbox,ATEpics[i])
-				--k = 0
-				--for j,v in pairs(ATEpics[i]) do
-					--tepiclistbox[j] = v
-					--k = j + 1
-				--end
-				--tepiclistbox[k] = nil
-				cbUpdateListBox(tpp1listbox,ATGeneral[i])
-				cbUpdateListBox(tpp2listbox,ATGeneral[i])
-				cbUpdateListBox(tpp3listbox,ATGeneral[i])
-				cbUpdateListBox(tpp4listbox,ATGeneral[i])
-				--k = 0
-				--for j,v in pairs(ATGeneral[i]) do
-					--tpp1listbox[j] = v
-					--tpp2listbox[j] = v
-					--tpp3listbox[j] = v
-					--tpp4listbox[j] = v
-					--k = j + 1
-				--end
-				--tpp1listbox[k] = nil
-				--tpp2listbox[k] = nil
-				--tpp3listbox[k] = nil
-				--tpp4listbox[k] = nil
-				t.primaryset = 1
-				tprimlistbox.value = 1
-				t.secondaryset = 1
-				tseclistbox.value = 1
-				t.epicset = 1
-				tepiclistbox.value = 1
-				if kheldswitch then
-					t.ppset1 = 1
-					t.ppset2 = 1
-					t.ppset3 = 1
-					t.ppset4 = 1
-					tpp1listbox.value = 1
-					tpp2listbox.value = 1
-					tpp3listbox.value = 1
-					tpp4listbox.value = 1
-				end
-				cbReloadPowers(t)
-			end
-		end)
-	table.insert(dlg,tathbox)
-	table.insert(dlg,tprimary)
-	table.insert(dlg,tsecondary)
-	table.insert(dlg,tepic)
-	table.insert(dlg,tpp1)
-	table.insert(dlg,tpp2)
-	table.insert(dlg,tpp3)
-	table.insert(dlg,tpp4)
-	cbReloadPowers(t)
-	
-	cbToolTip("This key is used by certain modules to reset binds")
-	local tresethbox = cbBindBox("Binds Reset Key",t,"ResetKey","Binds Reset Key",t)
-	table.insert(dlg,tresethbox)
-
-	cbToolTip("Check this to Enable feedback when you Reset your Binds")
-	local tresetnotice = cbCheckBox("Enable Reset Feedback Selftell",t.resetnotice,cbCheckBoxCB(t,t,'resetnotice'))
-	table.insert(dlg,tresetnotice)
-	
-	for cat in pairs(cats) do
-	for _,module in pairs(cats[cat]) do
-		local modbtnfunc = module.bindsettings
-		local modbtn = cbButton(module.btnlabel,function(_) modbtnfunc(t) end)
-		table.insert(dlg,modbtn)
-	end
-	end
-	
-	cbToolTip("Click this to save your CityBinder profile for later use and modification")
-	local savebutton = cbButton("Save Profile",function(_) t:saveprofile(false, false) end)
-	table.insert(dlg,savebutton)
-
-	cbToolTip("Click this to save a copy of your CityBinder profile")
-	local savebutton = cbButton("Save Copy Of Profile...",function(_) t:saveprofile(true, false) end)
-	table.insert(dlg,savebutton)
-
-	cbToolTip("Click this to save this CityBinder profile as the default settings for future new profiles")
-	local saveasdefault = cbButton("Save as Default",function(_) t:saveprofile(false,true) end)
-	table.insert(dlg,saveasdefault)
-
-	cbToolTip("Click this to generate your profile's bindfiles")
-	local writebutton = cbButton("Generate Bindfiles",function(_) t:write() end)
-	table.insert(dlg,writebutton)
-
-	profiledlg = iup.dialog{iup.vbox(dlg);title = t.name,maxbox="NO",resize="NO",toolbox="YES",mdichild="YES",mdiclient=mdiClient}
-	cbShowDialog(profiledlg,10,10,nil,function()
-		if t.modified then
-			local i = iup.Alarm("CityBinder","Profile not saved.  Save it now?","Yes","No","Cancel")
-			if i == 3 then
-				return iup.IGNORE
-			elseif i == 1 then
-				t:saveprofile(false, false)
-			end
-		end
-		for k,v in pairs(t.dialogs) do if v then k:hide() end end
-	end)
-	dialogs[t] = t.dialogs
-	return t
-end
-
-function cbAddModule(module,label,category)
-	module.category = category
-	module.label = label
-	module.btnlabel = category .. " : " .. label
-	if cats[category] == nil then
-		cats[category] = {}
-	end
-	cats[category][label] = module
-	mods[category .. ":" .. label] = module
-end
