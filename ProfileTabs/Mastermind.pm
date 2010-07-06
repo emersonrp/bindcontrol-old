@@ -129,12 +129,12 @@ sub new {
 		my $basename = $k->{'basename'};  # all of the fieldnames we look up in the MMP are based on this value
 
 		my $al = Wx::StaticText->new($self, -1, $k->{'label'});
-		my $ab = Wx::Button->    new($self, $basename, $MMP->{$basename});
+		my $ab = Wx::Button->    new($self, Utility::id($basename), $MMP->{$basename});
 
 		my $cl = Wx::StaticText->new($self, -1, "Respond via:");
-		my $cm = Wx::ComboBox->  new($self, "${basename}RespPicker", $MMP->{"${basename}ResponseMethod"},
+		my $cm = Wx::ComboBox->  new($self, Utility::id("${basename}RespPicker"), $MMP->{"${basename}ResponseMethod"},
 				wxDefaultPosition, wxDefaultSize, $ChatOptions, wxCB_READONLY);
-		my $cr = Wx::TextCtrl->  new($self, "${basename}Response",   $MMP->{"${basename}Response"});
+		my $cr = Wx::TextCtrl->  new($self, Utility::id("${basename}Response"),   $MMP->{"${basename}Response"});
 
 		my $tip = $k->{'tooltipdetail'};
 		$ab->SetToolTip( Wx::ToolTip->new("Choose the key combo that will $tip"));
@@ -159,14 +159,14 @@ sub new {
 	my $PetNames = Wx::FlexGridSizer->new(0,5,5,5);
 	for my $PetID (1..6) {
 
-		my $pn = Wx::TextCtrl->new($self,  "Pet${PetID}Name", $MMP->{"Pet${PetID}Name"});
+		my $pn = Wx::TextCtrl->new($self,  Utility::id("Pet${PetID}Name"), $MMP->{"Pet${PetID}Name"});
 		$pn->SetToolTip( Wx::ToolTip->new("Specify Pet ${PetID}'s Name for individual selection") );
 
-		my $cb = Wx::CheckBox->new($self, "Pet${PetID}Bodyguard", "Bodyguard" );
+		my $cb = Wx::CheckBox->new($self, Utility::id("Pet${PetID}Bodyguard"), "Bodyguard" );
 		$cb->SetValue($MMP->{"Pet${PetID}Bodyguard"});
 		$cb->SetToolTip( Wx::ToolTip->new("Select whether pet $PetID acts as Bodyguard") );
 
-		my $bn = Wx::Button->    new($self, "PetSelect$PetID", $MMP->{"PetSelect$PetID"});
+		my $bn = Wx::Button->    new($self, Utility::id("PetSelect$PetID"), $MMP->{"PetSelect$PetID"});
 		$bn->SetToolTip( Wx::ToolTip->new("Choose the Key Combo to Select Pet $PetID"));
 
 		$PetNames->Add( Wx::StaticText->new($self, -1, "Pet ${PetID}'s Name"), 0, wxALIGN_CENTER_VERTICAL);

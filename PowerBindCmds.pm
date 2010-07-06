@@ -8,14 +8,14 @@ use Powerbinder;
 
 sub match1arg {
 	my ($s,$arg1,$arg2match) = @_;
-	$arg2match ||= "(\S*)";
+	$arg2match ||= qr|(\S*)|;
 	if ($s =~ /^$arg1 ($arg2match)/i) { return $1; }
 }
 
 sub match2arg {
 	my ($s,$arg1,$arg2match,$arg3match) = @_;
-	$arg2match ||= "(\S*)";
-	$arg3match ||= "(\S*)";
+	$arg2match ||= qr|(\S*)|;
+	$arg3match ||= qr|(\S*)|;
 	if ($s =~ /^$arg1 ($arg2match) ($arg3match)/i) { return ($1, $2); }
 }
 
@@ -65,7 +65,7 @@ sub matchUsePowerCmd {
 	if ($power) { return {type => "Use Power", method => 3, power => $power} }
 }
 
-Powerbinder::addCmd("Use Power",&newUsePowerCmd,&formUsePowerCmd,&makeUsePowerCmd,&matchUsePowerCmd);
+Powerbinder::addCmd("Use Power",\&newUsePowerCmd,\&formUsePowerCmd,\&makeUsePowerCmd,\&matchUsePowerCmd);
 ################################################################################
 ################################################################################
 sub formCostumeChange {
@@ -94,7 +94,7 @@ sub matchCostumeChange {
 	}
 }
 
-Powerbinder::addCmd("Costume Change",&newCostumeChange,&formCostumeChange,&makeCostumeChange,&matchCostumeChange);
+Powerbinder::addCmd("Costume Change",\&newCostumeChange,\&formCostumeChange,\&makeCostumeChange,\&matchCostumeChange);
 ################################################################################
 
 
@@ -119,7 +119,7 @@ sub matchAFKMessage {
 	if (my $afkmsg = match1arg($s,"afk")) { return {type => "Away From Keyboard", afkmsg => $afkmsg } }
 }
 
-Powerbinder::addCmd("Away From Keyboard",&newAFKMessage,&formAFKMessage,&makeAFKMessage,&matchAFKMessage);
+Powerbinder::addCmd("Away From Keyboard",\&newAFKMessage,\&formAFKMessage,\&makeAFKMessage,\&matchAFKMessage);
 ################################################################################
 
 ################################################################################
@@ -138,7 +138,7 @@ sub matchSGMode {
 	if (lc $s eq "sgmode") { return { type => "SGMode Toggle", nosettings => 1 } }
 }
 
-Powerbinder::addCmd("SGMode Toggle",&newSGMode,&formSGMode,&makeSGMode,&matchSGMode);
+Powerbinder::addCmd("SGMode Toggle",\&newSGMode,\&formSGMode,\&makeSGMode,\&matchSGMode);
 ################################################################################
 
 ################################################################################
@@ -157,7 +157,7 @@ sub matchUnselect {
 	if (lc $s eq "unselect") { return { type => "Unselect", nosettings => 1 } }
 }
 
-Powerbinder::addCmd("Unselect",&newUnselect,&formUnselect,&makeUnselect,&matchUnselect);
+Powerbinder::addCmd("Unselect",\&newUnselect,\&formUnselect,\&makeUnselect,\&matchUnselect);
 ################################################################################
 
 ################################################################################
@@ -186,7 +186,7 @@ sub matchTargetEnemy {
 	};
 }
 
-Powerbinder::addCmd("Target Enemy",&newTargetEnemy,&formTargetEnemy,&makeTargetEnemy,&matchTargetEnemy);
+Powerbinder::addCmd("Target Enemy",\&newTargetEnemy,\&formTargetEnemy,\&makeTargetEnemy,\&matchTargetEnemy);
 ################################################################################
 
 ################################################################################
@@ -215,7 +215,7 @@ sub matchTargetFriend {
 	};
 }
 
-Powerbinder::addCmd("Target Friend",&newTargetFriend,&formTargetFriend,&makeTargetFriend,&matchTargetFriend);
+Powerbinder::addCmd("Target Friend",\&newTargetFriend,\&formTargetFriend,\&makeTargetFriend,\&matchTargetFriend);
 ################################################################################
 
 ################################################################################
@@ -267,7 +267,7 @@ sub matchTargetCustom {
 	return $return;
 }
 
-Powerbinder::addCmd("Target Custom",&newTargetCustom,&formTargetCustom,&makeTargetCustom,&matchTargetCustom);
+Powerbinder::addCmd("Target Custom",\&newTargetCustom,\&formTargetCustom,\&makeTargetCustom,\&matchTargetCustom);
 ################################################################################
 
 ################################################################################
@@ -305,7 +305,7 @@ sub matchPowExecTray {
 	if ($slot and $tray) { return { type => "Use Power From Tray", tray => $tray+3, slot => $slot }; }
 }
 
-Powerbinder::addCmd("Use Power From Tray",&newPowExecTray,&formPowExecTray,&makePowExecTray,&matchPowExecTray);
+Powerbinder::addCmd("Use Power From Tray",\&newPowExecTray,\&formPowExecTray,\&makePowExecTray,\&matchPowExecTray);
 ################################################################################
 
 ################################################################################
@@ -322,7 +322,7 @@ sub makeCustomBind {
 	return $s ? $s->{'custom'} : '';
 }
 
-Powerbinder::addCmd("Custom Bind",&newCustomBind,&formCustomBind,&makeCustomBind);
+Powerbinder::addCmd("Custom Bind",\&newCustomBind,\&formCustomBind,\&makeCustomBind);
 ################################################################################
 
 ################################################################################
@@ -341,7 +341,7 @@ sub makeEmoteBind {
 
 sub matchEmoteBind { if (my $emote = match1arg(shift(),"e|em|me|emote")) { return {type => "Emote",emote => $emote } } }
 
-Powerbinder::addCmd("Emote",&newEmoteBind,&formEmoteBind,&makeEmoteBind,&matchEmoteBind);
+Powerbinder::addCmd("Emote",\&newEmoteBind,\&formEmoteBind,\&makeEmoteBind,\&matchEmoteBind);
 ################################################################################
 
 ################################################################################
@@ -357,7 +357,7 @@ sub makePowerAbort { "powexecabort" }
 
 sub matchPowerAbort { if (lc shift() eq "powexecabort") { return { type => "Power Abort", nosettings => 1 } } }
 
-Powerbinder::addCmd("Power Abort",&newPowerAbort,&formPowerAbort,&makePowerAbort,&matchPowerAbort);
+Powerbinder::addCmd("Power Abort",\&newPowerAbort,\&formPowerAbort,\&makePowerAbort,\&matchPowerAbort);
 ################################################################################
 
 ################################################################################
@@ -373,7 +373,7 @@ sub makePowerUnqueue { "powexecunqueue" }
 
 sub matchPowerUnqueue { if (lc shift() eq "powexecunqueue") { return { type => "Power Unqueue", nosettings => 1 } } }
 
-Powerbinder::addCmd("Power Unqueue",&newPowerUnqueue,&formPowerUnqueue,&makePowerUnqueue,&matchPowerUnqueue);
+Powerbinder::addCmd("Power Unqueue",\&newPowerUnqueue,\&formPowerUnqueue,\&makePowerUnqueue,\&matchPowerUnqueue);
 ################################################################################
 
 ################################################################################
@@ -393,7 +393,7 @@ sub formAutoPower {
 sub newAutoPower { { type => "Auto Power", power => '' } }
 
 sub makeAutoPower {
-	my $s - shift;
+	my $s = shift;
 	return $s ? "powexecauto $s->{'power'}" : '';
 }
 
@@ -403,7 +403,7 @@ sub matchAutoPower {
 		return { type => "Auto Power", power => $power } };
 	}
 
-Powerbinder::addCmd("Auto Power",&newAutoPower,&formAutoPower,&makeAutoPower,&matchAutoPower);
+Powerbinder::addCmd("Auto Power",\&newAutoPower,\&formAutoPower,\&makeAutoPower,\&matchAutoPower);
 ################################################################################
 
 ################################################################################
@@ -420,7 +420,7 @@ sub formInspExecTray {
 sub newInspExecTray { { type => "Use Inspiration From Row/Column", row => 1, col => 1 } }
 
 sub makeInspExecTray {
-	my $t - shift;
+	my $t = shift;
 	if ($t->{'row'} == "1") {
 		return "inspexecslot $t->{'col'}"
 	} else {
@@ -437,7 +437,7 @@ sub matchInspExecTray {
 	if ($col) { return { type => "Use Inspiration From Row/Column", row => 1, col => $col } }
 }
 
-Powerbinder::addCmd("Use Inspiration From Row/Column",&newInspExecTray,&formInspExecTray,&makeInspExecTray,&matchInspExecTray);
+Powerbinder::addCmd("Use Inspiration From Row/Column",\&newInspExecTray,\&formInspExecTray,\&makeInspExecTray,\&matchInspExecTray);
 ################################################################################
 
 ################################################################################
@@ -464,7 +464,7 @@ sub matchInspExecName {
 	}
 }
 
-Powerbinder::addCmd("Use Inspiration By Name",&newInspExecName,&formInspExecName,&makeInspExecName,&matchInspExecName);
+Powerbinder::addCmd("Use Inspiration By Name",\&newInspExecName,\&formInspExecName,\&makeInspExecName,\&matchInspExecName);
 ################################################################################
 
 ################################################################################
@@ -516,7 +516,7 @@ sub matchGlobalChat {
 	if ($channel and $msg) { return { type => "Chat Command (Global)", channel => $channel, msg => $msg } }
 }
 
-Powerbinder::addCmd("Chat Command (Global)",&newGlobalChat,&formGlobalChat,&makeGlobalChat,&matchGlobalChat);
+Powerbinder::addCmd("Chat Command (Global)",\&newGlobalChat,\&formGlobalChat,\&makeGlobalChat,\&matchGlobalChat);
 ################################################################################
 
 ################################################################################
@@ -546,7 +546,7 @@ sub matchWindowToggle {
 	if ($s ~~ @windowlist) { return { type => "Window Toggle", window => $s} }
 }
 
-Powerbinder::addCmd("Window Toggle",&newWindowToggle,&formWindowToggle,&makeWindowToggle,&matchWindowToggle);
+Powerbinder::addCmd("Window Toggle",\&newWindowToggle,\&formWindowToggle,\&makeWindowToggle,\&matchWindowToggle);
 ################################################################################
 
 ################################################################################
@@ -583,7 +583,7 @@ sub matchTeamPetSelect {
 	if ($number) { return { type => "Team/Pet Select", teamsel => 2, number => $number+1 } }
 }
 
-Powerbinder::addCmd("Team/Pet Select",&newTeamPetSelect,&formTeamPetSelect,&makeTeamPetSelect,&matchTeamPetSelect);
+Powerbinder::addCmd("Team/Pet Select",\&newTeamPetSelect,\&formTeamPetSelect,\&makeTeamPetSelect,\&matchTeamPetSelect);
 ################################################################################
 
 ################################################################################
@@ -816,7 +816,7 @@ sub matchChatCommand {
 	}
 }
 
-Powerbinder::addCmd("Chat Command",&newChatCommand,&formChatCommand,&makeChatCommand,&matchChatCommand);
+Powerbinder::addCmd("Chat Command",\&newChatCommand,\&formChatCommand,\&makeChatCommand,\&matchChatCommand);
 
 # chatnogloballimit = {cmdlist={"Emote","Custom Bind","Costume Change","Chat Command"}};
 

@@ -20,7 +20,12 @@ sub new {
 
 	my $profile = $Profile::current;
 	my $petsel = $profile->{'petsel'};
-	unless ($petsel) { $profile->{'petsel'} = $petsel = {}; }
+	unless ($petsel) { $profile->{'petsel'} = $petsel = {
+		selnext => 'UNBOUND',
+		selprev => 'UNBOUND',
+		sizeup => 'UNBOUND',
+		sizedn => 'UNBOUND',
+	}; }
 
 	my $sizer = Wx::FlexGridSizer->new(0,2,4,4);
 

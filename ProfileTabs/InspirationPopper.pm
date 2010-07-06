@@ -46,22 +46,25 @@ sub new {
 
 		for my $order ('', 'Rev') {
 
+
+			my ($KeyPicker, $ColorsCB, $bc, $fc);
+
 			my $RowSet = $order ? $RevInspRows : $InspRows;
 
 			$RowSet->Add ( Wx::StaticText->new($self, -1, "$order $Insp Key"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
 
-			my $KeyPicker =  Wx::Button->    new($self, id("${order}${Insp}Key"), $InspPop->{"${order}${Insp}Key"});
+			$KeyPicker =  Wx::Button->    new($self, id("${order}${Insp}Key"), $InspPop->{"${order}${Insp}Key"});
 			$KeyPicker->SetToolTip( Wx::ToolTip->new("Choose the key combo to activate a $Insp inspiration") );
 			$RowSet->Add ( $KeyPicker, 0, wxEXPAND);
 
 			$RowSet->AddStretchSpacer(wxEXPAND);
 
-			my $ColorsCB = Wx::CheckBox->    new($self, id("${order}${Insp}Colors"), '');
+			$ColorsCB = Wx::CheckBox->    new($self, id("${order}${Insp}Colors"), '');
 			$ColorsCB->SetToolTip( Wx::ToolTip->new("Colorize Inspiration-Popper chat feedback") );
 			$RowSet->Add ( $ColorsCB, 0, wxALIGN_CENTER_VERTICAL);
 
 			$RowSet->Add( Wx::StaticText->new($self, -1, "Border"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
-			my $bc = $InspPop->{"${order}${Insp}Colors"}->{'border'};
+			$bc = $InspPop->{"${order}${Insp}Colors"}->{'border'};
 			$RowSet->Add( Wx::ColourPickerCtrl->new(
 					$self, id("${order}${Insp}BorderColor"),
 					Wx::Colour->new($bc->{'r'}, $bc->{'g'}, $bc->{'b'}),
@@ -70,7 +73,7 @@ sub new {
 			);
 
 			$RowSet->Add( Wx::StaticText->new($self, -1, "Background"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
-			my $bc = $InspPop->{"${order}${Insp}Colors"}->{'background'};
+			$bc = $InspPop->{"${order}${Insp}Colors"}->{'background'};
 			$RowSet->Add( Wx::ColourPickerCtrl->new(
 					$self, id("${order}${Insp}BackgroundColor"),
 					Wx::Colour->new($bc->{'r'}, $bc->{'g'}, $bc->{'b'}),
@@ -78,7 +81,7 @@ sub new {
 				)
 			);
 			$RowSet->Add( Wx::StaticText->new($self, -1, "Text"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
-			my $fc = $InspPop->{"${order}${Insp}Colors"}->{'foreground'};
+			$fc = $InspPop->{"${order}${Insp}Colors"}->{'foreground'};
 			$RowSet->Add( Wx::ColourPickerCtrl->new(
 					$self, id("${order}${Insp}ForegroundColor"),
 					Wx::Colour->new($fc->{'r'}, $fc->{'g'}, $fc->{'b'}),

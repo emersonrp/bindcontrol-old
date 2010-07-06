@@ -105,20 +105,26 @@ sub new {
 	# $SoD->{'TP'}->{'TP'} ||= "Teleport";
 	# $SoD->{'TP'}->{'Num'} ||= 1;
 
-	$SoD->{'Nova'} ||= {};
+	$SoD->{'Nova'} ||= {
+		Nova  => { Name => undef },
+		Dwarf => { Name => undef },
+	};
 	$SoD->{'Nova'}->{'Mode'} ||= "T";
-	$SoD->{'Nova'}->{'PowerTray'} ||= "4";
+	$SoD->{'Nova'}->{'Tray'} ||= "4";
 
-	$SoD->{'Dwarf'} ||= {};
+	$SoD->{'Dwarf'} ||= {
+		Nova  => { Name => undef },
+		Dwarf => { Name => undef },
+	};
 	$SoD->{'Dwarf'}->{'Mode'} ||= "G";
-	$SoD->{'Dwarf'}->{'PowerTray'} ||= "5";
+	$SoD->{'Dwarf'}->{'Tray'} ||= "5";
 
-	if ($profile->{'archetype'} eq "Peacebringer") {
+	if ($profile->{'Archetype'} eq "Peacebringer") {
 		$SoD->{'Nova'}->{'Nova'} = "Bright Nova";
 		$SoD->{'Dwarf'}->{'Dwarf'} = "White Dwarf";
 		$SoD->{'HumanFormShield'} ||= "Shining Shield";
 
-	} elsif ($profile->{'archetype'} eq "Warshade") {
+	} elsif ($profile->{'Archetype'} eq "Warshade") {
 		$SoD->{'Nova'}->{'Nova'} = "Dark Nova";
 		$SoD->{'Dwarf'}->{'Dwarf'} = "Black Dwarf";
 		$SoD->{'HumanFormShield'} ||= "Gravity Shield";
@@ -126,6 +132,7 @@ sub new {
 
 	$SoD->{'Human'} ||= {};
 	$SoD->{'Human'}->{'Mode'}    ||= "UNBOUND";
+	$SoD->{'Human'}->{'Tray'}    ||= "1";
 	$SoD->{'Human'}->{'HumanPBind'} ||= "nop";
 	$SoD->{'Human'}->{'NovaPBind'}  ||= "nop";
 	$SoD->{'Human'}->{'DwarfPBind'} ||= "nop";
@@ -316,7 +323,7 @@ sub new {
 
 	$tempSizer->Add( Wx::StaticText->new($self, -1, "Temp Travel Power Tray"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
 	my $tempTraySpin = Wx::SpinCtrl->new($self, 0, id('TEMP_POWERTRAY'));
-	$tempTraySpin->SetValue($SoD->{'TempTray'});
+	$tempTraySpin->SetValue($SoD->{'Temp'}->{'Tray'});
 	$tempTraySpin->SetRange(1, 10);
 	$tempSizer->Add( $tempTraySpin, 0, wxEXPAND );
 
@@ -331,7 +338,7 @@ sub new {
 
 	$kheldianSizer->Add( Wx::StaticText->new($self, -1, "Nova Powertray"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
 	my $novaTraySpin = Wx::SpinCtrl->new($self, 0, id('KHELD_NOVA_POWERTRAY'));
-	$novaTraySpin->SetValue($SoD->{'TempTray'});
+	$novaTraySpin->SetValue($SoD->{'Nova'}->{'Tray'});
 	$novaTraySpin->SetRange(1, 10);
 	$kheldianSizer->Add( $novaTraySpin, 0, wxEXPAND );
 
@@ -339,7 +346,7 @@ sub new {
 
 	$kheldianSizer->Add( Wx::StaticText->new($self, -1, "Dwarf Powertray"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
 	my $dwarfTraySpin = Wx::SpinCtrl->new($self, 0, id('KHELD_DWARF_POWERTRAY'));
-	$dwarfTraySpin->SetValue($SoD->{'TempTray'});
+	$dwarfTraySpin->SetValue($SoD->{'Dwarf'}->{'Tray'});
 	$dwarfTraySpin->SetRange(1, 10);
 	$kheldianSizer->Add( $dwarfTraySpin, 0, wxEXPAND );
 
@@ -348,7 +355,7 @@ sub new {
 
 	$kheldianSizer->Add( Wx::StaticText->new($self, -1, "Human Powertray"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
 	my $humanTraySpin = Wx::SpinCtrl->new($self, 0, id('KHELD_HUMAN_POWERTRAY'));
-	$humanTraySpin->SetValue($SoD->{'TempTray'});
+	$humanTraySpin->SetValue($SoD->{'Human'}->{'Tray'});
 	$humanTraySpin->SetRange(1, 10);
 	$kheldianSizer->Add( $humanTraySpin, 0, wxEXPAND );
 
@@ -608,7 +615,6 @@ sub makeModeKey {
 
 	my $profile = $params->{'profile'};
 	my $t = $params->{'t'};
-	my $bl = $params->{'bl'};
 	my $curfile = $params->{'curfile'};
 	my $turnon = $params->{'turnon'};
 	my $turnoff = $params->{'turnoff'};
@@ -638,8 +644,6 @@ sub makeModeKey {
 	my $bac = $t->{'bac'};
 	my $lef = $t->{'lef'};
 	my $rig = $t->{'rig'};
-
-	my $blfn = $t->{'blfn'};
 
 	my $dethi = $t->{'detailhi'};
 	my $detlo = $t->{'detaillo'};
@@ -999,7 +1003,7 @@ sub makebind {
 		$t->{'jump'} = "Super Jump";
 	}
 
-	if ($profile->{'archetype'} eq "Peacebringer") {
+	if ($profile->{'Archetype'} eq "Peacebringer") {
 		if ($SoD->{'Fly'}->{'Hover'}) {
 			$t->{'canhov'} = 1;
 			$t->{'canfly'} = 1;
@@ -1011,7 +1015,7 @@ sub makebind {
 			$t->{'hover'} = "Energy Flight";
 			$t->{'flyx'} = "Energy Flight";
 		}
-	 } elsif (not ($profile->{'archetype'} eq "Warshade")) {
+	 } elsif (not ($profile->{'Archetype'} eq "Warshade")) {
 		if ($SoD->{'Fly'}->{'Hover'} and not $SoD->{'Fly'}->{'Fly'}) {
 			$t->{'canhov'} = 1;
 			$t->{'hover'} = "Hover";
@@ -1032,7 +1036,7 @@ sub makebind {
 			if ($SoD->{'TP'}->{'TPHover'}) { $t->{'tphover'} = '$$powexectoggleon Hover' }
 		}
 	}
-	if (($profile->{'archetype'} eq "Peacebringer") and $SoD->{'Fly'}->{'QFly'}) {
+	if (($profile->{'Archetype'} eq "Peacebringer") and $SoD->{'Fly'}->{'QFly'}) {
 		$t->{'canqfly'} = 1;
 	}
 	# if ($SoD->{'Fly'}->{'GFly'}) {
@@ -1383,10 +1387,10 @@ sub makebind {
 	}
 
 	my ($dwarfTPPower, $normalTPPower, $teamTPPower);
-	if ($profile->{'archetype'} eq "Warshade") {
+	if ($profile->{'Archetype'} eq "Warshade") {
 		$dwarfTPPower = "powexecname Black Dwarf Step";
 		$normalTPPower = "powexecname Shadow Step";
-	 } elsif ($profile->{'archetype'} eq "Peacebringer") {
+	 } elsif ($profile->{'Archetype'} eq "Peacebringer") {
 		$dwarfTPPower = "powexecname White Dwarf Step";
 	 } else {
 		$normalTPPower = "powexecname Teleport";
@@ -1400,7 +1404,7 @@ sub makebind {
 		$novapbind = cbPBindToString($SoD->{'Human'}->{'NovaPBind'},$profile);
 		$dwarfpbind = cbPBindToString($SoD->{'Human'}->{'DwarfPBind'},$profile);
 	}
-	if (($profile->{'archetype'} eq "Peacebringer") or ($profile->{'archetype'} eq "Warshade")) {
+	if (($profile->{'Archetype'} eq "Peacebringer") or ($profile->{'Archetype'} eq "Warshade")) {
 		if ($humanBindKey) {
 			$resetfile->SetBind($humanBindKey,$humanpbind);
 		}
@@ -1412,12 +1416,12 @@ sub makebind {
 	my $Dwarf = $SoD->{'Dwarf'};
 
 	if ($Nova and $Nova->{'Enable'}) {
-		$resetfile->SetBind($Nova->{'ModeKey'},'t $name, Changing to '.$Nova->{'Nova'}.' Form$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0'.$t->{'on'}.$Nova->{'Nova'}.'$$gototray '.$Nova->{'PowerTray'}.'$$bindloadfile '.$Profile::basepath."\\nova.txt");
+		$resetfile->SetBind($Nova->{'ModeKey'},'t $name, Changing to '.$Nova->{'Nova'}.' Form$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0'.$t->{'on'}.$Nova->{'Nova'}.'$$gototray '.$Nova->{'Tray'}.'$$bindloadfile '.$Profile::basepath."\\nova.txt");
 
 		my $novafile = BindFile->new($Profile::basepath."\\nova.txt");
 
 		if ($Dwarf and $Dwarf->{'Enable'}) {
-			$novafile->SetBind($Dwarf->{'ModeKey'},'t $name, Changing to '.$Dwarf->{'Dwarf'}.' Form$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0'.$t->{'off'}.$Nova->{'Nova'}.$t->{'on'}.$Dwarf->{'Dwarf'}.'$$gototray '.$Dwarf->{'PowerTray'}.'$$bindloadfile '.$Profile::basepath."\\dwarf.txt");
+			$novafile->SetBind($Dwarf->{'ModeKey'},'t $name, Changing to '.$Dwarf->{'Dwarf'}.' Form$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0'.$t->{'off'}.$Nova->{'Nova'}.$t->{'on'}.$Dwarf->{'Dwarf'}.'$$gototray '.$Dwarf->{'Tray'}.'$$bindloadfile '.$Profile::basepath."\\dwarf.txt");
 		}
 		$humanBindKey ||= $Nova->{'ModeKey'};
 
@@ -1452,10 +1456,10 @@ sub makebind {
 	}
 
 	if ($Dwarf and $Dwarf->{'Enable'}) {
-		$resetfile->SetBind($Dwarf->{'ModeKey'},'t $name, Changing to '.$Dwarf->{'Dwarf'}.' Form$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleon '.$Dwarf->{'Dwarf'}.'$$gototray '.$Dwarf->{'PowerTray'}.'$$bindloadfile '.$Profile::basepath."\\dwarf.txt");
+		$resetfile->SetBind($Dwarf->{'ModeKey'},'t $name, Changing to '.$Dwarf->{'Dwarf'}.' Form$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleon '.$Dwarf->{'Dwarf'}.'$$gototray '.$Dwarf->{'Tray'}.'$$bindloadfile '.$Profile::basepath."\\dwarf.txt");
 		my $dwrffile = BindFile->new($Profile::basepath."\\dwarf.txt");
 		if ($Nova and $Nova->{'Enable'}) {
-			$dwrffile->SetBind($Nova->{'ModeKey'},'t $name, Changing to '.$Nova->{'Nova'}.' Form$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleoff '.$Dwarf->{'Dwarf'}.'$$powexectoggleon '.$Nova->{'Nova'}.'$$gototray '.$Nova->{'PowerTray'}.'$$bindloadfile '.$Profile::basepath."\\nova.txt");
+			$dwrffile->SetBind($Nova->{'ModeKey'},'t $name, Changing to '.$Nova->{'Nova'}.' Form$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleoff '.$Dwarf->{'Dwarf'}.'$$powexectoggleon '.$Nova->{'Nova'}.'$$gototray '.$Nova->{'Tray'}.'$$bindloadfile '.$Profile::basepath."\\nova.txt");
 		}
 
 		$humanBindKey ||= $Dwarf->{'ModeKey'};
@@ -2151,15 +2155,15 @@ sub findconflicts {
 	if ($SoD->{'Fly'}->{'Hover'}
 		or $SoD->{'Fly'}->{'Fly'}) { cbCheckConflict($SoD,"FlyModeKey","Fly Mode Key") }
 	if ($SoD->{'Fly'}->{'QFly'}
-		and ($profile->{'archetype'} eq "Peacebringer")) { cbCheckConflict($SoD,"QFlyModeKey","Q.Fly Mode Key") }
+		and ($profile->{'Archetype'} eq "Peacebringer")) { cbCheckConflict($SoD,"QFlyModeKey","Q.Fly Mode Key") }
 	if ($SoD->{'TP'} and $SoD->{'TP'}->{'Enable'}) {
 		cbCheckConflict($SoD->{'TP'},"ComboKey","TP ComboKey");
 		cbCheckConflict($SoD->{'TP'},"ResetKey","TP ResetKey");
 
 		my $TPQuestion = "Teleport Bind";
-		if ($profile->{'archetype'} eq "Peacebringer") {
+		if ($profile->{'Archetype'} eq "Peacebringer") {
 			$TPQuestion = "Dwarf Step Bind"
-		 } elsif ($profile->{'archetype'} eq "Warshade") {
+		 } elsif ($profile->{'Archetype'} eq "Warshade") {
 			$TPQuestion = "Shd/Dwf Step Bind"
 		}
 		cbCheckConflict($SoD->{'TP'},"BindKey",$TPQuestion)
@@ -2175,20 +2179,16 @@ sub findconflicts {
 		cbCheckConflict($SoD->{'Temp'},"TraySwitch","Tray Toggle Key");
 	}
 
-# XXX XXX XXX
-my ($Nova, $Dwarf);  # where are these supposed to come from?
-# XXX XXX XXX
-
-	if (($profile->{'archetype'} eq "Peacebringer") or ($profile->{'archetype'} eq "Warshade")) {
-		if ($Nova  and $Nova-> {'Enable'}) { cbCheckConflict($Nova,"ModeKey", "Nova Form Bind") }
-		if ($Dwarf and $Dwarf->{'Enable'}) { cbCheckConflict($Dwarf,"ModeKey","Dwarf Form Bind") }
+	if (($profile->{'Archetype'} eq "Peacebringer") or ($profile->{'Archetype'} eq "Warshade")) {
+		if ($SoD->{'Nova'}  and $SoD->{'Nova'}->  {'Enable'}) { cbCheckConflict($SoD->{'Nova'},  "ModeKey","Nova Form Bind") }
+		if ($SoD->{'Dwarf'} and $$soD->{'Dwarf'}->{'Enable'}) { cbCheckConflict($$soD->{'Dwarf'},"ModeKey","Dwarf Form Bind") }
 	}
 }
 
 #  toggleon variation
 sub actPower_toggle {
 	my ($start,$unq,$on,%rest) = @_;
-	my ($s, $traytest,$unq);
+	my ($s, $traytest);
 	if (ref $on) {
 		#  deal with power slot stuff..
 		$traytest = $on->{'trayslot'};
