@@ -2,8 +2,8 @@
 
 use strict;
 
-package ProfileTabs::SoD;
-use parent "ProfileTabs::ProfileTab";
+package Profile::SoD;
+use parent "Profile::ProfileTab";
 
 use Utility qw(id);
 use Wx qw( :everything );
@@ -13,13 +13,11 @@ use constant true => 1;
 
 sub new {
 
-	my ($class, $parent) = @_;
+	my ($class, $profile) = @_;
 
-	my $self = $class->SUPER::new($parent);
+	my $self = $class->SUPER::new($profile);
 
 	$self->{'TabTitle'} = "Speed On Demand";
-
-	my $profile = $Profile::current;
 
 	$profile->{'SoD'} ||= {
 
@@ -189,7 +187,7 @@ sub new {
 	$generalSizer->Add( Wx::ComboBox->new(
 			$self, id('SPRINT_PICKER'), '',
 			wxDefaultPosition, wxDefaultSize,
-			[@Profile::SprintPowers],
+			[@GameData::SprintPowers],
 			wxCB_READONLY,
 		));
 
@@ -397,7 +395,7 @@ sub makeSoDFile {
 	# TODO TODO TODO hmm what?
 	# if $modestr == "QFly" then return end
 
-	my $SoD = $Profile::current->{'SoD'};
+	my $SoD = $profile->{'SoD'};
 	my $curfile;
 
 	# this wants to be $turnoff ||= $mobile, $stationary once we know what those are.  arrays?  hashes?
@@ -961,6 +959,7 @@ sub iupMessage { print STDERR "ZOMG SOMEBODY IMPLEMENT A WARNING DIALOG!!!\n"; }
 
 sub makebind {
 	my $profile = shift;
+
 	my $resetfile = $profile->{'General'}->{'ResetFile'};
 	my $SoD = $profile->{'SoD'};
 
@@ -990,6 +989,7 @@ sub makebind {
 		$SoD->{'Default'} = "NonSoD";
 	}
 
+	# TODO -- make this into an object so it can do shiny things like $t->SpXWASD and $t->path('A')
 	my $t = {
 		sprint => "",
 		speed => "",
@@ -1105,69 +1105,16 @@ sub makebind {
 	my $windowhide = $SoD->{'TP'}->{'HideWindows'} ? '$$windowhide health$$windowhide chat$$windowhide target$$windowhide tray' : '';
 	my $windowshow = $SoD->{'TP'}->{'HideWindows'} ? '$$show health$$show chat$$show target$$show tray' : '';
 
-	for (qw( R F J S N T Q GA AR AF AJ AS GAF AN AT AQ FR FF FJ FS GFF FN FT FQ BO SD GBO GSD )) {
+	for (qw( R F J S N T Q AR AF AJ AS GAF AN AT AQ FR FF FJ FS GFF FN FT FQ BO SD GBO GSD )) {
 
-		my $sdname = 'subdir' . lc $_;
 		my $pathname = 'path' . lc $_;
-		$t->{$sdname} = "$profile->{'General'}->{'BindsDir'}\\$_";
-		$t->{$pathname} = "$t->{$sdname}\\$_";
+		$t->{$pathname} = "$_\\$_";
 		$t->{'bl' . lc $_} = '$$bindloadfile ' . $t->{$pathname};
 
 	}
 
 	# my $turn = "+zoomin$$-zoomin"  # a non functioning bind used only to activate the keydown/keyup functions of +commands;
 	$t->{'turn'} = "+down";  # a non functioning bind used only to activate the keydown/keyup functions of +commands;
-	
-	if ($SoD->{'Base'}) {
-		BindFile::MakeDirectory($t->{'subdirr'});
-		BindFile::MakeDirectory($t->{'subdirar'});
-		BindFile::MakeDirectory($t->{'subdirfr'});
-	}
-
-	if ($t->{'canhov'}+$t->{'canfly'}>0) {
-		BindFile::MakeDirectory($t->{'subdirf'});
-		BindFile::MakeDirectory($t->{'subdiraf'});
-		BindFile::MakeDirectory($t->{'subdirff'});
-		BindFile::MakeDirectory($t->{'subdirbo'});
-	}
-
-	# if ($t->{'canqfly'}>0) {
-		# BindFile::MakeDirectory($t->{'subdirq'});
-		# BindFile::MakeDirectory($t->{'subdiraq'});
-		# BindFile::MakeDirectory($t->{'subdirfq'});
-	# }
-
-	if ($t->{'canjmp'}>0) {
-		BindFile::MakeDirectory($t->{'subdirj'});
-		BindFile::MakeDirectory($t->{'subdiraj'});
-		BindFile::MakeDirectory($t->{'subdirfj'});
-	}
-
-	if ($t->{'canss'}>0) {
-		BindFile::MakeDirectory($t->{'subdirs'});
-		BindFile::MakeDirectory($t->{'subdiras'});
-		BindFile::MakeDirectory($t->{'subdirfs'});
-	}
-	
-	# [[if ($t->{'cangfly'}>0) {
-	#	BindFile::MakeDirectory($t->{'subdirga'});
-	#	BindFile::MakeDirectory($t->{'subdirgaf'});
-	#	BindFile::MakeDirectory($t->{'subdirgff'});
-	#	BindFile::MakeDirectory($t->{'subdirgbo'});
-	#	BindFile::MakeDirectory($t->{'subdirgsd'});
-	#} ]]
-	
-	if ($SoD->{'NonSoD'} or $t->{'canqfly'} > 0) {
-		BindFile::MakeDirectory($t->{'subdirn'});
-		BindFile::MakeDirectory($t->{'subdiran'});
-		BindFile::MakeDirectory($t->{'subdirfn'});
-	}
-	
-	if ($SoD->{'Temp'}->{'Enable'}) {
-		BindFile::MakeDirectory($t->{'subdirt'});
-		BindFile::MakeDirectory($t->{'subdirat'});
-		BindFile::MakeDirectory($t->{'subdirft'});
-	}
 	
 	#  temporarily set $SoD->{'Default'} to "NonSoD"
 	# $SoD->{'Default'} = "Base"
@@ -1242,7 +1189,7 @@ sub makebind {
 									bla => $t->{'blgr'},
 									blf => $t->{'blfr'},
 									path => $t->{'pathr'},
-									pathr => $t->{'pathgr'},
+									pathr => $t->{'pathar'},
 									pathf => $t->{'pathfr'},
 									mobile => $t->{'sprint'},
 									stationary => '',
@@ -1349,7 +1296,7 @@ sub makebind {
 								# });
 								# undef $t->{$SoD->{'Default'}."ModeKey"};
 							# }
-							# [[if ($t->{'cangfly'}>0) {
+							if ($t->{'cangfly'}) {
 								$t->{$SoD->{'Default'}."ModeKey"} = $t->{'GFlyModeKey'};
 								makeSoDFile({
 									profile => $profile,
@@ -1370,7 +1317,7 @@ sub makebind {
 									blsd => $t->{'blgsd'},
 								});
 								undef $t->{$SoD->{'Default'}."ModeKey"};
-							#} ]]
+							}
 							if ($SoD->{'Temp'} and $SoD->{'Temp'}->{'Enable'}) {
 								my $trayslot = "1 ".$SoD->{'Temp'}->{'Tray'};
 								$t->{$SoD->{'Default'}."ModeKey"} = $t->{'TempModeKey'};
@@ -1415,11 +1362,11 @@ sub makebind {
 	if ($SoD->{'TRight'} and uc $SoD->{'TRight'} eq "UNBOUND") { $resetfile->SetBind($SoD->{'TRight'},"+turnright") }
 	
 	if ($SoD->{'Temp'} and $SoD->{'Temp'}->{'Enable'}) {
-		my $temptogglefile1 = BindFile->new($profile->{'General'}->{'BindsDir'}."\\temptoggle1.txt");
-		my $temptogglefile2 = BindFile->new($profile->{'General'}->{'BindsDir'}."\\temptoggle2.txt");
-		$temptogglefile2->SetBind($SoD->{'Temp'}->{'TraySwitch'},'-down$$gototray 1'.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}."\\temptoggle1.txt");
-		$temptogglefile1->SetBind($SoD->{'Temp'}->{'TraySwitch'},'+down$$gototray '.$SoD->{'Temp'}->{'Tray'}.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}."\\temptoggle2.txt");
-		$resetfile->SetBind($SoD->{'Temp'}->{'TraySwitch'},'+down$$gototray '.$SoD->{'Temp'}->{'Tray'}.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}."\\temptoggle2.txt");
+		my $temptogglefile1 = BindFile->new("temptoggle1.txt");
+		my $temptogglefile2 = BindFile->new("temptoggle2.txt");
+		$temptogglefile2->SetBind($SoD->{'Temp'}->{'TraySwitch'},'-down$$gototray 1'.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}."temptoggle1.txt");
+		$temptogglefile1->SetBind($SoD->{'Temp'}->{'TraySwitch'},'+down$$gototray '.$SoD->{'Temp'}->{'Tray'}.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}."temptoggle2.txt");
+		$resetfile->SetBind($SoD->{'Temp'}->{'TraySwitch'},'+down$$gototray '.$SoD->{'Temp'}->{'Tray'}.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}."temptoggle2.txt");
 	}
 
 	my ($dwarfTPPower, $normalTPPower, $teamTPPower);
@@ -1452,18 +1399,18 @@ sub makebind {
 	my $Dwarf = $SoD->{'Dwarf'};
 
 	if ($Nova and $Nova->{'Enable'}) {
-		$resetfile->SetBind($Nova->{'ModeKey'},'t $name, Changing to '.$Nova->{'Nova'}.' Form$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0'.$t->{'on'}.$Nova->{'Nova'}.'$$gototray '.$Nova->{'Tray'}.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}."\\nova.txt");
+		$resetfile->SetBind($Nova->{'ModeKey'},'t $name, Changing to '.$Nova->{'Nova'}.' Form$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0'.$t->{'on'}.$Nova->{'Nova'}.'$$gototray '.$Nova->{'Tray'}.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}."nova.txt");
 
-		my $novafile = BindFile->new($profile->{'General'}->{'BindsDir'}."\\nova.txt");
+		my $novafile = BindFile->new("nova.txt");
 
 		if ($Dwarf and $Dwarf->{'Enable'}) {
-			$novafile->SetBind($Dwarf->{'ModeKey'},'t $name, Changing to '.$Dwarf->{'Dwarf'}.' Form$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0'.$t->{'off'}.$Nova->{'Nova'}.$t->{'on'}.$Dwarf->{'Dwarf'}.'$$gototray '.$Dwarf->{'Tray'}.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}."\\dwarf.txt");
+			$novafile->SetBind($Dwarf->{'ModeKey'},'t $name, Changing to '.$Dwarf->{'Dwarf'}.' Form$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0'.$t->{'off'}.$Nova->{'Nova'}.$t->{'on'}.$Dwarf->{'Dwarf'}.'$$gototray '.$Dwarf->{'Tray'}.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}."dwarf.txt");
 		}
 		$humanBindKey ||= $Nova->{'ModeKey'};
 
 		my $humpower = $SoD->{'UseHumanFormPower'} ? '$$powexectoggleon '.$SoD->{'HumanFormShield'} : '';
 
-		$novafile->SetBind($humanBindKey,'t $name, Changing to Human Form, SoD Mode$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleoff '.$Nova->{'Nova'}.$humpower.'$$gototray 1$$bindloadfile '.$profile->{'General'}->{'BindsDir'}."\\rese$t->{'txt'}");
+		$novafile->SetBind($humanBindKey,'t $name, Changing to Human Form, SoD Mode$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleoff '.$Nova->{'Nova'}.$humpower.'$$gototray 1$$bindloadfile '.$profile->{'General'}->{'BindsDir'}."reset.txt");
 
 		undef $humanBindKey if ($humanBindKey eq $Nova->{'ModeKey'});
 
@@ -1488,20 +1435,20 @@ sub makebind {
 			$novafile->SetBind($SoD->{'TP'}->{'ResetKey'},'nop');
 		}
 		$novafile->SetBind($SoD->{'Follow'},"follow");
-		# $novafile->SetBind($SoD->{'ToggleKey'},'t $name, Changing to Human Form, Normal Mode$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleoff '.$Nova->{'Nova'}.'$$gototray 1$$bindloadfile '.$profile->{'General'}->{'BindsDir'}."\\rese$t->{'txt'}")
+		# $novafile->SetBind($SoD->{'ToggleKey'},'t $name, Changing to Human Form, Normal Mode$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleoff '.$Nova->{'Nova'}.'$$gototray 1$$bindloadfile '.$profile->{'General'}->{'BindsDir'}."reset.txt")
 	}
 
 	if ($Dwarf and $Dwarf->{'Enable'}) {
-		$resetfile->SetBind($Dwarf->{'ModeKey'},'t $name, Changing to '.$Dwarf->{'Dwarf'}.' Form$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleon '.$Dwarf->{'Dwarf'}.'$$gototray '.$Dwarf->{'Tray'}.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}."\\dwarf.txt");
-		my $dwrffile = BindFile->new($profile->{'General'}->{'BindsDir'}."\\dwarf.txt");
+		$resetfile->SetBind($Dwarf->{'ModeKey'},'t $name, Changing to '.$Dwarf->{'Dwarf'}.' Form$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleon '.$Dwarf->{'Dwarf'}.'$$gototray '.$Dwarf->{'Tray'}.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}."dwarf.txt");
+		my $dwrffile = BindFile->new("dwarf.txt");
 		if ($Nova and $Nova->{'Enable'}) {
-			$dwrffile->SetBind($Nova->{'ModeKey'},'t $name, Changing to '.$Nova->{'Nova'}.' Form$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleoff '.$Dwarf->{'Dwarf'}.'$$powexectoggleon '.$Nova->{'Nova'}.'$$gototray '.$Nova->{'Tray'}.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}."\\nova.txt");
+			$dwrffile->SetBind($Nova->{'ModeKey'},'t $name, Changing to '.$Nova->{'Nova'}.' Form$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleoff '.$Dwarf->{'Dwarf'}.'$$powexectoggleon '.$Nova->{'Nova'}.'$$gototray '.$Nova->{'Tray'}.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}."nova.txt");
 		}
 
 		$humanBindKey ||= $Dwarf->{'ModeKey'};
 		my $humpower = $SoD->{'UseHumanFormPower'} ? '$$powexectoggleon '.$SoD->{'HumanFormShield'} : '';
 
-		$dwrffile->SetBind($humanBindKey,'t $name, Changing to Human Form, SoD Mode$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleoff '.$Dwarf->{'Dwarf'}.$humpower.'$$gototray 1$$bindloadfile '.$profile->{'General'}->{'BindsDir'}."\\rese$t->{'txt'}");
+		$dwrffile->SetBind($humanBindKey,'t $name, Changing to Human Form, SoD Mode$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleoff '.$Dwarf->{'Dwarf'}.$humpower.'$$gototray 1$$bindloadfile '.$profile->{'General'}->{'BindsDir'}."reset.txt");
 
 		$dwrffile->SetBind($Dwarf->{'ModeKey'},$dwarfpbind) if ($dwarfpbind);
 		makeQFlyModeKey($profile,$t,"r",$dwrffile,$Dwarf->{'Dwarf'},"Dwarf") if ($t->{'canqfly'});
@@ -1519,22 +1466,22 @@ sub makebind {
 		$dwrffile->SetBind('mousechord "'."+down$$+forward")    if ($SoD->{'MouseChord'});
 
 		if ($SoD->{'TP'} and $SoD->{'TP'}->{'Enable'}) {
-			$dwrffile->SetBind($SoD->{'TP'}->{'ComboKey'},'+down$$'.$dwarfTPPower.$t->{'detaillo'}.$t->{'flycamdist'}.$windowhide.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'\\dtp\\tp_on1.txt');
+			$dwrffile->SetBind($SoD->{'TP'}->{'ComboKey'},'+down$$'.$dwarfTPPower.$t->{'detaillo'}.$t->{'flycamdist'}.$windowhide.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'dtp\\tp_on1.txt');
 			$dwrffile->SetBind($SoD->{'TP'}->{'BindKey'},'nop');
-			$dwrffile->SetBind($SoD->{'TP'}->{'ResetKey'},substr($t->{'detailhi'},2).$t->{'runcamdist'}.$windowshow.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'\\dtp\\tp_off.txt');
+			$dwrffile->SetBind($SoD->{'TP'}->{'ResetKey'},substr($t->{'detailhi'},2).$t->{'runcamdist'}.$windowshow.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'dtp\\tp_off.txt');
 			#  Create tp directory
-			BindFile::MakeDirectory($profile->{'General'}->{'BindsDir'}.'\\dtp');
+			BindFile::MakeDirectory($profile->{'General'}->{'BindsDir'}.'dtp');
 			#  Create tp_off file
-			my $tp_off = BindFile->new($profile->{'General'}->{'BindsDir'}.'\\dtp\\tp_off.txt');
-			$tp_off->SetBind($SoD->{'TP'}->{'ComboKey'},'+down$$'.$dwarfTPPower.$t->{'detaillo'}.$t->{'flycamdist'}.$windowhide.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'\\dtp\\tp_on1.txt');
+			my $tp_off = BindFile->new("dtp\\tp_off.txt");
+			$tp_off->SetBind($SoD->{'TP'}->{'ComboKey'},'+down$$'.$dwarfTPPower.$t->{'detaillo'}.$t->{'flycamdist'}.$windowhide.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'dtp\\tp_on1.txt');
 			$tp_off->SetBind($SoD->{'TP'}->{'BindKey'},'nop');
-			my $tp_on1 = BindFile->new($profile->{'General'}->{'BindsDir'}.'\\dtp\\tp_on1.txt');
-			$tp_on1->SetBind($SoD->{'TP'}->{'ComboKey'},'-down$$powexecunqueue'.$t->{'detailhi'}.$t->{'runcamdist'}.$windowshow.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'\\dtp\\tp_off.txt');
-			$tp_on1->SetBind($SoD->{'TP'}->{'BindKey'},'+down$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'\\dtp\\tp_on2.txt');
-			my $tp_on2 = BindFile->new($profile->{'General'}->{'BindsDir'}.'\\dtp\\tp_on2.txt');
-			$tp_on2->SetBind($SoD->{'TP'}->{'BindKey'},'-down$$'.$dwarfTPPower.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'\\dtp\\tp_on1.txt');
+			my $tp_on1 = BindFile->new("dtp\\tp_on1.txt");
+			$tp_on1->SetBind($SoD->{'TP'}->{'ComboKey'},'-down$$powexecunqueue'.$t->{'detailhi'}.$t->{'runcamdist'}.$windowshow.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'dtp\\tp_off.txt');
+			$tp_on1->SetBind($SoD->{'TP'}->{'BindKey'},'+down$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'dtp\\tp_on2.txt');
+			my $tp_on2 = BindFile->new("dtp\\tp_on2.txt");
+			$tp_on2->SetBind($SoD->{'TP'}->{'BindKey'},'-down$$'.$dwarfTPPower.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'dtp\\tp_on1.txt');
 		}
-		# $dwrffile->SetBind($SoD->{'ToggleKey'},'t $name, Changing to Human Form, Normal Mode$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleoff '.$Dwarf->{'Dwarf'}.'$$gototray 1$$bindloadfile '.$profile->{'General'}->{'BindsDir'}."\\rese$t->{'txt'}");
+		# $dwrffile->SetBind($SoD->{'ToggleKey'},'t $name, Changing to Human Form, Normal Mode$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleoff '.$Dwarf->{'Dwarf'}.'$$gototray 1$$bindloadfile '.$profile->{'General'}->{'BindsDir'}."rese$t->{'txt'}");
 	}
 
 	if ($SoD->{'Jump'}->{'Simple'}) {
@@ -1557,39 +1504,39 @@ sub makebind {
 		if ($t->{'tphover'} eq "") {
 			$tphovermodeswitch = $t->{'blr'}."000000.txt";
 		}
-		$resetfile->SetBind($SoD->{'TP'}->{'ComboKey'},'+down$$'.$normalTPPower.$t->{'detaillo'}.$t->{'flycamdist'}.$windowhide.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'\\tp\\tp_on1.txt');
+		$resetfile->SetBind($SoD->{'TP'}->{'ComboKey'},'+down$$'.$normalTPPower.$t->{'detaillo'}.$t->{'flycamdist'}.$windowhide.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'tp\\tp_on1.txt');
 		$resetfile->SetBind($SoD->{'TP'}->{'BindKey'},'nop');
-		$resetfile->SetBind($SoD->{'TP'}->{'ResetKey'},substr($t->{'detailhi'},2).$t->{'runcamdist'}.$windowshow.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'\\tp\\tp_off.txt'.$tphovermodeswitch);
+		$resetfile->SetBind($SoD->{'TP'}->{'ResetKey'},substr($t->{'detailhi'},2).$t->{'runcamdist'}.$windowshow.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'tp\\tp_off.txt'.$tphovermodeswitch);
 		#  Create tp directory
-		BindFile::MakeDirectory($profile->{'General'}->{'BindsDir'}.'\\tp');
+		BindFile::MakeDirectory($profile->{'General'}->{'BindsDir'}.'tp');
 		#  Create tp_off file
-		my $tp_off = BindFile->new($profile->{'General'}->{'BindsDir'}.'\\tp\\tp_off.txt');
-		$tp_off->SetBind($SoD->{'TP'}->{'ComboKey'},'+down$$'.$normalTPPower.$t->{'detaillo'}.$t->{'flycamdist'}.$windowhide.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'\\tp\\tp_on1.txt');
+		my $tp_off = BindFile->new("tp\\tp_off.txt");
+		$tp_off->SetBind($SoD->{'TP'}->{'ComboKey'},'+down$$'.$normalTPPower.$t->{'detaillo'}.$t->{'flycamdist'}.$windowhide.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'tp\\tp_on1.txt');
 		$tp_off->SetBind($SoD->{'TP'}->{'BindKey'},'nop');
-		my $tp_on1 = BindFile->new($profile->{'General'}->{'BindsDir'}.'\\tp\\tp_on1.txt');
+		my $tp_on1 = BindFile->new("tp\\tp_on1.txt");
 		my $zoomin = $t->{'detailhi'}.$t->{'runcamdist'};
 		if ($t->{'tphover'}) { $zoomin = "" }
-		$tp_on1->SetBind($SoD->{'TP'}->{'ComboKey'},'-down$$powexecunqueue'.$zoomin.$windowshow.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'\\tp\\tp_off.txt'.$tphovermodeswitch);
-		$tp_on1->SetBind($SoD->{'TP'}->{'BindKey'},'+down'.$t->{'tphover'}.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'\\tp\\tp_on2.txt');
-		my $tp_on2 = BindFile->new($profile->{'General'}->{'BindsDir'}.'\\tp\\tp_on2.txt');
-		$tp_on2->SetBind($SoD->{'TP'}->{'BindKey'},'-down$$'.$normalTPPower.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'\\tp\\tp_on1.txt');
+		$tp_on1->SetBind($SoD->{'TP'}->{'ComboKey'},'-down$$powexecunqueue'.$zoomin.$windowshow.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'tp\\tp_off.txt'.$tphovermodeswitch);
+		$tp_on1->SetBind($SoD->{'TP'}->{'BindKey'},'+down'.$t->{'tphover'}.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'tp\\tp_on2.txt');
+		my $tp_on2 = BindFile->new("tp\\tp_on2.txt");
+		$tp_on2->SetBind($SoD->{'TP'}->{'BindKey'},'-down$$'.$normalTPPower.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'tp\\tp_on1.txt');
 	}
 	if ($SoD->{'TTP'} and $SoD->{'TTP'}->{'Enable'} and not ($profile->{'General'}->{'Archetype'} eq "Peacebringer") and $teamTPPower) {
 		my $tphovermodeswitch = "";
-		$resetfile->SetBind($SoD->{'TTP'}->{'ComboKey'},'+down$$'.$teamTPPower.$t->{'detaillo'}.$t->{'flycamdist'}.$windowhide.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'\\ttp\\ttp_on1.txt');
+		$resetfile->SetBind($SoD->{'TTP'}->{'ComboKey'},'+down$$'.$teamTPPower.$t->{'detaillo'}.$t->{'flycamdist'}.$windowhide.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'ttp\\ttp_on1.txt');
 		$resetfile->SetBind($SoD->{'TTP'}->{'BindKey'},'nop');
-		$resetfile->SetBind($SoD->{'TTP'}->{'ResetKey'},substr($t->{'detailhi'},2).$t->{'runcamdist'}.$windowshow.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'\\ttp\\ttp_off.txt'.$tphovermodeswitch);
+		$resetfile->SetBind($SoD->{'TTP'}->{'ResetKey'},substr($t->{'detailhi'},2).$t->{'runcamdist'}.$windowshow.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'ttp\\ttp_off.txt'.$tphovermodeswitch);
 		#  Create tp directory
-		BindFile::MakeDirectory($profile->{'General'}->{'BindsDir'}.'\\ttp');
+		BindFile::MakeDirectory($profile->{'General'}->{'BindsDir'}.'ttp');
 		#  Create tp_off file
-		my $ttp_off = BindFile->new($profile->{'General'}->{'BindsDir'}.'\\ttp\\ttp_off.txt');
-		$ttp_off->SetBind($SoD->{'TTP'}->{'ComboKey'},'+down$$'.$teamTPPower.$t->{'detaillo'}.$t->{'flycamdist'}.$windowhide.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'\\ttp\\ttp_on1.txt');
+		my $ttp_off = BindFile->new("ttp\\ttp_off.txt");
+		$ttp_off->SetBind($SoD->{'TTP'}->{'ComboKey'},'+down$$'.$teamTPPower.$t->{'detaillo'}.$t->{'flycamdist'}.$windowhide.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'ttp\\ttp_on1.txt');
 		$ttp_off->SetBind($SoD->{'TTP'}->{'BindKey'},'nop');
-		my $ttp_on1 = BindFile->new($profile->{'General'}->{'BindsDir'}.'\\ttp\\ttp_on1.txt');
-		$ttp_on1->SetBind($SoD->{'TTP'}->{'ComboKey'},'-down$$powexecunqueue'.$t->{'detailhi'}.$t->{'runcamdist'}.$windowshow.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'\\ttp\\ttp_off.txt'.$tphovermodeswitch);
-		$ttp_on1->SetBind($SoD->{'TTP'}->{'BindKey'},'+down'.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'\\ttp\\ttp_on2.txt');
-		my $ttp_on2 = BindFile->new($profile->{'General'}->{'BindsDir'}.'\\ttp\\ttp_on2.txt');
-		$ttp_on2->SetBind($SoD->{'TTP'}->{'BindKey'},'-down$$'.$teamTPPower.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'\\ttp\\ttp_on1.txt');
+		my $ttp_on1 = BindFile->new("ttp\\ttp_on1.txt");
+		$ttp_on1->SetBind($SoD->{'TTP'}->{'ComboKey'},'-down$$powexecunqueue'.$t->{'detailhi'}.$t->{'runcamdist'}.$windowshow.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'ttp\\ttp_off.txt'.$tphovermodeswitch);
+		$ttp_on1->SetBind($SoD->{'TTP'}->{'BindKey'},'+down'.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'ttp\\ttp_on2.txt');
+		my $ttp_on2 = BindFile->new("ttp\\ttp_on2.txt");
+		$ttp_on2->SetBind($SoD->{'TTP'}->{'BindKey'},'-down$$'.$teamTPPower.'$$bindloadfile '.$profile->{'General'}->{'BindsDir'}.'ttp\\ttp_on1.txt');
 	}
 }
 

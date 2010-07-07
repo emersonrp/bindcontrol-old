@@ -2,8 +2,8 @@
 
 use strict;
 
-package ProfileTabs::PetSel;
-use parent "ProfileTabs::ProfileTab";
+package Profile::PetSel;
+use parent "Profile::ProfileTab";
 
 use Wx qw( :everything );
 
@@ -12,20 +12,19 @@ use Utility qw(id);
 
 sub new {
 
-	my ($class, $parent) = @_;
+	my ($class, $profile) = @_;
 
-	my $self = $class->SUPER::new($parent);
+	my $self = $class->SUPER::new($profile);
 
 	$self->{'TabTitle'} = 'Single Key Pet Selection';
 
-	my $profile = $Profile::current;
-	my $petsel = $profile->{'petsel'};
-	unless ($petsel) { $profile->{'petsel'} = $petsel = {
+	$profile->{'petsel'} ||= {
 		selnext => 'UNBOUND',
 		selprev => 'UNBOUND',
 		sizeup => 'UNBOUND',
 		sizedn => 'UNBOUND',
-	}; }
+	};
+	my $petsel = $profile->{'petsel'};
 
 	my $sizer = Wx::FlexGridSizer->new(0,2,4,4);
 

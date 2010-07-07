@@ -1,72 +1,80 @@
+#!/usr/bin/perl
+
 package Profile;
+use parent -norequire, 'Wx::Notebook';
+
 use strict;
 
-use Utility qw(id);
+our $profile;
 
-# TODO - make this be like blaster/fire or something adequately generic.
-our $default = {
-	General => {
-		Archetype => 'Scrapper',
-		Origin => "Magic",
-		Primary => 'Martial Arts',
-		Secondary => 'Super Reflexes',
-		Epic => 'Weapon Mastery',
-		BindsDir => "c:\\CoH\\",
-		ResetFile => BindFile->new('reset.txt'),
-		ResetKey => 'CTRL-M',
-	},
-};
+# This all used to be auto-detecty-pluginny, but
+# PAR didn't want to package up anything that wasn't
+# explicitly 'use'd.  There's probably a better solution.
+use Profile::BufferBinds;
+use Profile::ComplexBinds;
+use Profile::CustomBinds;
+use Profile::FPSDisplay;
+use Profile::General;
+use Profile::InspirationPopper;
+use Profile::Mastermind;
+use Profile::PetSel;
+use Profile::SimpleBinds;
+use Profile::SoD;
+use Profile::TeamSel;
+use Profile::TeamSel2;
+use Profile::TypingMsg;
 
-# TODO TODO TODO XXX -- eventually "current" should be loaded from a file or something
-our $current = $default;
-# TODO TODO TODO XXX -- eventually "current" should be loaded from a file or something
+sub new {
+	my ($class, $parent) = @_;
 
-sub pickArchetype {
-	my ($self, $event) = @_;
-	$current->{'General'}->{'Archetype'} = $event->GetEventObject->GetValue;
-	fillPickers();
+	my $self = $class->SUPER::new($parent);
+
+	$profile = {};
+
+	# TODO -- here's where we'd load a profile from a file or something.
+
+	# Add the individual tabs, in order.
+	my $tab;
+	$tab = Profile::General->new($self);
+	$self->AddPage( $tab, $tab->{'TabTitle'} );
+
+	$tab = Profile::SoD->new($self);
+	$self->AddPage( $tab, $tab->{'TabTitle'} );
+
+	$tab = Profile::BufferBinds->new($self);
+	$self->AddPage( $tab, $tab->{'TabTitle'} );
+
+	$tab = Profile::ComplexBinds->new($self);
+	$self->AddPage( $tab, $tab->{'TabTitle'} );
+
+	$tab = Profile::CustomBinds->new($self);
+	$self->AddPage( $tab, $tab->{'TabTitle'} );
+
+	$tab = Profile::FPSDisplay->new($self);
+	$self->AddPage( $tab, $tab->{'TabTitle'} );
+
+	$tab = Profile::InspirationPopper->new($self);
+	$self->AddPage( $tab, $tab->{'TabTitle'} );
+
+	$tab = Profile::Mastermind->new($self);
+	$self->AddPage( $tab, $tab->{'TabTitle'} );
+
+	$tab = Profile::PetSel->new($self);
+	$self->AddPage( $tab, $tab->{'TabTitle'} );
+
+	$tab = Profile::SimpleBinds->new($self);
+	$self->AddPage( $tab, $tab->{'TabTitle'} );
+
+	$tab = Profile::TeamSel->new($self);
+	$self->AddPage( $tab, $tab->{'TabTitle'} );
+
+	$tab = Profile::TeamSel2->new($self);
+	$self->AddPage( $tab, $tab->{'TabTitle'} );
+
+	$tab = Profile::TypingMsg->new($self);
+	$self->AddPage( $tab, $tab->{'TabTitle'} );
+
+	return $self;
 }
-
-sub pickOrigin { fillPickers(); }
-
-sub pickPrimaryPowerSet {
-	my ($self, $event) = @_;
-	$current->{'General'}->{'Primary'} = $event->GetEventObject->GetValue;
-	fillPickers();
-}
-
-sub pickSecondaryPowerSet {
-	my ($self, $event) = @_;
-	$current->{'General'}->{'Secondary'} = $event->GetEventObject->GetValue;
-	fillPickers();
-}
-
-
-use Wx 'wxNullBitmap';
-
-sub fillPickers {
-	# my ($self, $event) = @_;
-
-	my $ArchData = $GameData::Archetypes->{$current->{'General'}->{'Archetype'}};
-
-	my $aPicker = Wx::Window::FindWindowById(id('PICKER_ARCHETYPE'));
-	$aPicker->SetStringSelection($current->{'General'}->{'Archetype'});
-
-	my $oPicker = Wx::Window::FindWindowById(id('PICKER_ORIGIN'));
-	$oPicker->SetStringSelection($current->{'General'}->{'Origin'});
-
-	my $pPicker = Wx::Window::FindWindowById(id('PICKER_PRIMARY'));
-	$pPicker->Clear();
-	for (sort keys %{$ArchData->{'Primary'}}) { $pPicker->Append($_, wxNullBitmap); }
-	$pPicker->SetStringSelection($current->{'General'}->{'Primary'});
-
-	my $sPicker = Wx::Window::FindWindowById(id('PICKER_SECONDARY'));
-	$sPicker->Clear();
-	for (sort keys %{$ArchData->{'Secondary'}}) { $sPicker->Append($_, wxNullBitmap); }
-	$sPicker->SetStringSelection($current->{'General'}->{'Secondary'});
-
-}
-
-sub poolPowers { return {} }
 
 1;

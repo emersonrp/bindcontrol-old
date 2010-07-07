@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 # base class for all the individual tabs
-package ProfileTabs::ProfileTab;
+package Profile::ProfileTab;
 
 use strict;
 use Wx qw( :everything );
@@ -19,7 +19,9 @@ sub new {
 	my $class = ref $proto || $proto;
 	my $self = $class->SUPER::new($parent);
 
-	($self->{'TabTitle'} = ref $self) =~ s/ProfileTabs:://;
+	($self->{'TabTitle'} = ref $self) =~ s/Profile:://;
+
+	$self->{'Profile'} = $parent;
 
 	return $self;
 }
@@ -43,6 +45,8 @@ sub help {
 
 	return $self->{'HelpWindow'};
 }
+
+sub profile { shift()->{'Profile'} }
 
 sub HelpText { qq|Help not currently implemented here.|; }
 

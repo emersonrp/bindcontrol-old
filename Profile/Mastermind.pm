@@ -2,8 +2,8 @@
 
 use strict;
 
-package ProfileTabs::Mastermind;
-use parent "ProfileTabs::ProfileTab";
+package Profile::Mastermind;
+use parent "Profile::ProfileTab";
 
 use BindFile;
 
@@ -11,92 +11,88 @@ use Wx qw( :everything );
 
 sub new {
 
-	my ($class, $parent) = @_;
+	my ($class, $profile) = @_;
 
-	my $self = $class->SUPER::new($parent);
-
+	my $self = $class->SUPER::new($profile);
 	$self->{'TabTitle'} = 'Mastermind / Pet Binds';
 
-	my $profile = $Profile::current;
+	$profile->{'MastermindPets'} ||= {
+		Enable => undef,
+
+		PetSelectAll => 'LALT-V',
+		PetSelectAllResponse => 'Orders?',
+		PetSelectAllResponseMethod => 'Petsay',
+
+		PetSelectMinions => 'LALT-Z',
+		PetSelectMinionsResponse => 'Orders?',
+		PetSelectMinionsResponseMethod => 'Petsay',
+
+		PetSelectLieutenants => 'LALT-X',
+		PetSelectLieutenantsResponse => 'Orders?',
+		PetSelectLieutenantsResponseMethod => 'Petsay',
+
+		PetSelectBoss => 'LALT-C',
+		PetSelectBossResponse => 'Orders?',
+		PetSelectBossResponseMethod => 'Petsay',
+
+		PetBodyguard => 'LALT-G',
+		PetBodyguardResponse => 'Bodyguarding.',
+		PetBodyguardResponseMethod => 'Petsay',
+
+		PetAggressive => 'LALT-A',
+		PetAggressiveResponse => 'Kill On Sight.',
+		PetAggressiveResponseMethod => 'Petsay',
+
+		PetDefensive => 'LALT-S',
+		PetDefensiveResponse => 'Return Fire Only.',
+		PetDefensiveResponseMethod => 'Petsay',
+
+		PetPassive => 'LALT-D',
+		PetPassiveResponse => 'At Ease.',
+		PetPassiveResponseMethod => 'Petsay',
+
+		PetAttack => 'LALT-Q',
+		PetAttackResponse => 'Open Fire!',
+		PetAttackResponseMethod => 'Petsay',
+
+		PetFollow => 'LALT-W',
+		PetFollowResponse => 'Falling In.',
+		PetFollowResponseMethod => 'Petsay',
+
+		PetStay => 'LALT-E',
+		PetStayResponse => 'Holding This Position',
+		PetStayResponseMethod => 'Petsay',
+
+		PetGoto => 'LALT-LBUTTON',
+		PetGotoResponse => 'Moving To Checkpoint.',
+		PetGotoResponseMethod => 'Petsay',
+
+		PetBodyguardMode => 1,
+		PetBodyguardAttack => '',
+		PetBodyguardGoto => '',
+
+		PetChatToggle => 'LALT-M',
+		PetSelect1 => 'F1',
+		PetSelect2 => 'F2',
+		PetSelect3 => 'F3',
+		PetSelect4 => 'F4',
+		PetSelect5 => 'F5',
+		PetSelect6 => 'F6',
+
+		Pet1Name => 'Crow T Robot',
+		Pet2Name => 'Tom Servo',
+		Pet3Name => 'Cambot',
+		Pet4Name => 'Gypsy',
+		Pet5Name => 'Mike',
+		Pet6Name => 'Joel',
+
+		Pet2Bodyguard => 1,
+		Pet5Bodyguard => 1,
+
+	};
+
 	my $MMP = $profile->{'MastermindPets'};
 
-	unless ($MMP) {
-		$MMP = {
-			Enable => undef,
-
-			PetSelectAll => 'LALT-V',
-			PetSelectAllResponse => 'Orders?',
-			PetSelectAllResponseMethod => 'Petsay',
-
-			PetSelectMinions => 'LALT-Z',
-			PetSelectMinionsResponse => 'Orders?',
-			PetSelectMinionsResponseMethod => 'Petsay',
-
-			PetSelectLieutenants => 'LALT-X',
-			PetSelectLieutenantsResponse => 'Orders?',
-			PetSelectLieutenantsResponseMethod => 'Petsay',
-
-			PetSelectBoss => 'LALT-C',
-			PetSelectBossResponse => 'Orders?',
-			PetSelectBossResponseMethod => 'Petsay',
-
-			PetBodyguard => 'LALT-G',
-			PetBodyguardResponse => 'Bodyguarding.',
-			PetBodyguardResponseMethod => 'Petsay',
-
-			PetAggressive => 'LALT-A',
-			PetAggressiveResponse => 'Kill On Sight.',
-			PetAggressiveResponseMethod => 'Petsay',
-
-			PetDefensive => 'LALT-S',
-			PetDefensiveResponse => 'Return Fire Only.',
-			PetDefensiveResponseMethod => 'Petsay',
-
-			PetPassive => 'LALT-D',
-			PetPassiveResponse => 'At Ease.',
-			PetPassiveResponseMethod => 'Petsay',
-
-			PetAttack => 'LALT-Q',
-			PetAttackResponse => 'Open Fire!',
-			PetAttackResponseMethod => 'Petsay',
-
-			PetFollow => 'LALT-W',
-			PetFollowResponse => 'Falling In.',
-			PetFollowResponseMethod => 'Petsay',
-
-			PetStay => 'LALT-E',
-			PetStayResponse => 'Holding This Position',
-			PetStayResponseMethod => 'Petsay',
-
-			PetGoto => 'LALT-LBUTTON',
-			PetGotoResponse => 'Moving To Checkpoint.',
-			PetGotoResponseMethod => 'Petsay',
-
-			PetBodyguardMode => 1,
-			PetBodyguardAttack => '',
-			PetBodyguardGoto => '',
-
-			PetChatToggle => 'LALT-M',
-			PetSelect1 => 'F1',
-			PetSelect2 => 'F2',
-			PetSelect3 => 'F3',
-			PetSelect4 => 'F4',
-			PetSelect5 => 'F5',
-			PetSelect6 => 'F6',
-
-			Pet1Name => 'Crow T Robot',
-			Pet2Name => 'Tom Servo',
-			Pet3Name => 'Cambot',
-			Pet4Name => 'Gypsy',
-			Pet5Name => 'Mike',
-			Pet6Name => 'Joel',
-
-			Pet2Bodyguard => 1,
-			Pet5Bodyguard => 1,
-
-		};
-		$profile->{'MastermindPets'} = $MMP;
-	}
 	if ($profile->{'General'}->{'Archetype'} eq "Mastermind") {
 		# TODO "GameData::ATPrimaries" can probably be replaced with nice hashes.
 		$MMP->{'Primary'} = $Gamedata::ATPrimaries[$profile->{'atnumber'}][$profile->{'primaryset'}];

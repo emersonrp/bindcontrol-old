@@ -4,8 +4,8 @@ use strict;
 
 use BindFile;
 
-package ProfileTabs::ComplexBinds;
-use parent "ProfileTabs::ProfileTab";
+package Profile::ComplexBinds;
+use parent "Profile::ProfileTab";
 
 sub addCBind {
 	my ($cbinds,$n,$profile) = @_;

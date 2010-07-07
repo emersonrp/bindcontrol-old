@@ -2,8 +2,8 @@
 
 use strict;
 
-package ProfileTabs::BufferBinds;
-use parent "ProfileTabs::ProfileTab";
+package Profile::BufferBinds;
+use parent "Profile::ProfileTab";
 
 use BindFile;
 

@@ -2,8 +2,8 @@
 
 use strict;
 
-package ProfileTabs::SimpleBinds;
-use parent "ProfileTabs::ProfileTab";
+package Profile::SimpleBinds;
+use parent "Profile::ProfileTab";
 
 sub addSBind {
 #	my (sbinds,n,profile) #  this returns an IUP vbox/hbox to be inserted into the SBind Dialog box

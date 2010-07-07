@@ -2,32 +2,26 @@
 
 use strict;
 
-package ProfileTabs::FPSDisplay;
-use parent "ProfileTabs::ProfileTab";
+package Profile::FPSDisplay;
+use parent "Profile::ProfileTab";
 
 use Wx qw( :everything );
 
 use Utility qw(id);
 
-
-
 sub new {
 
-	my ($class, $parent) = @_;
+	my ($class, $profile) = @_;
 
-	my $self = $class->SUPER::new($parent);
+	my $self = $class->SUPER::new($profile);
 
 	$self->{'TabTitle'} = "FPS / Netgraph";
 
-	my $profile = $Profile::current;
+	$profile->{'FPS'} ||= {
+		Enable => 1,
+		Bindkey => "P",
+	};
 	my $FPS = $profile->{'FPS'};
-	unless ($FPS) {
-		$FPS = {
-			Enable => undef,
-			Bindkey => "P",
-		};
-		$profile->{'FPS'} = $FPS;
-	}
 
 	my $sizer = Wx::BoxSizer->new(wxVERTICAL);
 

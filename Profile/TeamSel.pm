@@ -2,8 +2,8 @@
 
 use strict;
 
-package ProfileTabs::TeamSel;
-use parent "ProfileTabs::ProfileTab";
+package Profile::TeamSel;
+use parent "Profile::ProfileTab";
 
 use BindFile;
 
@@ -12,20 +12,17 @@ use Wx qw( :everything );
 use Wx::Event qw(EVT_BUTTON);
 use Utility qw(id);
 
-
 sub new {
 
-	my ($class, $parent) = @_;
+	my ($class, $profile) = @_;
 
-	my $self = $class->SUPER::new($parent);
+	my $self = $class->SUPER::new($profile);
 
 	$self->{'TabTitle'} = 'One-Key Team/Pet Select';
 
-	my $profile = $Profile::current;
+	$profile->{'TeamSelect'} ||= {};
 	my $TeamSelect = $profile->{'TeamSelect'};
-	unless ($TeamSelect) {
-		$profile->{'TeamSelect'} = $TeamSelect = {};
-	}
+
 	$TeamSelect->{'mode'} ||= 1;
 	for (1..8) { $TeamSelect->{"sel$_"} ||= 'UNBOUND' }
 

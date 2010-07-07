@@ -9,15 +9,12 @@ my %BindFiles; # keep all created objects here so we can iterate them when it's 
 
 sub new {
 	my ($proto, $filename) = @_;
-
+print STDERR Data::Dumper::Dumper [caller()] if $filename !~ /CoHTest/; 
 	unless ($BindFiles{$filename}) {
 
 		my $class = ref $proto || $proto;
 
-		my $self = {
-			filename => $filename, # TODO - want to be all File::Spec crossplatformy.
-			binds => {},
-		};
+		my $self = {};
 
 		bless $self, $class;
 
@@ -25,14 +22,13 @@ sub new {
 	}
 
 	return $BindFiles{$filename};
-
 }
 
 sub SetBind {
 	my ($self,$key,$bindtext) = @_;
 	if (not $key)  {
 		my @c = caller();
-		$key = ''; print STDERR "invalid key: $key, bindtext $bindtext from file $c[1] line $c[2]\n" and return;
+		# $key = ''; print STDERR "invalid key: $key, bindtext $bindtext from file $c[1] line $c[2]\n" and return;
 	}
 
 	$bindtext =~ s/^ +//;
@@ -43,21 +39,38 @@ sub SetBind {
 		# $resetfile2->{'binds'}->{$key} = $s;
 	# }
 
-	$self->{'binds'}->{$key} = $bindtext;
+	$self->{$key} = $bindtext;
 }
 
-sub BaseReset { '$$bind_load_file' . $Profile::current->{'General'}->{'BindsDir'} . "\\subreset.txt"; }
+sub BaseReset {
+	my $profile = shift;
+	return '$$bind_load_file' . $profile->{'General'}->{'BindsDir'} . "\\subreset.txt";
+}
 
 sub WriteBindFiles {
+	my ($target, $event) = @_;
 
-# TODO this needs to happen not-here.
-ProfileTabs::SoD::makebind($Profile::current);
+	my $profile = $target->profile;
+
+# TODO this wants not to happen here, this is just for testing.
+Profile::SoD::makebind($profile);
 
 	while (my ($filename, $binds) = each %BindFiles) {
-		# print STDERR "Found filename $filename\n";
+
+		print STDERR "Found filename $filename... \n";
+
+		my ($v, $d, $f) = File::Spec->splitpath( $filename );
+		$d = File::Spec->catdir( $profile->{'General'}->{'BindsDir'}, $d );
+		my $newpath = File::Spec->catpath( $v, $d, '' );
+		if ( ! -d $newpath ) {
+			File::Path::make_path( $newpath, {verbose=>1} ) or warn "can't make dir $newpath: $!";
+		}
+		my $fullname = File::Spec->catpath( $v, $d, $f );
+		open (my $fh, '>', $fullname ) or warn "can't write to $fullname: $!";
+		for my $k (sort keys %$binds) {
+			print $fh qq|$k "$binds->{$k}"\n|;
+		}
 	}
 }
-
-sub MakeDirectory { File::Path::make_path(@_); }
 
 1;

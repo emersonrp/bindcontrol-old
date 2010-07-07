@@ -7,11 +7,13 @@ use Data::Dumper;
 use Wx::Perl::Packager;
 
 use About;
-use ProfileTabs;
+use Profile;
 use StdDefault;
 
 use Powerbinder;
 use PowerBindCmds;
+
+our $profile;
 
 BCApp->new->MainLoop;
 
@@ -99,8 +101,8 @@ sub new {
 
 # TODO TODO TODO -- remove this once we actually start making and saving profiles
 	my $sizer = Wx::BoxSizer->new(Wx::wxVERTICAL);
-	my $profileTabs = ProfileTabs->new($self);
-	$sizer->Add($profileTabs, 1, wxEXPAND |  wxALL, 3);
+	my $profile = Profile->new($self);
+	$sizer->Add($profile, 1, wxEXPAND |  wxALL, 3);
 	$self->SetSizerAndFit($sizer);
 # TODO TODO TODO
 

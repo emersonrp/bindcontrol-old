@@ -2,8 +2,8 @@
 
 use strict;
 
-package ProfileTabs::InspirationPopper;
-use parent "ProfileTabs::ProfileTab";
+package Profile::InspirationPopper;
+use parent "Profile::ProfileTab";
 
 use Wx qw( :everything );
 
@@ -11,27 +11,23 @@ use Utility qw(id);
 
 sub new {
 
-	my ($class, $parent) = @_;
+	my ($class, $profile) = @_;
 
-	my $self = $class->SUPER::new($parent);
+	my $self = $class->SUPER::new($profile);
 
 	$self->{'TabTitle'} = 'Inspiration Popper';
 
-	my $profile = $Profile::current;
+	$profile->{'InspPop'} ||= {
+		Enable => undef,
+		AccuracyKey     => "LSHIFT+A",
+		HealthKey       => "LSHIFT+S",
+		DamageKey       => "LSHIFT+D",
+		EnduranceKey    => "LSHIFT+Q",
+		DefenseKey      => "LSHIFT+W",
+		BreakFreeKey    => "LSHIFT+E",
+		ResistDamageKey => "LSHIFT+SPACE",
+	};
 	my $InspPop = $profile->{'InspPop'};
-	unless ($InspPop) {
-		$InspPop = {
-			Enable => undef,
-			AccuracyKey     => "LSHIFT+A",
-			HealthKey       => "LSHIFT+S",
-			DamageKey       => "LSHIFT+D",
-			EnduranceKey    => "LSHIFT+Q",
-			DefenseKey      => "LSHIFT+W",
-			BreakFreeKey    => "LSHIFT+E",
-			ResistDamageKey => "LSHIFT+SPACE",
-		};
-		$profile->{'InspPop'} = $InspPop;
-	}
 
 	my $sizer = Wx::BoxSizer->new(wxVERTICAL);
 
@@ -109,9 +105,10 @@ sub new {
 }
 
 sub makebind {
-	my $profile = $Profile::current;
-	my $resetfile = $profile->{'resetfile'};
-	my $InspPop = $profile->{'InspPop'};
+	my $profile = shift;
+
+	my $resetfile = $profile->{'General'}->{'ResetFile'};
+	my $InspPop   = $profile->{'InspPop'};
 
 	for my $Insp (sort keys %GameData::Inspirations) {
 

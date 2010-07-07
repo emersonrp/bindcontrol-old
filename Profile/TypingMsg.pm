@@ -2,8 +2,8 @@
 
 use strict;
 
-package ProfileTabs::TypingMsg;
-use parent "ProfileTabs::ProfileTab";
+package Profile::TypingMsg;
+use parent "Profile::ProfileTab";
 
 use Wx qw( :everything );
 
@@ -13,19 +13,15 @@ my $Typingnotifierlimit = { cmdlist => ["Away From Keyboard","Emote"] };
 
 sub new {
 
-	my ($class, $parent) = @_;
+	my ($class, $profile) = @_;
 
-	my $self = $class->SUPER::new($parent);
+	my $self = $class->SUPER::new($profile);
 
 	$self->{'TabTitle'} = 'Typing Message';
 
-	my $profile = $Profile::current;
-
+	$profile->{'Typing'} ||= { Enable => undef };
 	my $Typing = $profile->{'Typing'};
-	unless ($Typing) {
-		$profile->{'Typing'} = $Typing = { Enable => undef };
-		# $Typing->{'Message'} = "Typing...";
-	}
+
 	$Typing->{'Message'} &&= "afk $Typing->{'Message'}";
 	$Typing->{'StartChat'}  ||= "ENTER";
 	$Typing->{'SlashChat1'} ||= "/";

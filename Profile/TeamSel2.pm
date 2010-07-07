@@ -2,8 +2,8 @@
 
 use strict;
 
-package ProfileTabs::TeamSel2;
-use parent "ProfileTabs::ProfileTab";
+package Profile::TeamSel2;
+use parent "Profile::ProfileTab";
 
 sub bindsettings {
 	my ($profile) = @_;
