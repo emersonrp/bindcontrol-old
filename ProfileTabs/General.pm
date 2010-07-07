@@ -79,7 +79,7 @@ sub new {
 			wxDIRP_USE_TEXTCTRL|wxALL,
 		), 0, wxALL|wxEXPAND,);
 
-	$self->addLabeledButton($topSizer, 'Reset Key', '', 'This key is used by certain modules to reset binds to a sane state.');
+	$self->addLabeledButton($topSizer, 'Reset Key', $general->{'ResetKey'}, 'This key is used by certain modules to reset binds to a sane state.');
 
 	$topSizer->Add ( Wx::CheckBox->new($self, id('Enable Reset Feedback'), 'Enable Reset Feedback'), 0, wxALL);
 	$topSizer->AddSpacer(5);

@@ -49,7 +49,6 @@ sub HelpText { qq|Help not currently implemented here.|; }
 sub addLabeledButton {
     my ($self, $sizer, $label, $value, $tooltip) = @_;
 
-
     my $button = Wx::Button->new($self, Utility::id($label), $value);
     $button->SetToolTip( Wx::ToolTip->new($tooltip)) if $tooltip;
 

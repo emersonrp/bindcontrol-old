@@ -35,6 +35,7 @@ sub new {
 
 		RunMode => "C",
 		FlyMode => "F",
+		SSMode => 'UNBOUND',
 		AutoRun => "R",
 		Follow => "TILDE",
 		Run => {
@@ -432,7 +433,7 @@ sub makeSoDFile {
 		#  blast off
 		my $curfile = BindFile->new($pathbo . SpXWSAD($t) . ".txt");
 
-		sodResetKey($curfile,$profile,$path,actPower_toggle(undef,true,$stationary,$mobile));
+		sodResetKey($curfile,$profile,$path,actPower_toggle(undef,true,$stationary,$mobile),'');
 
 		sodUpKey     ($t,$blbo,$curfile,$SoD,$mobile,$stationary,$flight,'','',"bo",$sssj);
 		sodDownKey   ($t,$blbo,$curfile,$SoD,$mobile,$stationary,$flight,'','',"bo",$sssj);
@@ -483,7 +484,7 @@ sub makeSoDFile {
 
 		# $curfile = BindFile->new($pathsd . SpXWSAD($t) . ".txt");
 
-		sodResetKey($curfile,$profile,$path,actPower_toggle(undef,true,$stationary,$mobile));
+		sodResetKey($curfile,$profile,$path,actPower_toggle(undef,true,$stationary,$mobile),'');
 
 		sodUpKey     ($t,$blsd,$curfile,$SoD,$mobile,$stationary,$flight,'','',"sd",$sssj);
 		sodDownKey   ($t,$blsd,$curfile,$SoD,$mobile,$stationary,$flight,'','',"sd",$sssj);
@@ -505,7 +506,7 @@ sub makeSoDFile {
 
 	$curfile = BindFile->new($path . SpXWSAD($t) . ".txt");
 
-	sodResetKey($curfile,$profile,$path,actPower_toggle(undef,true,$stationary,$mobile));
+	sodResetKey($curfile,$profile,$path,actPower_toggle(undef,true,$stationary,$mobile),'');
 
 	sodUpKey     ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,'','','',$sssj);
 	sodDownKey   ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,'','','',$sssj);
@@ -547,7 +548,7 @@ sub makeSoDFile {
 # AutoRun Binds
 	$curfile = BindFile->new($pathr . SpXWSAD($t) . ".txt");
 
-	sodResetKey($curfile,$profile,$path,actPower_toggle(undef,true,$stationary,$mobile));
+	sodResetKey($curfile,$profile,$path,actPower_toggle(undef,true,$stationary,$mobile),'');
 
 	sodUpKey     ($t,$bla,$curfile,$SoD,$mobile,$stationary,$flight,true,'','',$sssj);
 	sodDownKey   ($t,$bla,$curfile,$SoD,$mobile,$stationary,$flight,true,'','',$sssj);
@@ -572,12 +573,12 @@ sub makeSoDFile {
 
 	sodAutoRunOffKey($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight);
 
-	$curfile->SetBind($SoD->{'FollowKey'},'nop');
+	$curfile->SetBind($SoD->{'Follow'},'nop');
 
 # FollowRun Binds
 	$curfile = BindFile->new($pathf . SpXWSAD($t) . ".txt");
 
-   	sodResetKey($curfile,$profile,$path,actPower_toggle(undef,true,$stationary,$mobile));
+   	sodResetKey($curfile,$profile,$path,actPower_toggle(undef,true,$stationary,$mobile),'');
    
    	sodUpKey     ($t,$blf,$curfile,$SoD,$mobile,$stationary,$flight,'',$bl,'',$sssj);
    	sodDownKey   ($t,$blf,$curfile,$SoD,$mobile,$stationary,$flight,'',$bl,'',$sssj);
@@ -600,7 +601,7 @@ sub makeSoDFile {
    	if ($modestr eq "Temp")       { makeTempModeKey  ($profile,$t,"fr",$curfile,$turnoff,$path); }
    	if ($modestr eq "QFly")       { makeQFlyModeKey  ($profile,$t,"fr",$curfile,$turnoff,$modestr); }
 
-   	$curfile->SetBind($SoD->{'AutoRunKey'},'nop');
+   	$curfile->SetBind($SoD->{'AutoRun'},'nop');
 
    	sodFollowOffKey($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight);
 }
@@ -642,7 +643,7 @@ sub makeQFlyModeKey  {
 sub makeModeKey {
 	my $params = shift;
 
-	my $keytype = $params->{'keytype'};
+	my $keytype = $params->{'keytype'} || '';
 
 	my $profile = $params->{'profile'};
 	my $t = $params->{'t'};
@@ -1226,6 +1227,8 @@ sub makebind {
 									path => $t->{'pathn'},
 									pathr => $t->{'pathan'},
 									pathf => $t->{'pathfn'},
+									mobile => '',
+									stationary => '',
 									modestr => "NonSoD",
 								});
 								undef $t->{$SoD->{'Default'}."ModeKey"};
@@ -1242,11 +1245,12 @@ sub makebind {
 									pathr => $t->{'pathgr'},
 									pathf => $t->{'pathfr'},
 									mobile => $t->{'sprint'},
+									stationary => '',
 									modestr => "Base",
 								});
 								undef $t->{$SoD->{'Default'}."ModeKey"};
 							}
-							if ($t->{'canss'}>0) {
+							if ($t->{'canss'}) {
 								$t->{$SoD->{'Default'}."ModeKey"} = $t->{'RunModeKey'};
 								my $sssj;
 								if ($SoD->{'SS'}->{'SSSJMode'}) { $sssj = $t->{'jump'} }
@@ -1261,6 +1265,7 @@ sub makebind {
 										pathr => $t->{'pathas'},
 										pathf => $t->{'pathfs'},
 										mobile => $t->{'speed'},
+										stationary => '',
 										modestr => "Run",
 										sssj => $sssj,
 									});
@@ -1472,7 +1477,7 @@ sub makebind {
 		$novafile->SetBind($SoD->{'Back'},"+backward");
 		$novafile->SetBind($SoD->{'Up'},"+up");
 		$novafile->SetBind($SoD->{'Down'},"+down");
-		$novafile->SetBind($SoD->{'AutoRunKey'},"++forward");
+		$novafile->SetBind($SoD->{'AutoRun'},"++forward");
 		$novafile->SetBind($SoD->{'FlyModeKey'},'nop');
 		$novafile->SetBind($SoD->{'RunModeKey'},'nop')          if ($SoD->{'FlyModeKey'} ne $SoD->{'RunModeKey'});
 		$novafile->SetBind('mousechord "'."+down$$+forward")    if ($SoD->{'MouseChord'});
@@ -1482,7 +1487,7 @@ sub makebind {
 			$novafile->SetBind($SoD->{'TP'}->{'BindKey'},'nop');
 			$novafile->SetBind($SoD->{'TP'}->{'ResetKey'},'nop');
 		}
-		$novafile->SetBind($SoD->{'FollowKey'},"follow");
+		$novafile->SetBind($SoD->{'Follow'},"follow");
 		# $novafile->SetBind($SoD->{'ToggleKey'},'t $name, Changing to Human Form, Normal Mode$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleoff '.$Nova->{'Nova'}.'$$gototray 1$$bindloadfile '.$profile->{'General'}->{'BindsDir'}."\\rese$t->{'txt'}")
 	}
 
@@ -1507,9 +1512,9 @@ sub makebind {
 		$dwrffile->SetBind($SoD->{'Back'},"+backward");
 		$dwrffile->SetBind($SoD->{'Up'},"+up");
 		$dwrffile->SetBind($SoD->{'Down'},"+down");
-		$dwrffile->SetBind($SoD->{'AutoRunKey'},"++forward");
+		$dwrffile->SetBind($SoD->{'AutoRun'},"++forward");
 		$dwrffile->SetBind($SoD->{'FlyModeKey'},'nop');
-		$dwrffile->SetBind($SoD->{'FollowKey'},"follow");
+		$dwrffile->SetBind($SoD->{'Follow'},"follow");
 		$dwrffile->SetBind($SoD->{'RunModeKey'},'nop')          if ($SoD->{'FlyModeKey'} ne $SoD->{'RunModeKey'});
 		$dwrffile->SetBind('mousechord "'."+down$$+forward")    if ($SoD->{'MouseChord'});
 
@@ -1591,13 +1596,11 @@ sub makebind {
 
 sub sodResetKey {
 	my ($curfile,$p,$path,$turnoff,$moddir) = @_;
-	if (!$moddir) {
-		$curfile->SetBind($p->{'ResetKey'},'up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0'.$turnoff.'$$t $name, SoD Binds Reset'.BindFile::BaseReset($p).'$$bindloadfile '.$path.'000000.txt')
-	} elsif ($moddir eq 'up') {
-		$curfile->SetBind($p->{'ResetKey'},'up 1$$down 0$$forward 0$$backward 0$$left 0$$right 0'.$turnoff.'$$t $name, SoD Binds Reset'.BindFile::BaseReset($p).'$$bindloadfile '.$path.'000000.txt')
-	} elsif ($moddir eq 'down') {
-		$curfile->SetBind($p->{'ResetKey'},'up 0$$down 1$$forward 0$$backward 0$$left 0$$right 0'.$turnoff.'$$t $name, SoD Binds Reset'.BindFile::BaseReset($p).'$$bindloadfile '.$path.'000000.txt')
-	}
+
+	my ($u, $d) = (0, 0);
+	if ($moddir eq 'up')   { $u = 1; }
+	if ($moddir eq 'down') { $d = 1; }
+	$curfile->SetBind($p->{'General'}->{'ResetKey'},'up ' . $u . '$$down ' . $d . '$$forward 0$$backward 0$$left 0$$right 0' . $turnoff . '$$t $name, SoD Binds Reset' . BindFile::BaseReset($p) . '$$bindloadfile ' . $path . '000000.txt');
 }
 
 sub sodDefaultResetKey {
@@ -1612,7 +1615,7 @@ sub sodUpKey {
 
 	my ($upx, $dow, $forw, $bac, $lef, $rig) = ($t->{'upx'}, $t->{'dow'}, $t->{'forw'}, $t->{'bac'}, $t->{'lef'}, $t->{'rig'});
 
-	my ($ml, $toggle, $toggleon, $toggleoff, $toggleoff2);
+	my ($ml, $toggle, $toggleon, $toggleoff, $toggleoff2) = ('','','','','');
 
 	my $actkeys = $t->{'totalkeys'};
 
@@ -1621,8 +1624,8 @@ sub sodUpKey {
 	if ($bo eq "bo") { $upx = '$$up 1'; $dow = '$$down 0'; }
 	if ($bo eq "sd") { $upx = '$$up 0'; $dow = '$$down 1'; }
 	
-	undef $mobile     if $mobile     eq "Group Fly";
-	undef $stationary if $stationary eq "Group Fly";
+	undef $mobile     if $mobile     and $mobile     eq "Group Fly";
+	undef $stationary if $stationary and $stationary eq "Group Fly";
 
 	if ($flight eq "Jump") {
 		$dow = '$$down 0';
@@ -1675,7 +1678,7 @@ sub sodUpKey {
 	}
 
 	if ($followbl) {
-		my $move;
+		my $move = '';
 		if ($t->{'space'} != 1) {
 			$bindload = $followbl.(1-$t->{'space'}).$t->{'X'}.$t->{'W'}.$t->{'S'}.$t->{'A'}.$t->{'D'}.".txt";
 			$move = $upx.$dow.$forw.$bac.$lef.$rig;
@@ -1691,17 +1694,17 @@ sub sodUpKey {
 
 sub sodDownKey {
 	my ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,$autorun,$followbl,$bo,$sssj) = @_;
-	my $ml = ''; # , aj
 	my ($up, $dowx, $forw, $bac, $lef, $rig) = ($t->{'up'}, $t->{'dowx'}, $t->{'forw'}, $t->{'bac'}, $t->{'lef'}, $t->{'rig'});
-	my ($toggle, $toggleon, $toggleoff);
+
+	my ($ml, $toggle, $toggleon, $toggleoff) = ('','','','');
 	my $actkeys = $t->{'totalkeys'};
 
 	if (not $flight) { undef $mobile; undef $stationary; }
 	if ($bo eq 'bo') { $up = '$$up 1'; $dowx = '$$down 0'; }
 	if ($bo eq 'sd') { $up = '$$up 0'; $dowx = '$$down 1'; }
 
-	if ($mobile     eq 'Group Fly') { undef $mobile; }
-	if ($stationary eq 'Group Fly') { undef $stationary; }
+	if ($mobile     and $mobile     eq 'Group Fly') { undef $mobile; }
+	if ($stationary and $stationary eq 'Group Fly') { undef $stationary; }
 
 	if ($flight eq 'Jump') {
 		$dowx = '$$down 0';
@@ -1741,7 +1744,7 @@ sub sodDownKey {
 	my $ini = ($t->{'X'} == 1) ? '-down' : '+down';
 
 	if ($followbl) {
-		my $move;
+		my $move = '';
 		if ($t->{'X'} != 1) {
 			$bindload = $followbl.$t->{'space'}."1".$t->{'W'}.$t->{'S'}.$t->{'A'}.$t->{'D'}.".txt";
 			$move = $up.$dowx.$forw.$bac.$lef.$rig;
@@ -1759,7 +1762,7 @@ sub sodDownKey {
 sub sodForwardKey {
 	my ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,$autorunbl,$followbl,$bo,$sssj) = @_;
 	my ($up, $dow, $forx, $bac, $lef, $rig) = ($t->{'up'}, $t->{'dow'}, $t->{'forx'}, $t->{'bac'}, $t->{'lef'}, $t->{'rig'});
-	my ($ml, $toggle, $toggleon, $toggleoff);
+	my ($ml, $toggle, $toggleon, $toggleoff) = ('','','','');
 	my $actkeys = $t->{'totalkeys'};
 	if ($bo eq "bo") { $up = '$$up 1'; $dow = '$$down 0' }
 	if ($bo eq "sd") { $up = '$$up 0'; $dow = '$$down 1' }
@@ -1853,9 +1856,10 @@ sub sodForwardKey {
 
 sub sodBackKey {
 	my ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,$autorunbl,$followbl,$bo,$sssj) = @_;
-	my $ml = '';
 	my ($up, $dow, $forw, $bacx, $lef, $rig) = ($t->{'up'}, $t->{'dow'}, $t->{'forw'}, $t->{'bacx'}, $t->{'lef'}, $t->{'rig'});
-	my ($toggle, $toggleon, $toggleoff);
+
+	my ($ml, $toggle, $toggleon, $toggleoff) = ('','','','');
+
 	my $actkeys = $t->{'totalkeys'};
 	if ($bo eq "bo") { $up = '$$up 1'; $dow = '$$down 0' }
 	if ($bo eq "sd") { $up = '$$up 0'; $dow = '$$down 1' }
@@ -1936,9 +1940,10 @@ sub sodBackKey {
 
 sub sodLeftKey {
 	my ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,$autorun,$followbl,$bo,$sssj) = @_;
-	my $ml = '';
 	my ($up, $dow, $forw, $bac, $lefx, $rig) = ($t->{'up'}, $t->{'dow'}, $t->{'forw'}, $t->{'bac'}, $t->{'lefx'}, $t->{'rig'});
-	my ($toggle, $toggleon, $toggleoff);
+
+	my ($ml, $toggle, $toggleon, $toggleoff) = ('','','','');
+
 	my $actkeys = $t->{'totalkeys'};
 	if ($bo eq "bo") { $up = '$$up 1'; $dow = '$$down 0' }
 	if ($bo eq "sd") { $up = '$$up 0'; $dow = '$$down 1' }
@@ -1957,7 +1962,7 @@ sub sodLeftKey {
 	if ($t->{'totalkeys'} == 0) { 
 		$ml = $t->{'mlon'};
 		$toggleon = $mobile;
-		if (not $mobile and $mobile eq $stationary ) { 
+		if (not ($mobile and $mobile eq $stationary)) { 
 			$toggleoff = $stationary;
 		}
 	}
@@ -2016,9 +2021,10 @@ sub sodLeftKey {
 
 sub sodRightKey {
 	my ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,$autorun,$followbl,$bo,$sssj) = @_;
-	my $ml = '';
 	my ($up, $dow, $forw, $bac, $lef, $rigx) = ($t->{'up'}, $t->{'dow'}, $t->{'forw'}, $t->{'bac'}, $t->{'lef'}, $t->{'rigx'});
-	my ($toggle, $toggleon, $toggleoff);
+
+	my ($ml, $toggle, $toggleon, $toggleoff) = ('','','','');
+
 	my $actkeys = $t->{'totalkeys'};
 	if ($bo eq "bo") { $up = '$$up 1'; $dow = '$$down 0' }
 	if ($bo eq "sd") { $up = '$$up 0'; $dow = '$$down 1' }
@@ -2037,7 +2043,7 @@ sub sodRightKey {
 	if ($t->{'totalkeys'} == 0) { 
 		$ml = $t->{'mlon'};
 		$toggleon = $mobile;
-		if (not $mobile and $mobile eq $stationary ) { 
+		if (not ($mobile and $mobile eq $stationary)) { 
 			$toggleoff = $stationary;
 		}
 	}
@@ -2098,9 +2104,9 @@ sub sodAutoRunKey {
 	my ($t,$bl,$curfile,$SoD,$mobile,$sssj) = @_;
 	my $bindload = $bl.$t->{'space'}.$t->{'X'}.$t->{'W'}.$t->{'S'}.$t->{'A'}.$t->{'D'}.".txt";
 	if ($sssj and $t->{'space'} == 1) { 
-		$curfile->SetBind($SoD->{'AutoRunKey'},'forward 1$$backward 0'.$t->{'up'}.$t->{'dow'}.$t->{'lef'}.$t->{'rig'}.$t->{'mlon'}.actPower_name(undef,true,$sssj,$mobile).$bindload);
+		$curfile->SetBind($SoD->{'AutoRun'},'forward 1$$backward 0'.$t->{'up'}.$t->{'dow'}.$t->{'lef'}.$t->{'rig'}.$t->{'mlon'}.actPower_name(undef,true,$sssj,$mobile).$bindload);
 	} else {
-		$curfile->SetBind($SoD->{'AutoRunKey'},'forward 1$$backward 0'.$t->{'up'}.$t->{'dow'}.$t->{'lef'}.$t->{'rig'}.$t->{'mlon'}.actPower_name(undef,true,$mobile).$bindload);
+		$curfile->SetBind($SoD->{'AutoRun'},'forward 1$$backward 0'.$t->{'up'}.$t->{'dow'}.$t->{'lef'}.$t->{'rig'}.$t->{'mlon'}.actPower_name(undef,true,$mobile).$bindload);
 	}
 }
 
@@ -2126,18 +2132,18 @@ sub sodAutoRunOffKey {
 			$toggleon = $t->{'mloff'}.actPower_name(undef,true,$stationary,$mobile);
 		}
 	}
-	my $bindload = $bl.$t->{'space'}.$t->{'X'}.$t->{'W'}.$t->{'S'}.$t->{'A'}.$t->{'D'}.".txt";
-	$curfile->SetBind($SoD->{'AutoRunKey'},$t->{'up'}.$t->{'dow'}.$t->{'forw'}.$t->{'bac'}.$t->{'lef'}.$t->{'rig'}.$toggleon.$bindload);
+	my $bindload = $bl . SpXWSAD($t) . '.txt';
+	$curfile->SetBind($SoD->{'AutoRun'},$t->{'up'}.$t->{'dow'}.$t->{'forw'}.$t->{'bac'}.$t->{'lef'}.$t->{'rig'}.$toggleon.$bindload);
 }
 
 sub sodFollowKey {
 	my ($t,$bl,$curfile,$SoD,$mobile) = @_;
-	$curfile->SetBind($SoD->{'FollowKey'},'follow'.actPower_name(undef,true,$mobile).$bl.$t->{'space'}.$t->{'X'}.$t->{'W'}.$t->{'S'}.$t->{'A'}.$t->{'D'}.'.txt');
+	$curfile->SetBind($SoD->{'Follow'},'follow' . actPower_name(undef,true,$mobile) . $bl . SpXWSAD($t) . '.txt');
 }
 
 sub sodFollowOffKey {
 	my ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight) = @_;
-	my ($toggle);
+	my ($toggle) = '';
 	if (not $flight) { 
 		if ($t->{'horizkeys'} == 0) { 
 			if ($stationary eq $mobile) { 
@@ -2155,7 +2161,7 @@ sub sodFollowOffKey {
 			}
 		}
 	}
-	$curfile->SetBind($SoD->{'FollowKey'},"follow".$toggle.$t->{'up'}.$t->{'dow'}.$t->{'forw'}.$t->{'bac'}.$t->{'lef'}.$t->{'rig'}.$bl.$t->{'space'}.$t->{'X'}.$t->{'W'}.$t->{'S'}.$t->{'A'}.$t->{'D'}.".txt");
+	$curfile->SetBind($SoD->{'Follow'},"follow".$toggle.$t->{'up'}.$t->{'dow'}.$t->{'forw'}.$t->{'bac'}.$t->{'lef'}.$t->{'rig'}.$bl. SpXWSAD($t) . '.txt');
 }
 
 sub bindisused { 
@@ -2176,8 +2182,8 @@ sub findconflicts {
 	cbCheckConflict($SoD,"Right","Strafe Right Key");
 	cbCheckConflict($SoD,"TLeft","Turn Left Key");
 	cbCheckConflict($SoD,"TRight","Turn Right Key");
-	cbCheckConflict($SoD,"AutoRunKey","AutoRun Key");
-	cbCheckConflict($SoD,"FollowKey","Follow Key");
+	cbCheckConflict($SoD,"AutoRun","AutoRun Key");
+	cbCheckConflict($SoD,"Follow","Follow Key");
 
 	if ($SoD->{'NonSoD'})          { cbCheckConflict($SoD,"NonSoDModeKey","NonSoD Key") }
 	if ($SoD->{'Base'})            { cbCheckConflict($SoD,"BaseModeKey","Sprint Mode Key") }
@@ -2220,7 +2226,7 @@ sub findconflicts {
 #  toggleon variation
 sub actPower_toggle {
 	my ($start,$unq,$on,@rest) = @_;
-	my ($s, $traytest);
+	my ($s, $traytest) = ('','');
 	if (ref $on) {
 		#  deal with power slot stuff..
 		$traytest = $on->{'trayslot'};
@@ -2269,7 +2275,7 @@ sub actPower_toggle {
 
 sub actPower_name {
 	my ($start,$unq,$on,@rest) = @_;
-	my ($s, $traytest);
+	my ($s, $traytest) = ('','');
 	if (ref $on) {
 		#  deal with power slot stuff..
 		$traytest = $on->{'trayslot'};
@@ -2315,7 +2321,7 @@ sub actPower_name {
 #  updated hybrid binds can reduce the space used in SoD Bindfiles by more than 40KB per SoD mode generated
 sub actPower_hybrid {
 	my ($start,$unq,$on,%rest) = @_;
-	my ($s, $traytest);
+	my ($s, $traytest) = ('','');
 	if (ref $on) {
 		#  deal with power slot stuff..
 		$traytest = $on->{'trayslot'};
@@ -2361,7 +2367,7 @@ sub actPower_hybrid {
 sub sodJumpFix {
 	my ($profile,$t,$key,$makeModeKey,$suffix,$bl,$curfile,$turnoff,$autofollowmode,$feedback) = @_;
 
-	my $filename = $t->{"path".$autofollowmode."j"}.$t->{'space'}.$t->{'X'}.$t->{'W'}.$t->{'S'}.$t->{'A'}.$t->{'D'}.$suffix.".txt";
+	my $filename = $t->{"path${autofollowmode}j"}. SpXWSAD($t) . "$suffix.txt";
 	my $tglfile = BindFile->new($filename);
 	$t->{'ini'} = '-down$$';
 	makeModeKey($profile,$t,$bl,$tglfile,$turnoff,undef,true);
@@ -2372,7 +2378,7 @@ sub sodSetDownFix {
 	my ($profile,$t,$key,$makeModeKey,$suffix,$bl,$curfile,$turnoff,$autofollowmode,$feedback) = @_;
 	my $pathsuffix = $autofollowmode ? 'f' : 'a';
 	# iupMessage("",tostring($t->{'space'}).tostring($t->{'X'}).tostring($t->{'W'}).tostring($t->{'S'}).tostring($t->{'A'}).tostring($t->{'D'}).tostring("path".autofollowmode.pathsuffix).tostring(suffix))
-	my $filename = $t->{"path".$autofollowmode.$pathsuffix}.$t->{'space'}.$t->{'X'}.$t->{'W'}.$t->{'S'}.$t->{'A'}.$t->{'D'}.$suffix.".txt";
+	my $filename = $t->{"path$autofollowmode$pathsuffix"} . SpXWSAD($t)  . "$suffix.txt";
 	my $tglfile = BindFile->new($filename);
 	$t->{'ini'} = "-down$$";
 	makeModeKey($profile,$t,$bl,$tglfile,$turnoff,undef,true);

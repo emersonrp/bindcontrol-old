@@ -13,6 +13,7 @@ our $default = {
 		Epic => 'Weapon Mastery',
 		BindsDir => "c:\\CoH\\",
 		ResetFile => BindFile->new('reset.txt'),
+		ResetKey => 'CTRL-M',
 	},
 };
 
