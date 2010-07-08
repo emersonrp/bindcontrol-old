@@ -33,6 +33,28 @@ sub Icon {
 		);
 }
 
+
+sub CheckConflict {
+	my ($t,$k,$Purpose) = @_;
+	return unless $t->{$k};
+	return if (uc $t->{$k} eq 'UNBOUND');
+# 	if not conflictbinds.binds[t[k]] then
+# 		-- no conflict, add this to the list of binds.
+# 		conflictbinds.binds[t[k]] = {keybase = getMainKey(t[k]) or "UNBOUND",t=t,k=k,purpose=Purpose}
+# 	else
+# 		-- conflict...
+# 		local c
+# 		if not conflictbinds.conflicts[t[k]] then
+# 			-- first conflict for this key.
+# 			c = {}
+# 			table.insert(c,conflictbinds.binds[t[k]])
+# 			conflictbinds.conflicts[t[k]] = c
+# 		else
+# 			c = conflictbinds.conflicts[t[k]]
+# 		end
+# 		table.insert(c,{keybase = getMainKey(t[k]) or "UNBOUND",t=t,k=k,purpose=Purpose})
+# 	end
+}
 1;
 __DATA__
 
@@ -155,27 +177,6 @@ function cbWriteFile(f)
 	end
 	file:close()
 	return i
-end
-
-function cbCheckConflict(t,k,Purpose)
-	if not t[k] then return end
-	if string.upper(t[k]) == "UNBOUND" then return end
-	if not conflictbinds.binds[t[k]] then
-		-- no conflict, add this to the list of binds.
-		conflictbinds.binds[t[k]] = {keybase = getMainKey(t[k]) or "UNBOUND",t=t,k=k,purpose=Purpose}
-	else
-		-- conflict...
-		local c
-		if not conflictbinds.conflicts[t[k]] then
-			-- first conflict for this key.
-			c = {}
-			table.insert(c,conflictbinds.binds[t[k]])
-			conflictbinds.conflicts[t[k]] = c
-		else
-			c = conflictbinds.conflicts[t[k]]
-		end
-		table.insert(c,{keybase = getMainKey(t[k]) or "UNBOUND",t=t,k=k,purpose=Purpose})
-	end
 end
 
 function cbResolveConflict(conflict,key,profile)

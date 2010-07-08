@@ -46,17 +46,17 @@ sub SetBind {
 
 sub BaseReset {
 	my $profile = shift;
-	return '$$bind_load_file' . $profile->{'General'}->{'BindsDir'} . "\\subreset.txt";
+	return '$$bindloadfilesilent ' . $profile->{'General'}->{'BindsDir'} . "\\subreset.txt";
 }
 
-sub BLF {
+sub BLF { return '$$bindloadfilesilent ' . BLFPath(@_); }
+sub BLFPath {
 	my ($profile, @bits) = @_;
 	my $file = pop @bits;
 	my ($vol, $bdir, undef) = File::Spec->splitpath( $profile->{'General'}->{'BindsDir'}, 1 );
 	my $dirpath = File::Spec->catdir($bdir, @bits);
-	return '$$bindloadfile ' . File::Spec->catpath($vol, $dirpath, $file);
+	return File::Spec->catpath($vol, $dirpath, $file);
 }
-
 
 sub WriteBindFiles {
 	my ($target, $event) = @_;
@@ -72,8 +72,6 @@ Profile::SoD::makebind($profile);
 	while (my ($filename, $binds) = each %BindFiles) {
 
 		# Pick apart the filename into component bits.
-		# TODO - we should make sure we're sticking them into here all File::Spec happy
-		# instead of raw "X\\X111111.txt"
 		my (undef, $dir, $file) = File::Spec->splitpath( $filename );
 
 		# mash together the two 'directory' parts:
