@@ -433,7 +433,7 @@ sub makeSoDFile {
 
 	if ($flight and ($flight eq "Fly") and $pathbo) {
 		#  blast off
-		my $curfile = BindFile->new($pathbo . SpXWSAD($t) . ".txt");
+		my $curfile = BindFile->new($pathbo . $t->KeyState . ".txt");
 
 		sodResetKey($curfile,$profile,$path,actPower_toggle(undef,true,$stationary,$mobile),'');
 
@@ -484,7 +484,7 @@ sub makeSoDFile {
 
 		sodFollowKey($t,$blf,$curfile,$SoD,$mobile);
 
-		# $curfile = BindFile->new($pathsd . SpXWSAD($t) . ".txt");
+		# $curfile = BindFile->new($pathsd . $t->KeyState . ".txt");
 
 		sodResetKey($curfile,$profile,$path,actPower_toggle(undef,true,$stationary,$mobile),'');
 
@@ -506,7 +506,7 @@ sub makeSoDFile {
 		sodFollowKey($t,$blf,$curfile,$SoD,$mobile);
 	}
 
-	$curfile = BindFile->new($path . SpXWSAD($t) . ".txt");
+	$curfile = BindFile->new($path . $t->KeyState . ".txt");
 
 	sodResetKey($curfile,$profile,$path,actPower_toggle(undef,true,$stationary,$mobile),'');
 
@@ -522,7 +522,7 @@ sub makeSoDFile {
 		if ($modestr eq "NonSoD") { makeNonSoDModeKey($profile,$t,"r",$curfile,{$mobile,$stationary},&sodSetDownFix); }
 		if ($modestr eq "Base")   { makeBaseModeKey($profile,$t,"r",$curfile,$turnoff,&sodSetDownFix); }
 		# if ($t->{'BaseModeKey'}) {
-			# $curfile->SetBind($t->{'BaseModeKey'},"+down$$down 1" . actPower_name(undef,true,$mobile) . $t->{'detailhi'} . $t->{'runcamdist'} . $t->{'blsd'} . SpXWSAD($t) . ".txt")
+			# $curfile->SetBind($t->{'BaseModeKey'},"+down$$down 1" . actPower_name(undef,true,$mobile) . $t->{'detailhi'} . $t->{'runcamdist'} . $t->{'blsd'} . $t->KeyState . ".txt")
 		#}
 		if ($modestr eq "Run")     { makeRunModeKey   ($profile,$t,"s", $curfile,$turnoff,&sodSetDownFix); }
 		if ($modestr eq "Fly")     { makeFlyModeKey   ($profile,$t,"bo",$curfile,$turnoff,$fix); }
@@ -548,7 +548,7 @@ sub makeSoDFile {
 	sodFollowKey($t,$blf,$curfile,$SoD,$mobile);
 
 # AutoRun Binds
-	$curfile = BindFile->new($pathr . SpXWSAD($t) . ".txt");
+	$curfile = BindFile->new($pathr . $t->KeyState . ".txt");
 
 	sodResetKey($curfile,$profile,$path,actPower_toggle(undef,true,$stationary,$mobile),'');
 
@@ -578,7 +578,7 @@ sub makeSoDFile {
 	$curfile->SetBind($SoD->{'Follow'},'nop');
 
 # FollowRun Binds
-	$curfile = BindFile->new($pathf . SpXWSAD($t) . ".txt");
+	$curfile = BindFile->new($pathf . $t->KeyState . ".txt");
 
    	sodResetKey($curfile,$profile,$path,actPower_toggle(undef,true,$stationary,$mobile),'');
    
@@ -608,39 +608,156 @@ sub makeSoDFile {
    	sodFollowOffKey($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight);
 }
 
-sub SpXWSAD { my $t = shift;  return "$t->{'space'}$t->{'X'}$t->{'W'}$t->{'S'}$t->{'A'}$t->{'D'}"; }
+sub KeyState { my $t = shift;  return "$t->{'space'}$t->{'X'}$t->{'W'}$t->{'S'}$t->{'A'}$t->{'D'}"; }
 
+# TODO -- seems like these subs could get consolidated but stab one at that was feeble
 sub makeNonSoDModeKey{
-	my ($p,$t,$bl,$c,$to) = @_;
-	return makeModeKey({profile=>$p,t=>$t,bl=>$bl,curfile=>$c,turnoff=>$to,modestr=>'NonSoD'});
+	my ($p,$t,$bl,$cur,$toff,$fix, $fb) = @_;
+	my $SoD = $p->{'SoD'};
+	return if (not $t->{'NonSoDModeKey'} or $t->{'NonSoDModeKey'} eq 'UNBOUND');
+
+	if ($SoD->{'Feedback'}) { $fb ||= '$$t $name, Non-SoD Mode'; }
+	$t->{'ini'} ||= '';
+	if ($bl eq "r") {
+		my $bindload = $t->bl('n') . $t->KeyState . ".txt";
+		if ($fix) {
+			&$fix($p,$t,$t->{'NonSoDModeKey'}, \&makeNonSoDModeKey,"n",$bl,$cur,$toff,"",$fb)
+		} else {
+			$cur->SetBind($t->{'NonSoDModeKey'}, $t->{'ini'} . actPower_toggle(undef,true,undef,$toff) . $t->{'up'} . $t->{'dow'} . $t->{'forw'} . $t->{'bac'} . $t->{'lef'} . $t->{'rig'} . $t->{'detailhi'} . $t->{'runcamdist'} . $fb . $bindload)
+		}
+	} elsif ($bl eq "ar") {
+		my $bindload = $t->bl('an') . $t->KeyState . ".txt";
+		if ($fix) {
+			&$fix($p,$t,$t->{'NonSoDModeKey'}, \&makeNonSoDModeKey,"n",$bl,$cur,$toff,"a",$fb)
+		} else {
+			$cur->SetBind($t->{'NonSoDModeKey'}, $t->{'ini'} . actPower_toggle(undef,true,undef,$toff)..$t->{'detailhi'} . $t->{'runcamdist'} . '$$up 0' . $t->{'dow'} . $t->{'lef'} . $t->{'rig'} . $fb . $bindload);
+		}
+	} else {
+		if ($fix) {
+			&$fix($p,$t,$t->{'NonSoDModeKey'}, \&makeNonSoDModeKey,"n",$bl,$cur,$toff,"f",$fb)
+		} else {
+			$cur->SetBind($t->{'NonSoDModeKey'}, $t->{'ini'} . actPower_toggle(undef,true,undef,$toff)..$t->{'detailhi'} . $t->{'runcamdist'} . '$$up 0' . $fb . $t->bl('fn') . $t->KeyState . '.txt');
+		}
+	}
+	$t->{'ini'} = "";
 }
+
+# ODO -- seems like these subs could get consolidated but stab one at that was feeble
+sub makeTempModeKey  {
+	my ($p,$t,$bl,$cur,$toff) = @_;
+	my $SoD = $p->{'SoD'};
+	return if (not $t->{'TempModeKey'} or $t->{'TempModeKey'} eq "UNBOUND");
+
+	my $fb = $SoD->{'Feedback'} ? '$$t $name, Temp Mode' : '';
+	$t->{'ini'} ||= '';
+	my $trayslot = "1 $SoD->{'Temp'}->{'Tray'}";
+
+	if ($bl eq "r") {
+		my $bindload = $t->bl('t') . $t->KeyState . ".txt";
+		$cur->SetBind($t->{'TempModeKey'},$t->{'ini'} . actPower(undef,true,$trayslot,$toff) . $t->{'up'} . $t->{'down'} . $t->{'forw'} . $t->{'bac'} . $t->{'lef'} . $t->{'rig'} . $t->{'detaillo'} . $t->{'flycamdist'} . $fb . $bindload);
+	} elsif ($bl eq "ar") {
+		my $bindload  = $t->path('at') . $t->KeyState . '.txt';
+		my $bindload2 = $t->path('at') . $t->KeyState . '_t.txt';
+		my $tgl = BindFile->new($bindload2);
+		$cur->SetBind($t->{'TempModeKey'}, $t->{'in'} . actPower(undef,true,$trayslot,$toff) . $t->{'detaillo'} . $t->{'flycamdist'} . '$$up 0' . $t->{'dow'} . $t->{'lef'} . $t->{'rig'} . $fb . $bindload2);
+		$tgl->SetBind($t->{'TempModeKey'}, $t->{'in'} . actPower(undef,true,$trayslot,$toff) . $t->{'detaillo'} . $t->{'flycamdist'} . '$$up 0' . $t->{'dow'} . $t->{'lef'} . $t->{'rig'} . $fb . $bindload);
+	} else {
+		$cur->SetBind($t->{'TempModeKey'}, $t->{'ini'} . actPower(undef,true,$trayslot,$toff) . $t->{'detaillo'} . $t->{'flycamdist'} . '$$up 0' . $fb . $t->bl('ft') . $t->KeyState . '.txt');
+	}
+	$t->{'ini'} = '';
+}
+
+
+# TODO -- seems like these subs could get consolidated but stab one at that was feeble
+sub makeQFlyModeKey  {
+	my ($p,$t,$bl,$cur,$toff,$modestr) = @_;
+	my $SoD = $p->{'SoD'};
+	return if (not $t->{'QFlyModeKey'} or $t->{'QFlyModeKey'} eq "UNBOUND");
+
+	if ($modestr eq "NonSoD") { $cur->SetBind($t->{'QFlyModeKey'}, "powexecname Quantum Flight") && return; }
+
+	my $fb = $SoD->{'Feedback'} ? '$$t $name, QFlight Mode' : '';
+	$t->{'ini'} ||= '';
+
+	if ($bl eq "r") {
+		my $bindload  = $t->path('n') . $t->KeyState . ".txt";
+		my $bindload2 = $t->path('n') . $t->KeyState . "_q.txt";
+		my $tgl = BindFile->new($bindload2);
+
+		my $tray = ($modestr eq 'Nova' or $modestr eq 'Dwarf') ? '$$gototray 1' : '';
+
+		$cur->SetBind($t->{'QFlyModeKey'}, $t->{'ini'} . actPower(undef,true,'Quantum Flight', $toff) . $tray . $t->{'up'} . $t->{'down'} . $t->{'forw'} . $t->{'bac'} . $t->{'lef'} . $t->{'rig'} . $t->{'detaillo'} . $t->{'flycamdist'} . $fb . $bindload2);
+		$tgl->SetBind($t->{'QFlyModeKey'}, $t->{'ini'} . actPower(undef,true,'Quantum Flight', $toff) . $tray . $t->{'up'} . $t->{'down'} . $t->{'forw'} . $t->{'bac'} . $t->{'lef'} . $t->{'rig'} . $t->{'detaillo'} . $t->{'flycamdist'} . $fb . $bindload);
+
+	} elsif ($bl eq "ar") {
+		my $bindload  = $t->path('an') . $t->KeyState . '.txt';
+		my $bindload2 = $t->path('an') . $t->KeyState . '_t.txt';
+		my $tgl = BindFile->new($bindload2);
+		$cur->SetBind($t->{'QFlyModeKey'}, $t->{'in'} . actPower(undef,true,'Quantum Flight', $toff) . $t->{'detaillo'} . $t->{'flycamdist'} . '$$up 0' . $t->{'dow'} . $t->{'lef'} . $t->{'rig'} . $fb . $bindload2);
+		$tgl->SetBind($t->{'QFlyModeKey'}, $t->{'in'} . actPower(undef,true,'Quantum Flight', $toff) . $t->{'detaillo'} . $t->{'flycamdist'} . '$$up 0' . $t->{'dow'} . $t->{'lef'} . $t->{'rig'} . $fb . $bindload);
+	} else {
+		$cur->SetBind($t->{'QFlyModeKey'}, $t->{'ini'} . actPower(undef,true,'Quantum Flight', $toff) . $t->{'detaillo'} . $t->{'flycamdist'} . '$$up 0' . $fb . $t->bl('fn') . $t->KeyState . '.txt');
+	}
+	$t->{'ini'} = '';
+}
+
+# TODO -- seems like these subs could get consolidated but stab one at that was feeble
 sub makeBaseModeKey  {
-	my ($p,$t,$bl,$c,$to,$fix) = @_;
-	return makeModeKey({profile=>$p,t=>$t,bl=>$bl,curfile=>$c,turnoff=>$to,modestr=>'Base',fix=>$fix});
+	my ($p,$t,$bl,$cur,$toff,$fix,$fb) = @_;
+	my $SoD = $p->{'SoD'};
+	return if (not $t->{'BaseModeKey'} or $t->{'BaseModeKey'} eq "UNBOUND");
+
+	my $fb = $SoD->{'Feedback'} ? '$$t $name, Sprint-SoD Mode' : '';
+	$t->{'ini'} ||= '';
+
+	if ($bl eq "r") {
+		my $bindload  = $t->bl . $t->KeyState . ".txt";
+
+		my $ton = actPower_toggle(true, true, ($t->{'horizkeys'} ? $t->{'sprint'} : ''), $toff);
+
+		if ($fix) {
+			&$fix($p,$t,$t->{'BaseModeKey'}, \&makeBaseModeKey,"r",$bl,$cur,$toff,"",$fb)
+		} else {
+			$cur->SetBind($t->{'BaseModeKey'}, $t->{'ini'} . $ton . $t->{'up'} . $t->{'down'} . $t->{'forw'} . $t->{'bac'} . $t->{'lef'} . $t->{'rig'} . $t->{'detailhi'} . $t->{'runcamdist'} . $fb . $bindload);
+		}
+
+	} elsif ($bl eq "ar") {
+		my $bindload  = $t->bl('gr') . $t->KeyState . '.txt';
+
+		if ($fix) {
+			&$fix($p,$t,$t->{'BaseModeKey'}, \&makeBaseModeKey,"r",$bl,$cur,$toff,"a",$fb)
+		} else {
+			$cur->SetBind($t->{'BaseModeKey'}, $t->{'ini'} . actPower_toggle(true,true,$t->{'sprint'},$toff) . $t->{'detailhi'} .  $t->{'runcamdist'} . '$$up 0' . $t->{'down'} . $t->{'lef'} . $t->{'rig'} . $fb . $bindload);
+		}
+	} else {
+		if ($fix) {
+			&$fix($p,$t,$t->{'BaseModeKey'}, \&makeBaseModeKey,"r",$bl,$cur,$toff,"f",$fb)
+		} else {
+			$cur->SetBind($t->{'BaseModeKey'}, $t->{'ini'} . actPower_toggle(true,true,$t->{'sprint'}, $toff) . $t->{'detailhi'} . $t->{'runcamdist'} . '$$up 0' . $fb . $t->bl('fr') . $t->KeyState . '.txt');
+		}
+	}
+	$t->{'ini'} = '';
 }
+
+# TODO -- seems like these subs could get consolidated but stab one at that was feeble
 sub makeFlyModeKey   {
 	my ($p,$t,$bl,$c,$to,$fix) = @_;
 	return makeModeKey({profile=>$p,t=>$t,bl=>$bl,curfile=>$c,turnoff=>$to,modestr=>'Fly',fix=>$fix});
 }
+# TODO -- seems like these subs could get consolidated but stab one at that was feeble
 sub makeGFlyModeKey  {
 	my ($p,$t,$bl,$c,$to,$fix) = @_;
 	return makeModeKey({profile=>$p,t=>$t,bl=>$bl,curfile=>$c,turnoff=>$to,modestr=>'GFly',fix=>$fix});
 }
+# TODO -- seems like these subs could get consolidated but stab one at that was feeble
 sub makeRunModeKey   {
 	my ($p,$t,$bl,$c,$to,$fix) = @_;
 	return makeModeKey({profile=>$p,t=>$t,bl=>$bl,curfile=>$c,turnoff=>$to,modestr=>'Run',fix=>$fix});
 }
+# TODO -- seems like these subs could get consolidated but stab one at that was feeble
 sub makeJumpModeKey  {
 	my ($p,$t,$bl,$c,$to,$path) = @_;
 	return makeModeKey({profile=>$p,t=>$t,bl=>$bl,curfile=>$c,turnoff=>$to,modestr=>'Jump',path=>$path});
-}
-sub makeTempModeKey  {
-	my ($p,$t,$bl,$c,$to,$path) = @_;
-	return makeModeKey({profile=>$p,t=>$t,bl=>$bl,curfile=>$c,turnoff=>$to,modestr=>'Temp',path=>$path});
-}
-sub makeQFlyModeKey  {
-	my ($p,$t,$bl,$c,$to,$modestr) = @_;
-	return makeModeKey({profile=>$p,t=>$t,bl=>$bl,curfile=>$c,turnoff=>$to,modestr=>$modestr});
 }
 sub makeModeKey {
 	my $params = shift;
@@ -666,11 +783,11 @@ sub makeModeKey {
 	my $key = $t->{$keytype};
 
 	# fetch out some bits to make it more compact down there.
-	my $txtend =  SpXWSAD($t) . ".txt";
-	my $jtxtend = SpXWSAD($t) . "j.txt";
-	my $ttxtend = SpXWSAD($t) . ".$t->{'txt'}";
-	my $qtxtend = SpXWSAD($t) . "_q.txt";
-	my $stxtend = SpXWSAD($t) . "_s.txt";
+	my $txtend =  $t->KeyState . ".txt";
+	my $jtxtend = $t->KeyState . "j.txt";
+	my $ttxtend = $t->KeyState . ".$t->{'txt'}";
+	my $qtxtend = $t->KeyState . "_q.txt";
+	my $stxtend = $t->KeyState . "_s.txt";
 
 	my $up  = $t->{'up'};
 	my $dow = $t->{'dow'};
@@ -2051,13 +2168,13 @@ sub sodAutoRunOffKey {
 			$toggleon = $t->{'mloff'} . actPower_name(undef,true,$stationary,$mobile);
 		}
 	}
-	my $bindload = $bl . SpXWSAD($t) . '.txt';
+	my $bindload = $bl . $t->KeyState . '.txt';
 	$curfile->SetBind($SoD->{'AutoRun'},$t->{'up'} . $t->{'dow'} . $t->{'forw'} . $t->{'bac'} . $t->{'lef'} . $t->{'rig'} . $toggleon . $bindload);
 }
 
 sub sodFollowKey {
 	my ($t,$bl,$curfile,$SoD,$mobile) = @_;
-	$curfile->SetBind($SoD->{'Follow'},'follow' . actPower_name(undef,true,$mobile) . $bl . SpXWSAD($t) . '.txt');
+	$curfile->SetBind($SoD->{'Follow'},'follow' . actPower_name(undef,true,$mobile) . $bl . $t->KeyState . '.txt');
 }
 
 sub sodFollowOffKey {
@@ -2080,7 +2197,7 @@ sub sodFollowOffKey {
 			}
 		}
 	}
-	$curfile->SetBind($SoD->{'Follow'},"follow" . $toggle . $t->{'up'} . $t->{'dow'} . $t->{'forw'} . $t->{'bac'} . $t->{'lef'} . $t->{'rig'} . $bl . SpXWSAD($t) . '.txt');
+	$curfile->SetBind($SoD->{'Follow'},"follow" . $toggle . $t->{'up'} . $t->{'dow'} . $t->{'forw'} . $t->{'bac'} . $t->{'lef'} . $t->{'rig'} . $bl . $t->KeyState . '.txt');
 }
 
 sub bindisused { 
@@ -2286,7 +2403,7 @@ sub actPower_hybrid {
 sub sodJumpFix {
 	my ($profile,$t,$key,$makeModeKey,$suffix,$bl,$curfile,$turnoff,$autofollowmode,$feedback) = @_;
 
-	my $filename = $t->path("${autofollowmode}j") . SpXWSAD($t) . "$suffix.txt";
+	my $filename = $t->path("${autofollowmode}j") . $t->KeyState . "$suffix.txt";
 	my $tglfile = BindFile->new($filename);
 	$t->{'ini'} = '-down$$';
 	makeModeKey($profile,$t,$bl,$tglfile,$turnoff,undef,true);
@@ -2296,7 +2413,7 @@ sub sodJumpFix {
 sub sodSetDownFix {
 	my ($profile,$t,$key,$makeModeKey,$suffix,$bl,$curfile,$turnoff,$autofollowmode,$feedback) = @_;
 	my $pathsuffix = $autofollowmode ? 'f' : 'a';
-	my $filename = $t->path("$autofollowmode$pathsuffix") . SpXWSAD($t)  . "$suffix.txt";
+	my $filename = $t->path("$autofollowmode$pathsuffix") . $t->KeyState  . "$suffix.txt";
 	my $tglfile = BindFile->new($filename);
 	$t->{'ini'} = "-down$$";
 	makeModeKey($profile,$t,$bl,$tglfile,$turnoff,undef,true);
