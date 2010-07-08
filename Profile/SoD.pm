@@ -61,7 +61,7 @@ sub new {
 	$SoD->{'GFlyMode'} ||= "G";
 	$SoD->{'NonSoDMode'} ||= "UNBOUND";
 	$SoD->{'BaseMode'} ||= "UNBOUND";
-	$SoD->{'Default'} ||= "Base";
+	$SoD->{'Default'} ||= "Jump";
 	$SoD->{'Jump'} ||= {};
 	$SoD->{'Jump'}->{'CJ'} = 1;
 	$SoD->{'Jump'}->{'SJ'} = 1;
@@ -586,30 +586,30 @@ sub makeSoDFile {
 # TODO -- seems like these subs could get consolidated but stab one at that was feeble
 sub makeNonSoDModeKey{
 	my ($p,$t,$bl,$cur,$toff,$fix, $fb) = @_;
-	my $SoD = $p->{'SoD'};
-	return if (not $t->{'NonSoDMode'} or $t->{'NonSoDMode'} eq 'UNBOUND');
+	my $key = $t->{'NonSoDMode'};
+	return if (not $key or $key eq 'UNBOUND');
 
-	my $feedback = $SoD->{'Feedback'} ? ($fb or '$$t $name, Non-SoD Mode') : '';
+	my $feedback = $p->{'SoD'}->{'Feedback'} ? ($fb or '$$t $name, Non-SoD Mode') : '';
 	$t->{'ini'} ||= '';
 	if ($bl eq "r") {
 		my $bindload = $t->bl('n');
 		if ($fix) {
-			&$fix($p,$t,$t->{'NonSoDMode'}, \&makeNonSoDModeKey,"n",$bl,$cur,$toff,'',$feedback)
+			&$fix($p,$t,$key, \&makeNonSoDModeKey,"n",$bl,$cur,$toff,'',$feedback)
 		} else {
-			$cur->SetBind($t->{'NonSoDMode'}, $t->{'ini'} . actPower_toggle(undef,1,undef,$toff) . $t->U . $t->D . $t->F . $t->B . $t->L . $t->R . $t->{'detailhi'} . $t->{'runcamdist'} . $feedback . $bindload)
+			$cur->SetBind($key, $t->{'ini'} . actPower_toggle(undef,1,undef,$toff) . $t->dirs('UDFBLR') . $t->{'detailhi'} . $t->{'runcamdist'} . $feedback . $bindload)
 		}
 	} elsif ($bl eq "ar") {
 		my $bindload = $t->bl('an');
 		if ($fix) {
-			&$fix($p,$t,$t->{'NonSoDMode'}, \&makeNonSoDModeKey,"n",$bl,$cur,$toff,"a",$feedback)
+			&$fix($p,$t,$key, \&makeNonSoDModeKey,"n",$bl,$cur,$toff,"a",$feedback)
 		} else {
-			$cur->SetBind($t->{'NonSoDMode'}, $t->{'ini'} . actPower_toggle(undef,1,undef,$toff)..$t->{'detailhi'} . $t->{'runcamdist'} . '$$up 0' . $t->D . $t->L . $t->R . $feedback . $bindload);
+			$cur->SetBind($key, $t->{'ini'} . actPower_toggle(undef,1,undef,$toff)..$t->{'detailhi'} . $t->{'runcamdist'} . '$$up 0' . $t->dirs('DLR') . $feedback . $bindload);
 		}
 	} else {
 		if ($fix) {
-			&$fix($p,$t,$t->{'NonSoDMode'}, \&makeNonSoDModeKey,"n",$bl,$cur,$toff,"f",$feedback)
+			&$fix($p,$t,$key, \&makeNonSoDModeKey,"n",$bl,$cur,$toff,"f",$feedback)
 		} else {
-			$cur->SetBind($t->{'NonSoDMode'}, $t->{'ini'} . actPower_toggle(undef,1,undef,$toff)..$t->{'detailhi'} . $t->{'runcamdist'} . '$$up 0' . $feedback . $t->bl('fn'));
+			$cur->SetBind($key, $t->{'ini'} . actPower_toggle(undef,1,undef,$toff)..$t->{'detailhi'} . $t->{'runcamdist'} . '$$up 0' . $feedback . $t->bl('fn'));
 		}
 	}
 	$t->{'ini'} = '';
@@ -618,24 +618,24 @@ sub makeNonSoDModeKey{
 # ODO -- seems like these subs could get consolidated but stab one at that was feeble
 sub makeTempModeKey  {
 	my ($p,$t,$bl,$cur,$toff) = @_;
-	my $SoD = $p->{'SoD'};
-	return if (not $t->{'TempMode'} or $t->{'TempMode'} eq "UNBOUND");
+	my $key = $t->{'TempMode'};
+	return if (not $key or $key eq "UNBOUND");
 
-	my $feedback = $SoD->{'Feedback'} ? '$$t $name, Temp Mode' : '';
+	my $feedback = $p->{'SoD'}->{'Feedback'} ? '$$t $name, Temp Mode' : '';
 	$t->{'ini'} ||= '';
-	my $trayslot = "1 $SoD->{'Temp'}->{'Tray'}";
+	my $trayslot = "1 $p->{'SoD'}->{'Temp'}->{'Tray'}";
 
 	if ($bl eq "r") {
 		my $bindload = $t->bl('t');
-		$cur->SetBind($t->{'TempMode'},$t->{'ini'} . actPower(undef,1,$trayslot,$toff) . $t->U . $t->D . $t->F . $t->B . $t->L . $t->R . $t->{'detaillo'} . $t->{'flycamdist'} . $feedback . $bindload);
+		$cur->SetBind($key, $t->{'ini'} . actPower(undef,1,$trayslot,$toff) . $t->dirs('UDFBLR') . $t->{'detaillo'} . $t->{'flycamdist'} . $feedback . $bindload);
 	} elsif ($bl eq "ar") {
 		my $bindload  = $t->path('at');
 		my $bindload2 = $t->path('at','_t');
 		my $tgl = BindFile->new($bindload2);
-		$cur->SetBind($t->{'TempMode'}, $t->{'in'} . actPower(undef,1,$trayslot,$toff) . $t->{'detaillo'} . $t->{'flycamdist'} . '$$up 0' . $t->D . $t->L . $t->R . $feedback . $bindload2);
-		$tgl->SetBind($t->{'TempMode'}, $t->{'in'} . actPower(undef,1,$trayslot,$toff) . $t->{'detaillo'} . $t->{'flycamdist'} . '$$up 0' . $t->D . $t->L . $t->R . $feedback . $bindload);
+		$cur->SetBind($key, $t->{'in'} . actPower(undef,1,$trayslot,$toff) . $t->{'detaillo'} . $t->{'flycamdist'} . '$$up 0' . $t->dirs('DLR') . $feedback . $bindload2);
+		$tgl->SetBind($key, $t->{'in'} . actPower(undef,1,$trayslot,$toff) . $t->{'detaillo'} . $t->{'flycamdist'} . '$$up 0' . $t->dirs('DLR') . $feedback . $bindload);
 	} else {
-		$cur->SetBind($t->{'TempMode'}, $t->{'ini'} . actPower(undef,1,$trayslot,$toff) . $t->{'detaillo'} . $t->{'flycamdist'} . '$$up 0' . $feedback . $t->bl('ft'));
+		$cur->SetBind($key, $t->{'ini'} . actPower(undef,1,$trayslot,$toff) . $t->{'detaillo'} . $t->{'flycamdist'} . '$$up 0' . $feedback . $t->bl('ft'));
 	}
 	$t->{'ini'} = '';
 }
@@ -644,12 +644,12 @@ sub makeTempModeKey  {
 # TODO -- seems like these subs could get consolidated but stab one at that was feeble
 sub makeQFlyModeKey  {
 	my ($p,$t,$bl,$cur,$toff,$modestr) = @_;
-	my $SoD = $p->{'SoD'};
-	return if (not $t->{'QFlyMode'} or $t->{'QFlyMode'} eq "UNBOUND");
+	my $key = $t->{'QFlyMode'};
+	return if (not $key or $key eq "UNBOUND");
 
-	if ($modestr eq "NonSoD") { $cur->SetBind($t->{'QFlyMode'}, "powexecname Quantum Flight") && return; }
+	if ($modestr eq "NonSoD") { $cur->SetBind($key, "powexecname Quantum Flight") && return; }
 
-	my $feedback = $SoD->{'Feedback'} ? '$$t $name, QFlight Mode' : '';
+	my $feedback = $p->{'SoD'}->{'Feedback'} ? '$$t $name, QFlight Mode' : '';
 	$t->{'ini'} ||= '';
 
 	if ($bl eq "r") {
@@ -659,17 +659,17 @@ sub makeQFlyModeKey  {
 
 		my $tray = ($modestr eq 'Nova' or $modestr eq 'Dwarf') ? '$$gototray 1' : '';
 
-		$cur->SetBind($t->{'QFlyMode'}, $t->{'ini'} . actPower(undef,1,'Quantum Flight', $toff) . $tray . $t->U . $t->D . $t->F . $t->B . $t->L . $t->R . $t->{'detaillo'} . $t->{'flycamdist'} . $feedback . $bindload2);
-		$tgl->SetBind($t->{'QFlyMode'}, $t->{'ini'} . actPower(undef,1,'Quantum Flight', $toff) . $tray . $t->U . $t->D . $t->F . $t->B . $t->L . $t->R . $t->{'detaillo'} . $t->{'flycamdist'} . $feedback . $bindload);
+		$cur->SetBind($key, $t->{'ini'} . actPower(undef,1,'Quantum Flight', $toff) . $tray . $t->dirs('UDFBLR') . $t->{'detaillo'} . $t->{'flycamdist'} . $feedback . $bindload2);
+		$tgl->SetBind($key, $t->{'ini'} . actPower(undef,1,'Quantum Flight', $toff) . $tray . $t->dirs('UDFBLR') . $t->{'detaillo'} . $t->{'flycamdist'} . $feedback . $bindload);
 
 	} elsif ($bl eq "ar") {
 		my $bindload  = $t->path('an');
 		my $bindload2 = $t->path('an','_t');
 		my $tgl = BindFile->new($bindload2);
-		$cur->SetBind($t->{'QFlyMode'}, $t->{'in'} . actPower(undef,1,'Quantum Flight', $toff) . $t->{'detaillo'} . $t->{'flycamdist'} . '$$up 0' . $t->D . $t->L . $t->R . $feedback . $bindload2);
-		$tgl->SetBind($t->{'QFlyMode'}, $t->{'in'} . actPower(undef,1,'Quantum Flight', $toff) . $t->{'detaillo'} . $t->{'flycamdist'} . '$$up 0' . $t->D . $t->L . $t->R . $feedback . $bindload);
+		$cur->SetBind($key, $t->{'in'} . actPower(undef,1,'Quantum Flight', $toff) . $t->{'detaillo'} . $t->{'flycamdist'} . '$$up 0' . $t->dirs('DLR') . $feedback . $bindload2);
+		$tgl->SetBind($key, $t->{'in'} . actPower(undef,1,'Quantum Flight', $toff) . $t->{'detaillo'} . $t->{'flycamdist'} . '$$up 0' . $t->dirs('DLR') . $feedback . $bindload);
 	} else {
-		$cur->SetBind($t->{'QFlyMode'}, $t->{'ini'} . actPower(undef,1,'Quantum Flight', $toff) . $t->{'detaillo'} . $t->{'flycamdist'} . '$$up 0' . $feedback . $t->bl('fn'));
+		$cur->SetBind($key, $t->{'ini'} . actPower(undef,1,'Quantum Flight', $toff) . $t->{'detaillo'} . $t->{'flycamdist'} . '$$up 0' . $feedback . $t->bl('fn'));
 	}
 	$t->{'ini'} = '';
 }
@@ -677,10 +677,10 @@ sub makeQFlyModeKey  {
 # TODO -- seems like these subs could get consolidated but stab one at that was feeble
 sub makeBaseModeKey  {
 	my ($p,$t,$bl,$cur,$toff,$fix,$fb) = @_;
-	my $SoD = $p->{'SoD'};
-	return if (not $t->{'BaseMode'} or $t->{'BaseMode'} eq "UNBOUND");
+	my $key = $t->{'BaseMode'};
+	return if (not $key or $key eq "UNBOUND");
 
-	my $feedback = $SoD->{'Feedback'} ? ($fb or '$$t $name, Sprint-SoD Mode') : '';
+	my $feedback = $p->{'SoD'}->{'Feedback'} ? ($fb or '$$t $name, Sprint-SoD Mode') : '';
 	$t->{'ini'} ||= '';
 
 	if ($bl eq "r") {
@@ -689,24 +689,24 @@ sub makeBaseModeKey  {
 		my $ton = actPower_toggle(1, 1, ($t->{'horizkeys'} ? $t->{'sprint'} : ''), $toff);
 
 		if ($fix) {
-			&$fix($p,$t,$t->{'BaseMode'}, \&makeBaseModeKey,"r",$bl,$cur,$toff,'',$feedback)
+			&$fix($p,$t,$key, \&makeBaseModeKey,"r",$bl,$cur,$toff,'',$feedback)
 		} else {
-			$cur->SetBind($t->{'BaseMode'}, $t->{'ini'} . $ton . $t->U . $t->D . $t->F . $t->B . $t->L . $t->R . $t->{'detailhi'} . $t->{'runcamdist'} . $feedback . $bindload);
+			$cur->SetBind($key, $t->{'ini'} . $ton . $t->dirs('UDFBLR') . $t->{'detailhi'} . $t->{'runcamdist'} . $feedback . $bindload);
 		}
 
 	} elsif ($bl eq "ar") {
 		my $bindload  = $t->bl('gr');
 
 		if ($fix) {
-			&$fix($p,$t,$t->{'BaseMode'}, \&makeBaseModeKey,"r",$bl,$cur,$toff,"a",$feedback)
+			&$fix($p,$t,$key, \&makeBaseModeKey,"r",$bl,$cur,$toff,"a",$feedback)
 		} else {
-			$cur->SetBind($t->{'BaseMode'}, $t->{'ini'} . actPower_toggle(1,1,$t->{'sprint'},$toff) . $t->{'detailhi'} .  $t->{'runcamdist'} . '$$up 0' . $t->D . $t->L . $t->R . $feedback . $bindload);
+			$cur->SetBind($key, $t->{'ini'} . actPower_toggle(1,1,$t->{'sprint'},$toff) . $t->{'detailhi'} .  $t->{'runcamdist'} . '$$up 0' . $t->dirs('DLR') . $feedback . $bindload);
 		}
 	} else {
 		if ($fix) {
-			&$fix($p,$t,$t->{'BaseMode'}, \&makeBaseModeKey,"r",$bl,$cur,$toff,"f",$feedback)
+			&$fix($p,$t,$key, \&makeBaseModeKey,"r",$bl,$cur,$toff,"f",$feedback)
 		} else {
-			$cur->SetBind($t->{'BaseMode'}, $t->{'ini'} . actPower_toggle(1,1,$t->{'sprint'}, $toff) . $t->{'detailhi'} . $t->{'runcamdist'} . '$$up 0' . $fb . $t->bl('fr'));
+			$cur->SetBind($key, $t->{'ini'} . actPower_toggle(1,1,$t->{'sprint'}, $toff) . $t->{'detailhi'} . $t->{'runcamdist'} . '$$up 0' . $fb . $t->bl('fr'));
 		}
 	}
 	$t->{'ini'} = '';
@@ -715,35 +715,35 @@ sub makeBaseModeKey  {
 # TODO -- seems like these subs could get consolidated but stab one at that was feeble
 sub makeSpeedModeKey   {
 	my ($p,$t,$bl,$cur,$toff,$fix,$fb) = @_;
-	my $SoD = $p->{'SoD'};
-	my $feedback = $SoD->{'Feedback'} ? ($fb or '$$t $name, Superspeed Mode') : '';
+	my $key = $t->{'RunMode'};
+	my $feedback = $p->{'SoD'}->{'Feedback'} ? ($fb or '$$t $name, Superspeed Mode') : '';
 	$t->{'ini'} ||= '';
 	if ($t->{'canss'}) {
 		if ($bl eq 's') {
 			my $bindload = $t->bl('s');
 			if ($fix) {
-				&$fix($p,$t,$t->{'RunMode'},\&makeSpeedModeKey,"s",$bl,$cur,$toff,'',$feedback)
+				&$fix($p,$t,$key,\&makeSpeedModeKey,"s",$bl,$cur,$toff,'',$feedback)
 			} else {
-				$cur->SetBind($t->{'RunMode'},$t->{'ini'} . actPower_toggle(1,1,$t->{'speed'},$toff) . $t->U . $t->D . $t->F . $t->B . $t->L . $t->R . $t->{'detaillo'} . $t->{'flycamdist'} . $feedback . $bindload);
+				$cur->SetBind($key,$t->{'ini'} . actPower_toggle(1,1,$t->{'speed'},$toff) . $t->dirs('UDFBLR') . $t->{'detaillo'} . $t->{'flycamdist'} . $feedback . $bindload);
 			}
 		} elsif ($bl eq "as") {
 			my $bindload = $t->bl('as');
 			if ($fix) {
-				&$fix($p,$t,$t->{'RunMode'},\&makeSpeedModeKey,"s",$bl,$cur,$toff,"a",$feedback)
+				&$fix($p,$t,$key,\&makeSpeedModeKey,"s",$bl,$cur,$toff,"a",$feedback)
 			} elsif (not $feedback) {
-				$cur->SetBind($t->{'RunMode'},$t->{'ini'} . actPower_toggle(1,1,$t->{'speed'},$toff) . $t->U . $t->D . $t->L . $t->R . $t->{'detaillo'} . $t->{'flycamdist'} . $feedback . $bindload);
+				$cur->SetBind($key,$t->{'ini'} . actPower_toggle(1,1,$t->{'speed'},$toff) . $t->dirs('UDLR') . $t->{'detaillo'} . $t->{'flycamdist'} . $feedback . $bindload);
 			} else {
 				my $bindload  = $t->path('as');
 				my $bindload2 = $t->path('as','_s');
 				my $tgl = BindFile->new($bindload2);
-				$cur->SetBind($t->{'RunMode'},$t->{'ini'} . actPower_toggle(1,1,$t->{'speed'},$toff) . $t->U . $t->D . $t->L . $t->R . $t->{'detaillo'} . $t->{'flycamdist'} . $feedback . $bindload2);
-				$tgl->SetBind($t->{'RunMode'},$t->{'ini'} . actPower_toggle(1,1,$t->{'speed'},$toff) . $t->U . $t->D . $t->L . $t->R . $t->{'detaillo'} . $t->{'flycamdist'} . $feedback . $bindload);
+				$cur->SetBind($key,$t->{'ini'} . actPower_toggle(1,1,$t->{'speed'},$toff) . $t->dirs('UDLR') . $t->{'detaillo'} . $t->{'flycamdist'} . $feedback . $bindload2);
+				$tgl->SetBind($key,$t->{'ini'} . actPower_toggle(1,1,$t->{'speed'},$toff) . $t->dirs('UDLR') . $t->{'detaillo'} . $t->{'flycamdist'} . $feedback . $bindload);
 			}
 		} else {
 			if ($fix) {
-				&$fix($p,$t,$t->{'RunMode'},\&makeSpeedModeKey,"s",$bl,$cur,$toff,"f",$feedback)
+				&$fix($p,$t,$key,\&makeSpeedModeKey,"s",$bl,$cur,$toff,"f",$feedback)
 			} else {
-				$cur->SetBind($t->{'RunMode'}, $t->{'ini'} . actPower_toggle(1,1,$t->{'speed'},$toff) . '$$up 0' .  $t->{'detaillo'} . $t->{'flycamdist'} . $feedback . $t->bl('fs'));
+				$cur->SetBind($key, $t->{'ini'} . actPower_toggle(1,1,$t->{'speed'},$toff) . '$$up 0' .  $t->{'detaillo'} . $t->{'flycamdist'} . $feedback . $t->bl('fs'));
 			}
 		}
 	}
@@ -754,10 +754,10 @@ sub makeSpeedModeKey   {
 # TODO -- seems like these subs could get consolidated but stab one at that was feeble
 sub makeJumpModeKey  {
 	my ($p,$t,$bl,$cur,$toff,$fbl) = @_;
-	my $SoD = $p->{'SoD'};
-	if ($t->{'canjmp'} and not $SoD->{'Jump'}->{'Simple'}) {
+	my $key = $t->{'JumpMode'};
+	if ($t->{'canjmp'} and not $p->{'SoD'}->{'Jump'}->{'Simple'}) {
 
-		my $feedback = $SoD->{'Feedback'} ? '$$t $name, Superjump Mode' : '';
+		my $feedback = $p->{'SoD'}->{'Feedback'} ? '$$t $name, Superjump Mode' : '';
 		my $filename = $fbl . $t->KeyState . 'j.txt';
 		my $tgl = BindFile->new($filename);
 
@@ -769,15 +769,15 @@ sub makeJumpModeKey  {
 				$a = actPower(undef,1,$t->{'cjmp'},$toff);
 			}
 			my $bindload = $t->bl('j');
-			$tgl->SetBind($t->{'JumpMode'}, '-down' . $a . $t->{'detaillo'} . $t->{'flycamdist'} . $bindload);
-			$cur->SetBind($t->{'JumpMode'}, '+down' . $feedback . '$$bindloadfilesilent ' . $filename)
+			$tgl->SetBind($key, '-down' . $a . $t->{'detaillo'} . $t->{'flycamdist'} . $bindload);
+			$cur->SetBind($key, '+down' . $feedback . '$$bindloadfilesilent ' . $filename)
 		} elsif ($bl eq "aj") {
 			my $bindload = $t->bl('aj');
-			$tgl->SetBind($t->{'JumpMode'}, '-down' . actPower(undef,1,$t->{'jump'},$toff) . '$$up 1' . $t->{'detaillo'} . $t->{'flycamdist'} . $t->D . $t->L . $t->R . $bindload);
-			$cur->SetBind($t->{'JumpMode'}, '+down' . $feedback . '$$bindloadfilesilent ' . $filename);
+			$tgl->SetBind($key, '-down' . actPower(undef,1,$t->{'jump'},$toff) . '$$up 1' . $t->{'detaillo'} . $t->{'flycamdist'} . $t->dirs('DLR') . $bindload);
+			$cur->SetBind($key, '+down' . $feedback . '$$bindloadfilesilent ' . $filename);
 		} else {
-			$tgl->SetBind($t->{'JumpMode'}, '-down' . actPower(undef,1,$t->{'jump'},$toff) . '$$up 1' . $t->{'detaillo'} . $t->{'flycamdist'} . $t->bl('fj'));
-			$cur->SetBind($t->{'JumpMode'}, '+down' . $feedback . '$$bindloadfilesilent ' . $filename);
+			$tgl->SetBind($key, '-down' . actPower(undef,1,$t->{'jump'},$toff) . '$$up 1' . $t->{'detaillo'} . $t->{'flycamdist'} . $t->bl('fj'));
+			$cur->SetBind($key, '+down' . $feedback . '$$bindloadfilesilent ' . $filename);
 		}
 	}
 	$t->{'ini'} = '';
@@ -786,41 +786,40 @@ sub makeJumpModeKey  {
 # TODO -- seems like these subs could get consolidated but stab one at that was feeble
 sub makeFlyModeKey   {
 	my ($p,$t,$bl,$cur,$toff,$fix,$fb,$fb_on_a) = @_;
-	my $SoD = $p->{'SoD'};
-
-	return if (not $t->{'FlyMode'} or $t->{'FlyMode'} eq "UNBOUND");
-	my $feedback = $SoD->{'Feedback'} ? ($fb or '$$t $name, Flight Mode') : '';
+	my $key = $t->{'FlyMode'};
+	return if (not $key or $key eq "UNBOUND");
+	my $feedback = $p->{'SoD'}->{'Feedback'} ? ($fb or '$$t $name, Flight Mode') : '';
 
 	$t->{'ini'} ||= '';
 	if ($t->{'canhov'} + $t->{'canfly'} > 0) {
 		if ($bl eq "bo") {
 			my $bindload = $t->bl('bo');
 			if ($fix) {
-				&$fix($p,$t,$t->{'FlyMode'},\&makeFlyModeKey,"f",$bl,$cur,$toff,'',$feedback);
+				&$fix($p,$t,$key,\&makeFlyModeKey,"f",$bl,$cur,$toff,'',$feedback);
 			} else {
-				$cur->SetBind($t->{'FlyMode'},'+down$$' . actPower_toggle(1,1,$t->{'flyx'},$toff) . '$$up 1$$down 0' . $t->F . $t->B . $t->L . $t->R . $t->{'detaillo'} . $t->{'flycamdist'} . $feedback . $bindload);
+				$cur->SetBind($key,'+down$$' . actPower_toggle(1,1,$t->{'flyx'},$toff) . '$$up 1$$down 0' . $t->dirs('FBLR') . $t->{'detaillo'} . $t->{'flycamdist'} . $feedback . $bindload);
 			}
 		} elsif ($bl eq "a") {
 			if (not $fb_on_a) { $feedback = ''; }
 			my $bindload = $t->bl('a');
 			my $ton = $t->{'tkeys'} ? $t->{'flyx'} : $t->{'hover'};
 			if ($fix) {
-				&$fix($p,$t,$t->{'FlyMode'},\&makeFlyModeKey,"f",$bl,$cur,$toff,'',$feedback);
+				&$fix($p,$t,$key,\&makeFlyModeKey,"f",$bl,$cur,$toff,'',$feedback);
 			} else {
-				$cur->SetBind($t-{'FlyMode'}, $t->{'ini'} . actPower_toggle(1,1,$ton ,$toff) . $t->U . $t->D . $t->L . $t->R . $t->{'detaillo'} . $t->{'flycamdist'} . $feedback . $bindload)
+				$cur->SetBind($t-{'FlyMode'}, $t->{'ini'} . actPower_toggle(1,1,$ton ,$toff) . $t->dirs('UDLR') . $t->{'detaillo'} . $t->{'flycamdist'} . $feedback . $bindload)
 			}
 		} elsif ($bl eq "af") {
 			my $bindload = $t->bl('af');
 			if ($fix) {
-				&$fix($p,$t,$t->{'FlyMode'},\&makeFlyModeKey,"f",$bl,$cur,$toff,"a",$feedback);
+				&$fix($p,$t,$key,\&makeFlyModeKey,"f",$bl,$cur,$toff,"a",$feedback);
 			} else {
-				$cur->SetBind($t->{'FlyMode'}, $t->{'ini'} . actPower_toggle(1,1,$t->{'flyx'},$toff) . $t->{'detaillo'} . $t->{'flycamdist'} . $t->D . $t->L . $t->R . $feedback . $bindload)
+				$cur->SetBind($key, $t->{'ini'} . actPower_toggle(1,1,$t->{'flyx'},$toff) . $t->{'detaillo'} . $t->{'flycamdist'} . $t->dirs('DLR') . $feedback . $bindload)
 			}
 		} else {
 			if ($fix) {
-				&$fix($p,$t,$t->{'FlyMode'},\&makeFlyModeKey,"f",$bl,$cur,$toff,"f",$feedback);
+				&$fix($p,$t,$key,\&makeFlyModeKey,"f",$bl,$cur,$toff,"f",$feedback);
 			} else {
-				$cur->SetBind($t->{'FlyMode'}, $t->{'ini'} . actPower_toggle(1,1,$t->{'flyx'},$toff) . $t->U . $t->D . $t->F . $t->B . $t->L . $t->R . $t->{'detaillo'} . $t->{'flycamdist'} . $feedback . $t->bl('ff'));
+				$cur->SetBind($key, $t->{'ini'} . actPower_toggle(1,1,$t->{'flyx'},$toff) . $t->dirs('UDFBLR') . $t->{'detaillo'} . $t->{'flycamdist'} . $feedback . $t->bl('ff'));
 			}
 		}
 	}
@@ -831,32 +830,32 @@ sub makeFlyModeKey   {
 # TODO -- seems like these subs could get consolidated but stab one at that was feeble
 sub makeGFlyModeKey  {
 	my ($p,$t,$bl,$cur,$toff,$fix) = @_;
-	my $SoD = $p->{'SoD'};
+	my $key = $t->{'GFlyMode'};
 
 	$t->{'ini'} ||= '';
 	if ($t->{'cangfly'} > 0) {
 		if ($bl eq "gbo") {
 			my $bindload = $t->bl('gbo');
 			if ($fix) {
-				&$fix($p,$t,$t->{'GFlyMode'},\&makeGFlyModeKey,"gf",$bl,$cur,$toff,'','');
+				&$fix($p,$t,$key,\&makeGFlyModeKey,"gf",$bl,$cur,$toff,'','');
 			} else {
-				$cur->SetBind($t->{'GFlyMode'},$t->{'ini'} . '$$up 1$$down 0' . actPower_toggle(undef,1,$t->{'gfly'},$toff) . $t->F . $t->B . $t->L . $t->R . $t->{'detaillo'} . $t->{'flycamdist'} .$bindload);
+				$cur->SetBind($key,$t->{'ini'} . '$$up 1$$down 0' . actPower_toggle(undef,1,$t->{'gfly'},$toff) . $t->dirs('FBLR') . $t->{'detaillo'} . $t->{'flycamdist'} .$bindload);
 			}
 		} elsif ($bl eq "gaf") {
 			my $bindload = $t->bl('gaf');
 			if ($fix) {
-				&$fix($p,$t,$t->{'GFlyMode'},\&makeGFlyModeKey,"gf",$bl,$cur,$toff,"a")
+				&$fix($p,$t,$key,\&makeGFlyModeKey,"gf",$bl,$cur,$toff,"a")
 			} else {
-				$cur->SetBind($t->{'GFlyMode'},$t->{'ini'} . $t->{'detaillo'} . $t->{'flycamdist'} . $t->U . $t->D . $t->L . $t->R . $bindload);
+				$cur->SetBind($key,$t->{'ini'} . $t->{'detaillo'} . $t->{'flycamdist'} . $t->dirs('UDLR') . $bindload);
 			}
 		} else {
 			if ($fix) {
-				&$fix($p,$t,$t->{'GFlyMode'},\&makeGFlyModeKey,"gf",$bl,$cur,$toff,"f")
+				&$fix($p,$t,$key,\&makeGFlyModeKey,"gf",$bl,$cur,$toff,"f")
 			} else {
 				if ($bl eq "gf") {
-					$cur->SetBind($t->{'GFlyMode'},$t->{'ini'} . actPower_toggle(1,1,$t->{'gfly'},$toff) . $t->{'detaillo'} . $t->{'flycamdist'} . $t->bl('gff'));
+					$cur->SetBind($key,$t->{'ini'} . actPower_toggle(1,1,$t->{'gfly'},$toff) . $t->{'detaillo'} . $t->{'flycamdist'} . $t->bl('gff'));
 				} else {
-					$cur->SetBind($t->{'GFlyMode'},$t->{'ini'} . $t->{'detaillo'} . $t->{'flycamdist'} . $t->bl('gff'));
+					$cur->SetBind($key,$t->{'ini'} . $t->{'detaillo'} . $t->{'flycamdist'} . $t->bl('gff'));
 				}
 			}
 		}
@@ -1512,7 +1511,7 @@ sub sodUpKey {
 		$toggle = actPower_name(undef,1,$toggleon,$toggleoff,$toggleoff2);
 	}
 
-	my $newbits = (1-$t->{'space'}) . $t->{'X'} . $t->{'W'} . $t->{'S'} . $t->{'A'} . $t->{'D'};
+	my $newbits = $t->KeyState({toggle => 'space'});
 	$bl =~ s/\d\d\d\d\d\d/$newbits/;
 
 	my $ini = ($t->{'space'} == 1) ? '-down' : '+down';
@@ -1575,7 +1574,7 @@ sub sodDownKey {
 		$toggle = actPower_name(undef,1,$toggleon,$toggleoff)
 	}
 
-	my $newbits = $t->{'space'} . (1-$t->{'X'}) . $t->{'W'} . $t->{'S'} . $t->{'A'} . $t->{'D'};
+	my $newbits = $t->KeyState({toggle => 'X'});
 	$bl =~ s/\d\d\d\d\d\d/$newbits/;
 
 	my $ini = ($t->{'X'} == 1) ? '-down' : '+down';
@@ -1647,7 +1646,7 @@ sub sodForwardKey {
 		$toggle = actPower_name(undef,1,$toggleon,$toggleoff);
 	}
 
-	my $newbits = $t->{'space'} . $t->{'X'} . (1-$t->{'W'}) . $t->{'S'} . $t->{'A'} . $t->{'D'};
+	my $newbits = $t->KeyState({toggle => 'W'});
 	$bl =~ s/\d\d\d\d\d\d/$newbits/;
 
 	my $ini = ($t->{'W'} == 1) ? '-down' : '+down';
@@ -1731,7 +1730,7 @@ sub sodBackKey {
 		$toggle = actPower_name(undef,1,$toggleon,$toggleoff);
 	}
 
-	my $newbits = $t->{'space'} . $t->{'X'} . $t->{'W'} . (1-$t->{'S'}) . $t->{'A'} . $t->{'D'};
+	my $newbits = $t->KeyState({toggle => 'S'});
 	$bl =~ s/\d\d\d\d\d\d/$newbits/;
 
 	my $ini = ($t->{'S'} == 1) ? "-down" : "+down";
@@ -1808,7 +1807,7 @@ sub sodLeftKey {
 		$toggle = actPower_name(undef,1,$toggleon,$toggleoff);
 	}
 
-	my $newbits = $t->{'space'} . $t->{'X'} . $t->{'W'} . $t->{'S'} . (1-$t->{'A'}) . $t->{'D'};
+	my $newbits = $t->KeyState({toggle => 'A'});
 	$bl =~ s/\d\d\d\d\d\d/$newbits/;
 
 	my $ini = ($t->{'A'} == 1) ? '-down' : '+down';
@@ -1879,7 +1878,7 @@ sub sodRightKey {
 		$toggle = actPower_name(undef,1,$toggleon,$toggleoff);
 	}
 
-	my $newbits = $t->{'space'} . $t->{'X'} . $t->{'W'} . $t->{'S'} . $t->{'A'} . (1-$t->{'D'});
+	my $newbits = $t->KeyState({toggle => 'D'});
 	$bl =~ s/\d\d\d\d\d\d/$newbits/;
 
 	my $ini = ($t->{'D'} == 1) ? '-down' : '+down';
@@ -1903,9 +1902,9 @@ sub sodRightKey {
 sub sodAutoRunKey {
 	my ($t,$bl,$curfile,$SoD,$mobile,$sssj) = @_;
 	if ($sssj and $t->{'space'} == 1) { 
-		$curfile->SetBind($SoD->{'AutoRun'},'forward 1$$backward 0' . $t->U . $t->D . $t->L . $t->R . $t->{'mlon'} . actPower_name(undef,1,$sssj,$mobile) . $bl);
+		$curfile->SetBind($SoD->{'AutoRun'},'forward 1$$backward 0' . $t->dirs('UDLR') . $t->{'mlon'} . actPower_name(undef,1,$sssj,$mobile) . $bl);
 	} else {
-		$curfile->SetBind($SoD->{'AutoRun'},'forward 1$$backward 0' . $t->U . $t->D . $t->L . $t->R . $t->{'mlon'} . actPower_name(undef,1,$mobile) . $bl);
+		$curfile->SetBind($SoD->{'AutoRun'},'forward 1$$backward 0' . $t->dirs('UDLR') . $t->{'mlon'} . actPower_name(undef,1,$mobile) . $bl);
 	}
 }
 
@@ -1932,7 +1931,7 @@ sub sodAutoRunOffKey {
 		}
 	}
 	my $bindload = $bl . $t->KeyState . '.txt';
-	$curfile->SetBind($SoD->{'AutoRun'},$t->U . $t->D . $t->F . $t->B . $t->L . $t->R . $toggleon . $bindload);
+	$curfile->SetBind($SoD->{'AutoRun'},$t->dirs('UDFBLR') . $toggleon . $bindload);
 }
 
 sub sodFollowKey {
@@ -2225,20 +2224,42 @@ sub new {
 	return $self;
 }
 
-sub KeyState { my $t = shift;  return "$t->{'space'}$t->{'X'}$t->{'W'}$t->{'S'}$t->{'A'}$t->{'D'}"; }
+sub KeyState {
+	my $t = shift;
+	my $p = shift;
+	my $togglebit = $p->{'toggle'} || '';
+
+	my $ret;
+	for (qw(space X W S A D)) {
+		$ret .= ($_ eq $togglebit) ? not $t->{$_} : $t->{$_};
+	}
+	return $ret;
+}
 
 sub bl {
-	my ($self, $code, $suffix) = @_;
+	my $self = shift;
+	my $code = shift;
+	my $suffix = shift || '';
 	my $p = $self->{'profile'};
 	return BindFile::BLF($p, uc($code), uc($code) . $self->KeyState . $suffix . '.txt');
 }
 
 sub path {
-	my ($self, $code, $suffix) = @_;
+	my $self = shift;
+	my $code = shift;
+	my $suffix = shift || '';
 	my $p = $self->{'profile'};
 	return BindFile::BLFPath($p, uc($code), uc($code) . $self->KeyState . $suffix . '.txt');
 }
 
+sub dirs {
+	my $self = shift;
+	my $ret;
+	for (split '', shift) {
+		$ret .= $self->{ { U => 'up', D => 'dow', F => 'forw', B => 'bac', L => 'lef', R => 'rig' }->{$_} };
+	}
+	return $ret;
+}
 sub U { shift()->{'up'} }
 sub D { shift()->{'dow'} }
 sub F { shift()->{'forw'} }

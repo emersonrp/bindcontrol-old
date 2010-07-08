@@ -30,7 +30,7 @@ sub SetBind {
 	my ($self,$key,$bindtext) = @_;
 	if (not $key)  {
 		my @c = caller();
-		# $key = ''; print STDERR "invalid key: $key, bindtext $bindtext from file $c[1] line $c[2]\n" and return;
+		$key = ''; print STDERR "invalid key: $key, bindtext $bindtext from file $c[1] line $c[2]\n" and return;
 	}
 
 	$bindtext =~ s/^ +//;
