@@ -51,19 +51,26 @@ sub profile { shift()->{'Profile'} }
 sub HelpText { qq|Help not currently implemented here.|; }
 
 sub addLabeledButton {
-    my ($self, $sizer, $label, $value, $tooltip) = @_;
+    my ($self, $sizer, $module, $value, $tooltip) = @_;
 
-    my $button = Wx::Button->new($self, Utility::id($label), $value);
+    my $button = Wx::Button->new($self, Utility::id($value), $module->{$value});
     $button->SetToolTip( Wx::ToolTip->new($tooltip)) if $tooltip;
 
-    $sizer->Add( Wx::StaticText->new($self, -1, ($UI::Labels::Labels{$label} || $label)), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
+    $sizer->Add( Wx::StaticText->new($self, -1, ($UI::Labels::Labels{$value} || $value)), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
     $sizer->Add( $button, 0, wxEXPAND );
 
-	Wx::Event::EVT_BUTTON( $self, Utility::id($label),
+	Wx::Event::EVT_BUTTON( $self, Utility::id($value),
 		sub {
-			Wx::Window::FindWindowById(Utility::id($label))->SetLabel(
-				UI::KeyBindDialog::showWindow($self, $label, $value)
-			);
+			my $newKey = UI::KeyBindDialog::showWindow($self, $value, $module->{$value});
+
+			# TODO -- check for conflicts
+			# my $otherThingWithThatBind = checkConflicts($newKey);
+
+			# update the associated profile var
+			$module->{$value} = $newKey;
+
+			# re-label the button
+			Wx::Window::FindWindowById(Utility::id($value))->SetLabel($newKey);
 		}
 	);
 }

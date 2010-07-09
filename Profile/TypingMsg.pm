@@ -23,24 +23,24 @@ sub new {
 	my $Typing = $profile->{'Typing'};
 
 	$Typing->{'Message'} &&= "afk $Typing->{'Message'}";
-	$Typing->{'StartChat'}  ||= "ENTER";
-	$Typing->{'SlashChat1'} ||= "/";
-	$Typing->{'SlashChat2'} ||= ";";
-	$Typing->{'AutoReply'}  ||= "BACKSPACE";
-	$Typing->{'TellTarget'} ||= "COMMA";
+	$Typing->{'Start Chat'}  ||= "ENTER";
+	$Typing->{'Primary Slashchat'} ||= "/";
+	$Typing->{'Secondary Slashchat'} ||= ";";
+	$Typing->{'Autoreply'}  ||= "BACKSPACE";
+	$Typing->{'Tell Target'} ||= "COMMA";
 	$Typing->{'QuickChat'}  ||= "\'";
 
 	my $sizer = Wx::FlexGridSizer->new(0,2,10,10);
 
 	for my $b ( (
-		['StartChat', 'Start Chat Key',     'Choose the key combo that activates the Chat bar'],
-		['SlashChat1','Primary Slashchat',  'Choose the key combo that activates the Chat bar with a slash already typed'],
-		['SlashChat2','Secondary Slashchat','Choose the second key combo that activates the Chat bar with a slash already typed'],
-		['AutoReply', 'Autoreply Key',      'Choose the key combo that Autoreplies to incoming tells'],
-		['TellTarget','Tell Target Key',    'Choose the key combo that starts a /tell to your current target'],
-		['QuickChat', 'QuickChat Key',      'Choose the key combo that activates QuickChat'],
+		['Start Chat',     'Choose the key combo that activates the Chat bar'],
+		['Primary Slashchat',  'Choose the key combo that activates the Chat bar with a slash already typed'],
+		['Secondary Slashchat','Choose the second key combo that activates the Chat bar with a slash already typed'],
+		['Autoreply',      'Choose the key combo that Autoreplies to incoming tells'],
+		['Tell Target',    'Choose the key combo that starts a /tell to your current target'],
+		['QuickChat',      'Choose the key combo that activates QuickChat'],
 	)) {
-		$self->addLabeledButton($sizer, $b->[1], $Typing->{$b->[0]}, $b->[2]);
+		$self->addLabeledButton($sizer, $Typing, @$b);
 	}
 
 # # # TODO -- this is shiny, you can compose a multipart emote etc for typing.  Implement this.

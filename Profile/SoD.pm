@@ -62,71 +62,57 @@ sub new {
 	$SoD->{'NonSoDMode'} ||= "UNBOUND";
 	$SoD->{'BaseMode'} ||= "UNBOUND";
 	$SoD->{'Default'} ||= "Jump";
-	$SoD->{'Jump'} ||= {};
-	$SoD->{'Jump'}->{'CJ'} = 1;
-	$SoD->{'Jump'}->{'SJ'} = 1;
+
+	$SoD->{'JumpCJ'} = 1;
+	$SoD->{'JumpSJ'} = 1;
 
 	# $SoD->{'Run.UseCamdist'} ||= undef;
 	# $SoD->{'Fly.UseCamdist'} ||= undef;
-	$SoD->{'Camdist'} ||= {};
-	$SoD->{'Camdist'}->{'Base'} ||= "15";
-	$SoD->{'Camdist'}->{'Travelling'} ||= "60";
+	$SoD->{'CamdistBase'} ||= "15";
+	$SoD->{'CamdistTravelling'} ||= "60";
 
 	$SoD->{'SS'} ||= {};
-	if (!$SoD->{'SS'}->{'SS'} and ($SoD->{'Run'}->{'PrimaryNumber'} == 2)) { $SoD->{'SS'}->{'SS'} = 1; }
+	if (!$SoD->{'SSSS'} and ($SoD->{'RunPrimaryNumber'} == 2)) { $SoD->{'SSSS'} = 1; }
 
-	$SoD->{'TTP'} ||= {};
-	$SoD->{'TTP'}->{'Bind'} ||="SHIFT+CTRL+LBUTTON";
-	$SoD->{'TTP'}->{'Combo'} ||="SHIFT+CTRL";
-	$SoD->{'TTP'}->{'Reset'} ||="SHIFT+CTRL+T";
+	$SoD->{'TTPMode'} ||="SHIFT+CTRL+LBUTTON";
+	$SoD->{'TTPCombo'} ||="SHIFT+CTRL";
+	$SoD->{'TTPReset'} ||="SHIFT+CTRL+T";
 
-	$SoD->{'TP'} ||= {};
-	$SoD->{'TP'}->{'Bind'} ||= "SHIFT+LBUTTON";
-	$SoD->{'TP'}->{'Combo'} ||= "SHIFT";
-	$SoD->{'TP'}->{'Reset'} ||= "CTRL+T";
-	$SoD->{'TP'}->{'HideWindows'} ||= 1;
+	$SoD->{'TPMode'} ||= "SHIFT+LBUTTON";
+	$SoD->{'TPCombo'} ||= "SHIFT";
+	$SoD->{'TPReset'} ||= "CTRL+T";
+	$SoD->{'TPHideWindows'} ||= 1;
 
-	$SoD->{'Nova'} ||= {
-		Nova  => { Name => undef },
-		Dwarf => { Name => undef },
-	};
-	$SoD->{'Nova'}->{'Mode'} ||= "T";
-	$SoD->{'Nova'}->{'Tray'} ||= "4";
+	$SoD->{'NovaMode'} ||= "T";
+	$SoD->{'NovaTray'} ||= "4";
 
-	$SoD->{'Dwarf'} ||= {
-		Nova  => { Name => undef },
-		Dwarf => { Name => undef },
-	};
-	$SoD->{'Dwarf'}->{'Mode'} ||= "G";
-	$SoD->{'Dwarf'}->{'Tray'} ||= "5";
+	$SoD->{'DwarfMode'} ||= "G";
+	$SoD->{'DwarfTray'} ||= "5";
 
 	if ($profile->{'General'}->{'Archetype'} eq "Peacebringer") {
-		$SoD->{'Nova'}->{'Nova'} = "Bright Nova";
-		$SoD->{'Dwarf'}->{'Dwarf'} = "White Dwarf";
+		$SoD->{'NovaNova'} = "Bright Nova";
+		$SoD->{'DwarfDwarf'} = "White Dwarf";
 		$SoD->{'HumanFormShield'} ||= "Shining Shield";
 
 	} elsif ($profile->{'General'}->{'Archetype'} eq "Warshade") {
-		$SoD->{'Nova'}->{'Nova'} = "Dark Nova";
-		$SoD->{'Dwarf'}->{'Dwarf'} = "Black Dwarf";
+		$SoD->{'NovaNova'} = "Dark Nova";
+		$SoD->{'DwarfDwarf'} = "Black Dwarf";
 		$SoD->{'HumanFormShield'} ||= "Gravity Shield";
 	}
 
-	$SoD->{'Human'} ||= {};
-	$SoD->{'Human'}->{'Mode'}    ||= "UNBOUND";
-	$SoD->{'Human'}->{'Tray'}    ||= "1";
-	$SoD->{'Human'}->{'HumanPBind'} ||= "nop";
-	$SoD->{'Human'}->{'NovaPBind'}  ||= "nop";
-	$SoD->{'Human'}->{'DwarfPBind'} ||= "nop";
+	$SoD->{'HumanMode'}    ||= "UNBOUND";
+	$SoD->{'HumanTray'}    ||= "1";
+	$SoD->{'HumanHumanPBind'} ||= "nop";
+	$SoD->{'HumanNovaPBind'}  ||= "nop";
+	$SoD->{'HumanDwarfPBind'} ||= "nop";
 
 	# TODO!  This number needs to be divided by 100 before being written into the bind.
-	$SoD->{'Detail'} ||= {};
-	$SoD->{'Detail'}->{'Base'}       ||= "100";
-	$SoD->{'Detail'}->{'Travelling'} ||= "50";
+	$SoD->{'DetailBase'}       ||= "100";
+	$SoD->{'DetailTravelling'} ||= "50";
 
 	#  Temp Travel Powers
-	$SoD->{'Temp'} ||= {};
-	$SoD->{'Temp'}->{'Tray'} ||= "6";
-	$SoD->{'Temp'}->{'TraySwitch'} ||= "UNBOUND";
+	$SoD->{'TempTray'} ||= "6";
+	$SoD->{'TempTraySwitch'} ||= "UNBOUND";
 	$SoD->{'TempMode'} ||= "UNBOUND";
 
 	my $topSizer = Wx::FlexGridSizer->new(0,2,10,10);
@@ -142,7 +128,7 @@ sub new {
 	my $movementSizer = Wx::FlexGridSizer->new(0,2,3,3);
 
 	for ( qw(Up Down Forward Back Left Right TurnLeft TurnRight) ){
-		$self->addLabeledButton($movementSizer, $_, $SoD->{$_});
+		$self->addLabeledButton($movementSizer, $SoD, $_);
 	}
 
 	# TODO!  fill this picker with only the appropriate bits.
@@ -178,10 +164,10 @@ sub new {
 	# $generalSizer->Add( Wx::CheckBox->new($self, SPRINT_UNQUEUE, "Exec powexecunqueue"));
 
 	for ( qw(AutoRun Follow NonSoDMode) ){ # TODO - lost "Sprint-Only SoD Mode" b/c couldn't find the name in %$Labels
-		$self->addLabeledButton($generalSizer, $_, $SoD->{$_});
+		$self->addLabeledButton($generalSizer, $SoD, $_);
 	}
 
-	$self->addLabeledButton($generalSizer, 'Toggle', $SoD->{'Toggle'});
+	$self->addLabeledButton($generalSizer, $SoD, 'Toggle');
 
 	$generalBox->Add($generalSizer, 0, wxALIGN_RIGHT|wxALL, 5);
 
@@ -192,13 +178,13 @@ sub new {
 	my $cSizer = Wx::FlexGridSizer->new(0,2,3,3);
 	$cSizer->Add( Wx::StaticText->new($self, -1, "Base Camera Distance"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
 	my $baseSpin = Wx::SpinCtrl->new($self, 0, id('BASE_CAMERA_DISTANCE'));
-	$baseSpin->SetValue($SoD->{'Camdist'}->{'Base'});
+	$baseSpin->SetValue($SoD->{'CamdistBase'});
 	$baseSpin->SetRange(1, 100);
 	$cSizer->Add( $baseSpin, 0, wxEXPAND );
 
 	$cSizer->Add( Wx::StaticText->new($self, -1, "Travelling Camera Distance"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
 	my $travSpin = Wx::SpinCtrl->new($self, 0, id('TRAVEL_CAMERA_DISTANCE'));
-	$travSpin->SetValue($SoD->{'Camdist'}->{'Travelling'});
+	$travSpin->SetValue($SoD->{'CamdistTravelling'});
 	$travSpin->SetRange(1, 100);
 	$cSizer->Add( $travSpin, 0, wxEXPAND );
 
@@ -210,13 +196,13 @@ sub new {
 	my $dSizer = Wx::FlexGridSizer->new(0,2,3,3);
 	$dSizer->Add( Wx::StaticText->new($self, -1, "Base Detail Level"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
 	my $baseDetail = Wx::SpinCtrl->new($self, 0, id('BASE_DETAIL_LEVEL'));
-	$baseDetail->SetValue($SoD->{'Detail'}->{'Base'});
+	$baseDetail->SetValue($SoD->{'DetailBase'});
 	$baseDetail->SetRange(1, 100);
 	$dSizer->Add( $baseDetail, 0, wxEXPAND );
 
 	$dSizer->Add( Wx::StaticText->new($self, -1, "Travelling Detail Level"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
 	my $travDetail = Wx::SpinCtrl->new($self, 0, id('TRAVEL_DETAIL_LEVEL'));
-	$travDetail->SetValue($SoD->{'Detail'}->{'Travelling'});
+	$travDetail->SetValue($SoD->{'DetailTravelling'});
 	$travDetail->SetRange(1, 100);
 	$dSizer->Add( $travDetail, 0, wxEXPAND );
 
@@ -232,7 +218,7 @@ sub new {
 	my $superSpeedBox   = Wx::StaticBoxSizer->new(Wx::StaticBox->new($self, -1, 'Super Speed'), wxVERTICAL);
 
 	my $superSpeedSizer = Wx::FlexGridSizer->new(0,2,3,3);
-	$self->addLabeledButton($superSpeedSizer, 'RunMode', $SoD->{'RunMode'});
+	$self->addLabeledButton($superSpeedSizer, $SoD, 'RunMode');
 
 	$superSpeedBox->Add($superSpeedSizer, 0, wxALIGN_RIGHT);
 
@@ -245,7 +231,7 @@ sub new {
 	my $superJumpBox   = Wx::StaticBoxSizer->new(Wx::StaticBox->new($self, -1, 'Super Jump'), wxVERTICAL);
 	my $superJumpSizer = Wx::FlexGridSizer->new(0,2,3,3);
 
-	$self->addLabeledButton($superJumpSizer, 'JumpMode', $SoD->{'JumpMode'});
+	$self->addLabeledButton($superJumpSizer,  $SoD, 'JumpMode');
 
 	$superJumpBox->Add( $superJumpSizer, 0, wxALIGN_RIGHT );
 	$superJumpBox->Add( Wx::CheckBox->new($self, id('SJ_SIMPLE_TOGGLE'), "Use Simple CJ / SJ Mode Toggle"));
@@ -257,8 +243,8 @@ sub new {
 	my $flyBox   = Wx::StaticBoxSizer->new(Wx::StaticBox->new($self, -1, 'Flight'), wxVERTICAL);
 	my $flySizer = Wx::FlexGridSizer->new(0,2,3,3);
 
-	$self->addLabeledButton($flySizer, 'FlyMode', $SoD->{'FlyMode'});
-	$self->addLabeledButton($flySizer, 'GFlyMode', $SoD->{'GFlyMode'});
+	$self->addLabeledButton($flySizer, $SoD, 'FlyMode');
+	$self->addLabeledButton($flySizer, $SoD, 'GFlyMode');
 
 	$flyBox->Add($flySizer, 0, wxALIGN_RIGHT);
 	$rightColumn->Add($flyBox, 0, wxEXPAND);
@@ -270,9 +256,9 @@ sub new {
 	# if (at == warshade) "Shadow Step / Dwarf Step"
 
 	my $teleportSizer = Wx::FlexGridSizer->new(0,2,3,3);
-	$self->addLabeledButton($teleportSizer, "TPMode",  $SoD->{'TP'}->{'Bind'});
-	$self->addLabeledButton($teleportSizer, "TPCombo", $SoD->{'TP'}->{'Combo'});
-	$self->addLabeledButton($teleportSizer, "TPReset", $SoD->{'TP'}->{'Reset'});
+	$self->addLabeledButton($teleportSizer, $SoD, "TPMode");
+	$self->addLabeledButton($teleportSizer, $SoD, "TPCombo");
+	$self->addLabeledButton($teleportSizer, $SoD, "TPReset");
 	$teleportBox->Add( $teleportSizer, 0, wxALL|wxALIGN_RIGHT, 5 );
 
 	# if (player has hover): {
@@ -281,9 +267,9 @@ sub new {
 
 	# if (player has team-tp) {
 		my $tteleportSizer = Wx::FlexGridSizer->new(0,2,3,3);
-		$self->addLabeledButton($tteleportSizer, "TTPMode",  $SoD->{'TTP'}->{'Bind'});
-		$self->addLabeledButton($tteleportSizer, "TTPCombo", $SoD->{'TTP'}->{'Combo'});
-		$self->addLabeledButton($tteleportSizer, "TTPReset", $SoD->{'TTP'}->{'Reset'});
+		$self->addLabeledButton($tteleportSizer, $SoD, "TTPMode");
+		$self->addLabeledButton($tteleportSizer, $SoD, "TTPCombo");
+		$self->addLabeledButton($tteleportSizer, $SoD, "TTPReset");
 		$teleportBox->Add( $tteleportSizer, 0, wxALL|wxALIGN_RIGHT, 5 );
 
 		# if (player has group fly) {
@@ -298,11 +284,11 @@ sub new {
 	my $tempSizer = Wx::FlexGridSizer->new(0,2,3,3);
 
 	# if (temp travel powers exist)?  Should this be "custom"?
-	$self->addLabeledButton($tempSizer, 'TempMode', $SoD->{'TempMode'});
+	$self->addLabeledButton($tempSizer, $SoD, 'TempMode');
 
 	$tempSizer->Add( Wx::StaticText->new($self, -1, "Temp Travel Power Tray"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
 	my $tempTraySpin = Wx::SpinCtrl->new($self, 0, id('TEMP_POWERTRAY'));
-	$tempTraySpin->SetValue($SoD->{'Temp'}->{'Tray'});
+	$tempTraySpin->SetValue($SoD->{'TempTray'});
 	$tempTraySpin->SetRange(1, 10);
 	$tempSizer->Add( $tempTraySpin, 0, wxEXPAND );
 
@@ -313,28 +299,28 @@ sub new {
 	my $kheldianBox   = Wx::StaticBoxSizer->new(Wx::StaticBox->new($self, -1, 'Nova / Dwarf Travel Powers'), wxVERTICAL);
 	my $kheldianSizer = Wx::FlexGridSizer->new(0,2,3,3);
 
-	$self->addLabeledButton($kheldianSizer, 'NovaMode', $SoD->{'Nova'}->{'Mode'});
+	$self->addLabeledButton($kheldianSizer, $SoD, 'NovaMode');
 
 	$kheldianSizer->Add( Wx::StaticText->new($self, -1, "Nova Powertray"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
 	my $novaTraySpin = Wx::SpinCtrl->new($self, 0, id('KHELD_NOVA_POWERTRAY'));
-	$novaTraySpin->SetValue($SoD->{'Nova'}->{'Tray'});
+	$novaTraySpin->SetValue($SoD->{'NovaTray'});
 	$novaTraySpin->SetRange(1, 10);
 	$kheldianSizer->Add( $novaTraySpin, 0, wxEXPAND );
 
-	$self->addLabeledButton($kheldianSizer, 'DwarfMode', $SoD->{'Dwarf'}->{'Mode'});
+	$self->addLabeledButton($kheldianSizer, $SoD, 'DwarfMode');
 
 	$kheldianSizer->Add( Wx::StaticText->new($self, -1, "Dwarf Powertray"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
 	my $dwarfTraySpin = Wx::SpinCtrl->new($self, 0, id('KHELD_DWARF_POWERTRAY'));
-	$dwarfTraySpin->SetValue($SoD->{'Dwarf'}->{'Tray'});
+	$dwarfTraySpin->SetValue($SoD->{'DwarfTray'});
 	$dwarfTraySpin->SetRange(1, 10);
 	$kheldianSizer->Add( $dwarfTraySpin, 0, wxEXPAND );
 
 	# do we want a key to change directly to human form, instead of toggles?
-	$self->addLabeledButton($kheldianSizer, 'HumanMode', $SoD->{'Human'}->{'Mode'});
+	$self->addLabeledButton($kheldianSizer, $SoD, 'HumanMode');
 
 	$kheldianSizer->Add( Wx::StaticText->new($self, -1, "Human Powertray"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
 	my $humanTraySpin = Wx::SpinCtrl->new($self, 0, id('KHELD_HUMAN_POWERTRAY'));
-	$humanTraySpin->SetValue($SoD->{'Human'}->{'Tray'});
+	$humanTraySpin->SetValue($SoD->{'HumanTray'});
 	$humanTraySpin->SetRange(1, 10);
 	$kheldianSizer->Add( $humanTraySpin, 0, wxEXPAND );
 
@@ -442,7 +428,7 @@ sub makeSoDFile {
 				$t->{'FlyMode'} = $t->{'JumpMode'};
 				makeFlyModeKey($profile,$t,"a",$curfile,$turnoff,$fix);
 			}
-			if ($SoD->{'Temp'} and $SoD->{'Temp'}->{'Enable'}) {
+			if ($SoD->{'Temp'} and $SoD->{'TempEnable'}) {
 				$t->{'FlyMode'} = $t->{'TempMode'};
 				makeFlyModeKey($profile,$t,"a",$curfile,$turnoff,$fix);
 			}
@@ -623,7 +609,7 @@ sub makeTempModeKey  {
 
 	my $feedback = $p->{'SoD'}->{'Feedback'} ? '$$t $name, Temp Mode' : '';
 	$t->{'ini'} ||= '';
-	my $trayslot = "1 $p->{'SoD'}->{'Temp'}->{'Tray'}";
+	my $trayslot = "1 $p->{'SoD'}->{'TempTray'}";
 
 	if ($bl eq "r") {
 		my $bindload = $t->bl('t');
@@ -755,7 +741,7 @@ sub makeSpeedModeKey   {
 sub makeJumpModeKey  {
 	my ($p,$t,$bl,$cur,$toff,$fbl) = @_;
 	my $key = $t->{'JumpMode'};
-	if ($t->{'canjmp'} and not $p->{'SoD'}->{'Jump'}->{'Simple'}) {
+	if ($t->{'canjmp'} and not $p->{'SoD'}->{'JumpSimple'}) {
 
 		my $feedback = $p->{'SoD'}->{'Feedback'} ? '$$t $name, Superjump Mode' : '';
 		my $filename = $fbl . $t->KeyState . 'j.txt';
@@ -881,17 +867,17 @@ sub makebind {
 		$SoD->{'NonSoD'} = true;
 		$SoD->{'Default'} = "NonSoD";
 	}
-	if ($SoD->{'Default'} eq "Fly" and not ($SoD->{'Fly'}->{'Hover'} or $SoD->{'Fly'}->{'Fly'})) {
+	if ($SoD->{'Default'} eq "Fly" and not ($SoD->{'FlyHover'} or $SoD->{'FlyFly'})) {
 		iupMessage("Notice","Enabling NonSoD mode and making it the default, since Flight SoD, your previous Default mode, is not enabled.");
 		$SoD->{'NonSoD'} = true;
 		$SoD->{'Default'} = "NonSoD";
 	}
-	if ($SoD->{'Default'} eq "Jump" and not ($SoD->{'Jump'}->{'CJ'} or $SoD->{'Jump'}->{'SJ'})) {
+	if ($SoD->{'Default'} eq "Jump" and not ($SoD->{'JumpCJ'} or $SoD->{'JumpSJ'})) {
 		iupMessage("Notice","Enabling NonSoD mode and making it the default, since Superjump SoD, your previous Default mode, is not enabled.");
 		$SoD->{'NonSoD'} = true;
 		$SoD->{'Default'} = "NonSoD";
 	}
-	if ($SoD->{'Default'} eq "Run" and $SoD->{'Run'}->{'PrimaryNumber'} == 1) {
+	if ($SoD->{'Default'} eq "Run" and $SoD->{'RunPrimaryNumber'} == 1) {
 		iupMessage("Notice","Enabling NonSoD mode and making it the default, since Superspeed SoD, your previous Default mode, is not enabled.");
 		$SoD->{'NonSoD'} = true;
 		$SoD->{'Default'} = "NonSoD";
@@ -926,17 +912,17 @@ sub makebind {
 		detaillo => '',
 	});
 
-	if ($SoD->{'Jump'}->{'CJ'} and not $SoD->{'Jump'}->{'SJ'}) {
+	if ($SoD->{'JumpCJ'} and not $SoD->{'JumpSJ'}) {
 		$t->{'cancj'} = 1;
 		$t->{'cjmp'} = "Combat Jumping";
 		$t->{'jump'} = "Combat Jumping";
 	}
-	if (not $SoD->{'Jump'}->{'CJ'} and $SoD->{'Jump'}->{'SJ'}) {
+	if (not $SoD->{'JumpCJ'} and $SoD->{'JumpSJ'}) {
 		$t->{'canjmp'} = 1;
 		$t->{'jump'} = "Super Jump";
 		$t->{'jumpifnocj'} = "Super Jump";
 	}
-	if ($SoD->{'Jump'}->{'CJ'} and $SoD->{'Jump'}->{'SJ'}) {
+	if ($SoD->{'JumpCJ'} and $SoD->{'JumpSJ'}) {
 		$t->{'cancj'} = 1;
 		$t->{'canjmp'} = 1;
 		$t->{'cjmp'} = "Combat Jumping";
@@ -944,7 +930,7 @@ sub makebind {
 	}
 
 	if ($profile->{'General'}->{'Archetype'} eq "Peacebringer") {
-		if ($SoD->{'Fly'}->{'Hover'}) {
+		if ($SoD->{'FlyHover'}) {
 			$t->{'canhov'} = 1;
 			$t->{'canfly'} = 1;
 			$t->{'hover'} = "Combat Flight";
@@ -956,40 +942,40 @@ sub makebind {
 			$t->{'flyx'} = "Energy Flight";
 		}
 	 } elsif (not ($profile->{'General'}->{'Archetype'} eq "Warshade")) {
-		if ($SoD->{'Fly'}->{'Hover'} and not $SoD->{'Fly'}->{'Fly'}) {
+		if ($SoD->{'FlyHover'} and not $SoD->{'FlyFly'}) {
 			$t->{'canhov'} = 1;
 			$t->{'hover'} = "Hover";
 			$t->{'flyx'} = "Hover";
-			if ($SoD->{'TP'}->{'TPHover'}) { $t->{'tphover'} = '$$powexectoggleon Hover' }
+			if ($SoD->{'TPTPHover'}) { $t->{'tphover'} = '$$powexectoggleon Hover' }
 		}
-		if (not $SoD->{'Fly'}->{'Hover'} and $SoD->{'Fly'}->{'Fly'}) {
+		if (not $SoD->{'FlyHover'} and $SoD->{'FlyFly'}) {
 			$t->{'canfly'} = 1;
 			$t->{'hover'} = "Fly";
 			$t->{'flyx'} = "Fly";
 		}
-		if ($SoD->{'Fly'}->{'Hover'} and $SoD->{'Fly'}->{'Fly'}) {
+		if ($SoD->{'FlyHover'} and $SoD->{'FlyFly'}) {
 			$t->{'canhov'} = 1;
 			$t->{'canfly'} = 1;
 			$t->{'hover'} = "Hover";
 			$t->{'fly'} = "Fly";
 			$t->{'flyx'} = "Fly";
-			if ($SoD->{'TP'}->{'TPHover'}) { $t->{'tphover'} = '$$powexectoggleon Hover' }
+			if ($SoD->{'TPTPHover'}) { $t->{'tphover'} = '$$powexectoggleon Hover' }
 		}
 	}
-	if (($profile->{'General'}->{'Archetype'} eq "Peacebringer") and $SoD->{'Fly'}->{'QFly'}) {
+	if (($profile->{'General'}->{'Archetype'} eq "Peacebringer") and $SoD->{'FlyQFly'}) {
 		$t->{'canqfly'} = 1;
 	}
-	if ($SoD->{'Fly'}->{'GFly'}) {
+	if ($SoD->{'FlyGFly'}) {
 		$t->{'cangfly'} = 1;
 		$t->{'gfly'} = "Group Fly";
-		if ($SoD->{'TTP'}->{'TPGFly'}) { $t->{'ttpgfly'} = '$$powexectoggleon Group Fly' }
+		if ($SoD->{'TTPTPGFly'}) { $t->{'ttpgfly'} = '$$powexectoggleon Group Fly' }
 	}
-	if ($SoD->{'Run'}->{'PrimaryNumber'} == 1) {
-		$t->{'sprint'} = $SoD->{'Run'}->{'Secondary'};
-		$t->{'speed'}  = $SoD->{'Run'}->{'Secondary'};
+	if ($SoD->{'RunPrimaryNumber'} == 1) {
+		$t->{'sprint'} = $SoD->{'RunSecondary'};
+		$t->{'speed'}  = $SoD->{'RunSecondary'};
 	} else {
-		$t->{'sprint'} = $SoD->{'Run'}->{'Secondary'};
-		$t->{'speed'}  = $SoD->{'Run'}->{'Primary'};
+		$t->{'sprint'} = $SoD->{'RunSecondary'};
+		$t->{'speed'}  = $SoD->{'RunPrimary'};
 		$t->{'canss'} = 1;
 	}
 	$t->{'unqueue'} = $SoD->{'Unqueue'} ? '$$powexecunqueue' : '';
@@ -997,19 +983,19 @@ sub makebind {
 		$t->{'mlon'}  = '$$mouselook 1';
 		$t->{'mloff'} = '$$mouselook 0';
 	}
-	if ($SoD->{'Run'}->{'UseCamdist'}) {
-		$t->{'runcamdist'} = '$$camdist ' . $SoD->{'Run'}->{'Camdist'};
+	if ($SoD->{'RunUseCamdist'}) {
+		$t->{'runcamdist'} = '$$camdist ' . $SoD->{'RunCamdist'};
 	}
-	if ($SoD->{'Fly'}->{'UseCamdist'}) {
-		$t->{'flycamdist'} = '$$camdist ' . $SoD->{'Fly'}->{'Camdist'};
+	if ($SoD->{'FlyUseCamdist'}) {
+		$t->{'flycamdist'} = '$$camdist ' . $SoD->{'FlyCamdist'};
 	}
-	if ($SoD->{'Detail'} and $SoD->{'Detail'}->{'Enable'}) {
-		$t->{'detailhi'} = '$$visscale ' . $SoD->{'Detail'}->{'NormalAmt'} . '$$shadowvol 0$$ss 0';
-		$t->{'detaillo'} = '$$visscale ' . $SoD->{'Detail'}->{'MovingAmt'} . '$$shadowvol 0$$ss 0';
+	if ($SoD->{'Detail'} and $SoD->{'DetailEnable'}) {
+		$t->{'detailhi'} = '$$visscale ' . $SoD->{'DetailNormalAmt'} . '$$shadowvol 0$$ss 0';
+		$t->{'detaillo'} = '$$visscale ' . $SoD->{'DetailMovingAmt'} . '$$shadowvol 0$$ss 0';
 	}
 
-	my $windowhide = $SoD->{'TP'}->{'HideWindows'} ? '$$windowhide health$$windowhide chat$$windowhide target$$windowhide tray' : '';
-	my $windowshow = $SoD->{'TP'}->{'HideWindows'} ? '$$show health$$show chat$$show target$$show tray' : '';
+	my $windowhide = $SoD->{'TPHideWindows'} ? '$$windowhide health$$windowhide chat$$windowhide target$$windowhide tray' : '';
+	my $windowshow = $SoD->{'TPHideWindows'} ? '$$show health$$show chat$$show target$$show tray' : '';
 
 	# my $turn = "+zoomin$$-zoomin"  # a non functioning bind used only to activate the keydown/keyup functions of +commands;
 	$t->{'turn'} = "+down";  # a non functioning bind used only to activate the keydown/keyup functions of +commands;
@@ -1096,8 +1082,8 @@ sub makebind {
 							if ($t->{'canss'}) {
 								$t->{$SoD->{'Default'} . "Mode"} = $t->{'RunMode'};
 								my $sssj;
-								if ($SoD->{'SS'}->{'SSSJMode'}) { $sssj = $t->{'jump'} }
-								if ($SoD->{'SS'}->{'MobileOnly'}) {
+								if ($SoD->{'SSSSSJMode'}) { $sssj = $t->{'jump'} }
+								if ($SoD->{'SSMobileOnly'}) {
 									makeSoDFile({
 										t => $t,
 										bl => 's',
@@ -1128,7 +1114,7 @@ sub makebind {
 								}
 								undef $t->{$SoD->{'Default'} . "Mode"};
 							}
-							if ($t->{'canjmp'}>0 and not ($SoD->{'Jump'}->{'Simple'})) {
+							if ($t->{'canjmp'}>0 and not ($SoD->{'JumpSimple'})) {
 								$t->{$SoD->{'Default'} . "Mode"} = $t->{'JumpMode'};
 								my $jturnoff;
 								if ($t->{'jump'} eq $t->{'cjmp'}) { $jturnoff = $t->{'jumpifnocj'} }
@@ -1208,8 +1194,8 @@ sub makebind {
 								});
 								undef $t->{$SoD->{'Default'} . "Mode"};
 							}
-							if ($SoD->{'Temp'} and $SoD->{'Temp'}->{'Enable'}) {
-								my $trayslot = "1 " . $SoD->{'Temp'}->{'Tray'};
+							if ($SoD->{'Temp'} and $SoD->{'TempEnable'}) {
+								my $trayslot = "1 " . $SoD->{'TempTray'};
 								$t->{$SoD->{'Default'} . "Mode"} = $t->{'TempMode'};
 								makeSoDFile({
 									t => $t,
@@ -1250,12 +1236,12 @@ sub makebind {
 	if ($SoD->{'TLeft'}  and uc $SoD->{'TLeft'}  eq "UNBOUND") { $resetfile->SetBind($SoD->{'TLeft'}, "+turnleft") }
 	if ($SoD->{'TRight'} and uc $SoD->{'TRight'} eq "UNBOUND") { $resetfile->SetBind($SoD->{'TRight'},"+turnright") }
 	
-	if ($SoD->{'Temp'} and $SoD->{'Temp'}->{'Enable'}) {
+	if ($SoD->{'Temp'} and $SoD->{'TempEnable'}) {
 		my $temptogglefile1 = BindFile->new("temptoggle1.txt");
 		my $temptogglefile2 = BindFile->new("temptoggle2.txt");
-		$temptogglefile2->SetBind($SoD->{'Temp'}->{'TraySwitch'},'-down$$gototray 1'                           . BindFile::BLF($profile, 'temptoggle1.txt'));
-		$temptogglefile1->SetBind($SoD->{'Temp'}->{'TraySwitch'},'+down$$gototray ' . $SoD->{'Temp'}->{'Tray'} . BindFile::BLF($profile, 'temptoggle2.txt'));
-		$resetfile->      SetBind($SoD->{'Temp'}->{'TraySwitch'},'+down$$gototray ' . $SoD->{'Temp'}->{'Tray'} . BindFile::BLF($profile, 'temptoggle2.txt'));
+		$temptogglefile2->SetBind($SoD->{'TempTraySwitch'},'-down$$gototray 1'                           . BindFile::BLF($profile, 'temptoggle1.txt'));
+		$temptogglefile1->SetBind($SoD->{'TempTraySwitch'},'+down$$gototray ' . $SoD->{'TempTray'} . BindFile::BLF($profile, 'temptoggle2.txt'));
+		$resetfile->      SetBind($SoD->{'TempTraySwitch'},'+down$$gototray ' . $SoD->{'TempTray'} . BindFile::BLF($profile, 'temptoggle2.txt'));
 	}
 
 	my ($dwarfTPPower, $normalTPPower, $teamTPPower);
@@ -1270,11 +1256,11 @@ sub makebind {
 	}
 
 	my ($dwarfpbind, $novapbind, $humanpbind, $humanBindKey);
-	if ($SoD->{'Human'} and $SoD->{'Human'}->{'Enable'}) {
-		$humanBindKey = $SoD->{'Human'}->{'Mode'};
-		$humanpbind = cbPBindToString($SoD->{'Human'}->{'HumanPBind'},$profile);
-		$novapbind  = cbPBindToString($SoD->{'Human'}->{'NovaPBind'}, $profile);
-		$dwarfpbind = cbPBindToString($SoD->{'Human'}->{'DwarfPBind'},$profile);
+	if ($SoD->{'Human'} and $SoD->{'HumanEnable'}) {
+		$humanBindKey = $SoD->{'HumanMode'};
+		$humanpbind = cbPBindToString($SoD->{'HumanHumanPBind'},$profile);
+		$novapbind  = cbPBindToString($SoD->{'HumanNovaPBind'}, $profile);
+		$dwarfpbind = cbPBindToString($SoD->{'HumanDwarfPBind'},$profile);
 	}
 	if (($profile->{'General'}->{'Archetype'} eq "Peacebringer") or ($profile->{'General'}->{'Archetype'} eq "Warshade")) {
 		if ($humanBindKey) {
@@ -1320,10 +1306,10 @@ sub makebind {
 		$novafile->SetBind($SoD->{'RunMode'},'nop')          if ($SoD->{'FlyMode'} ne $SoD->{'RunMode'});
 		$novafile->SetBind('mousechord "' . "+down$$+forward")    if ($SoD->{'MouseChord'});
 
-		if ($SoD->{'TP'} and $SoD->{'TP'}->{'Enable'}) {
-			$novafile->SetBind($SoD->{'TP'}->{'ComboKey'},'nop');
-			$novafile->SetBind($SoD->{'TP'}->{'BindKey'},'nop');
-			$novafile->SetBind($SoD->{'TP'}->{'ResetKey'},'nop');
+		if ($SoD->{'TP'} and $SoD->{'TPEnable'}) {
+			$novafile->SetBind($SoD->{'TPComboKey'},'nop');
+			$novafile->SetBind($SoD->{'TPBindKey'},'nop');
+			$novafile->SetBind($SoD->{'TPResetKey'},'nop');
 		}
 		$novafile->SetBind($SoD->{'Follow'},"follow");
 		# $novafile->SetBind($SoD->{'ToggleKey'},'t $name, Changing to Human Form, Normal Mode$$up 0$$down 0$$forward 0$$backward 0$$left 0$$right 0$$powexectoggleoff ' . $Nova->{'Nova'} . '$$gototray 1' . BindFile::BLF($profile, 'reset.txt'));
@@ -1356,80 +1342,80 @@ sub makebind {
 		$dwrffile->SetBind($SoD->{'RunMode'},'nop')          if ($SoD->{'FlyMode'} ne $SoD->{'RunMode'});
 		$dwrffile->SetBind('mousechord "' . "+down$$+forward")    if ($SoD->{'MouseChord'});
 
-		if ($SoD->{'TP'} and $SoD->{'TP'}->{'Enable'}) {
-			$dwrffile->SetBind($SoD->{'TP'}->{'ComboKey'},'+down$$' . $dwarfTPPower . $t->{'detaillo'} . $t->{'flycamdist'} . $windowhide . BindFile::BLF($profile, 'dtp','tp_on1.txt'));
-			$dwrffile->SetBind($SoD->{'TP'}->{'BindKey'},'nop');
-			$dwrffile->SetBind($SoD->{'TP'}->{'ResetKey'},substr($t->{'detailhi'},2) . $t->{'runcamdist'} . $windowshow . BindFile::BLF($profile, 'dtp','tp_off.txt'));
+		if ($SoD->{'TP'} and $SoD->{'TPEnable'}) {
+			$dwrffile->SetBind($SoD->{'TPComboKey'},'+down$$' . $dwarfTPPower . $t->{'detaillo'} . $t->{'flycamdist'} . $windowhide . BindFile::BLF($profile, 'dtp','tp_on1.txt'));
+			$dwrffile->SetBind($SoD->{'TPBindKey'},'nop');
+			$dwrffile->SetBind($SoD->{'TPResetKey'},substr($t->{'detailhi'},2) . $t->{'runcamdist'} . $windowshow . BindFile::BLF($profile, 'dtp','tp_off.txt'));
 			#  Create tp_off file
 			my $tp_off = BindFile->new("dtp","tp_off.txt");
-			$tp_off->SetBind($SoD->{'TP'}->{'ComboKey'},'+down$$' . $dwarfTPPower . $t->{'detaillo'} . $t->{'flycamdist'} . $windowhide . BindFile::BLF($profile, 'dtp','tp_on1.txt'));
-			$tp_off->SetBind($SoD->{'TP'}->{'BindKey'},'nop');
+			$tp_off->SetBind($SoD->{'TPComboKey'},'+down$$' . $dwarfTPPower . $t->{'detaillo'} . $t->{'flycamdist'} . $windowhide . BindFile::BLF($profile, 'dtp','tp_on1.txt'));
+			$tp_off->SetBind($SoD->{'TPBindKey'},'nop');
 
 			my $tp_on1 = BindFile->new("dtp","tp_on1.txt");
-			$tp_on1->SetBind($SoD->{'TP'}->{'ComboKey'},'-down$$powexecunqueue' . $t->{'detailhi'} . $t->{'runcamdist'} . $windowshow . BindFile::BLF($profile, 'dtp','tp_off.txt'));
-			$tp_on1->SetBind($SoD->{'TP'}->{'BindKey'},'+down' . BindFile::BLF($profile, 'dtp','tp_on2.txt'));
+			$tp_on1->SetBind($SoD->{'TPComboKey'},'-down$$powexecunqueue' . $t->{'detailhi'} . $t->{'runcamdist'} . $windowshow . BindFile::BLF($profile, 'dtp','tp_off.txt'));
+			$tp_on1->SetBind($SoD->{'TPBindKey'},'+down' . BindFile::BLF($profile, 'dtp','tp_on2.txt'));
 
 			my $tp_on2 = BindFile->new("dtp","tp_on2.txt");
-			$tp_on2->SetBind($SoD->{'TP'}->{'BindKey'},'-down$$' . $dwarfTPPower . BindFile::BLF($profile, 'dtp','tp_on1.txt'));
+			$tp_on2->SetBind($SoD->{'TPBindKey'},'-down$$' . $dwarfTPPower . BindFile::BLF($profile, 'dtp','tp_on1.txt'));
 		}
 		# $dwrffile->SetBind($SoD->{'ToggleKey'},"t \$name, Changing to Human Form, Normal Mode$fullstop\$\$powexectoggleoff $Dwarf->{'Dwarf'}\$\$gototray 1" . BindFile::BLF($profile, 'reset.txt'));
 	}
 
-	if ($SoD->{'Jump'}->{'Simple'}) {
-		if ($SoD->{'Jump'}->{'CJ'} and $SoD->{'Jump'}->{'SJ'}) {
+	if ($SoD->{'JumpSimple'}) {
+		if ($SoD->{'JumpCJ'} and $SoD->{'JumpSJ'}) {
 			$resetfile->SetBind($SoD->{'JumpMode'},'powexecname Super Jump$$powexecname Combat Jumping');
-		 } elsif ($SoD->{'Jump'}->{'SJ'}) {
+		 } elsif ($SoD->{'JumpSJ'}) {
 			$resetfile->SetBind($SoD->{'JumpMode'},'powexecname Super Jump');
-		 } elsif ($SoD->{'Jump'}->{'CJ'}) {
+		 } elsif ($SoD->{'JumpCJ'}) {
 			$resetfile->SetBind($SoD->{'JumpMode'},'powexecname Combat Jumping');
 		}
 	}
 
-	if ($SoD->{'TP'} and $SoD->{'TP'}->{'Enable'} and not $normalTPPower) {
-		$resetfile->SetBind($SoD->{'TP'}->{'ComboKey'},'nop');
-		$resetfile->SetBind($SoD->{'TP'}->{'BindKey'},'nop');
-		$resetfile->SetBind($SoD->{'TP'}->{'ResetKey'},'nop');
+	if ($SoD->{'TP'} and $SoD->{'TPEnable'} and not $normalTPPower) {
+		$resetfile->SetBind($SoD->{'TPComboKey'},'nop');
+		$resetfile->SetBind($SoD->{'TPBindKey'},'nop');
+		$resetfile->SetBind($SoD->{'TPResetKey'},'nop');
 	}
-	if ($SoD->{'TP'} and $SoD->{'TP'}->{'Enable'} and not ($profile->{'General'}->{'Archetype'} eq "Peacebringer") and $normalTPPower) {
+	if ($SoD->{'TP'} and $SoD->{'TPEnable'} and not ($profile->{'General'}->{'Archetype'} eq "Peacebringer") and $normalTPPower) {
 		my $tphovermodeswitch = '';
 		if ($t->{'tphover'} eq '') {
 			# TODO hmm can't get this from ->KeyState directly?
 			#$tphovermodeswitch = $t->bl('r') . "000000.txt";
 			($tphovermodeswitch = $t->bl('r')) =~ s/\d\d\d\d\d\d/000000/;
 		}
-		$resetfile->SetBind($SoD->{'TP'}->{'ComboKey'},'+down$$' . $normalTPPower . $t->{'detaillo'} . $t->{'flycamdist'} . $windowhide . BindFile::BLF($profile, 'tp','tp_on1.txt'));
-		$resetfile->SetBind($SoD->{'TP'}->{'BindKey'},'nop');
-		$resetfile->SetBind($SoD->{'TP'}->{'ResetKey'},substr($t->{'detailhi'},2) . $t->{'runcamdist'} . $windowshow . BindFile::BLF($profile, 'tp','tp_off.txt') . $tphovermodeswitch);
+		$resetfile->SetBind($SoD->{'TPComboKey'},'+down$$' . $normalTPPower . $t->{'detaillo'} . $t->{'flycamdist'} . $windowhide . BindFile::BLF($profile, 'tp','tp_on1.txt'));
+		$resetfile->SetBind($SoD->{'TPBindKey'},'nop');
+		$resetfile->SetBind($SoD->{'TPResetKey'},substr($t->{'detailhi'},2) . $t->{'runcamdist'} . $windowshow . BindFile::BLF($profile, 'tp','tp_off.txt') . $tphovermodeswitch);
 		#  Create tp_off file
 		my $tp_off = BindFile->new("tp","tp_off.txt");
-		$tp_off->SetBind($SoD->{'TP'}->{'ComboKey'},'+down$$' . $normalTPPower . $t->{'detaillo'} . $t->{'flycamdist'} . $windowhide . BindFile::BLF($profile, 'tp','tp_on1.txt'));
-		$tp_off->SetBind($SoD->{'TP'}->{'BindKey'},'nop');
+		$tp_off->SetBind($SoD->{'TPComboKey'},'+down$$' . $normalTPPower . $t->{'detaillo'} . $t->{'flycamdist'} . $windowhide . BindFile::BLF($profile, 'tp','tp_on1.txt'));
+		$tp_off->SetBind($SoD->{'TPBindKey'},'nop');
 
 		my $tp_on1 = BindFile->new("tp","tp_on1.txt");
 		my $zoomin = $t->{'detailhi'} . $t->{'runcamdist'};
 		if ($t->{'tphover'}) { $zoomin = '' }
-		$tp_on1->SetBind($SoD->{'TP'}->{'ComboKey'},'-down$$powexecunqueue' . $zoomin . $windowshow . '$$bindloadfilesilent ' . BindFile::BLF($profile, 'tp','tp_off.txt') . $tphovermodeswitch);
-		$tp_on1->SetBind($SoD->{'TP'}->{'BindKey'},'+down' . $t->{'tphover'} . BindFile::BLF($profile, 'tp','tp_on2.txt'));
+		$tp_on1->SetBind($SoD->{'TPComboKey'},'-down$$powexecunqueue' . $zoomin . $windowshow . '$$bindloadfilesilent ' . BindFile::BLF($profile, 'tp','tp_off.txt') . $tphovermodeswitch);
+		$tp_on1->SetBind($SoD->{'TPBindKey'},'+down' . $t->{'tphover'} . BindFile::BLF($profile, 'tp','tp_on2.txt'));
 
 		my $tp_on2 = BindFile->new("tp","tp_on2.txt");
-		$tp_on2->SetBind($SoD->{'TP'}->{'BindKey'},'-down$$' . $normalTPPower . BindFile::BLF($profile, 'tp','tp_on1.txt'));
+		$tp_on2->SetBind($SoD->{'TPBindKey'},'-down$$' . $normalTPPower . BindFile::BLF($profile, 'tp','tp_on1.txt'));
 	}
-	if ($SoD->{'TTP'} and $SoD->{'TTP'}->{'Enable'} and not ($profile->{'General'}->{'Archetype'} eq "Peacebringer") and $teamTPPower) {
+	if ($SoD->{'TTP'} and $SoD->{'TTPEnable'} and not ($profile->{'General'}->{'Archetype'} eq "Peacebringer") and $teamTPPower) {
 		my $tphovermodeswitch = '';
-		$resetfile->SetBind($SoD->{'TTP'}->{'ComboKey'},'+down$$' . $teamTPPower . $t->{'detaillo'} . $t->{'flycamdist'} . $windowhide . BindFile::BLF($profile, 'ttp','ttp_on1.txt'));
-		$resetfile->SetBind($SoD->{'TTP'}->{'BindKey'},'nop');
-		$resetfile->SetBind($SoD->{'TTP'}->{'ResetKey'},substr($t->{'detailhi'},2) . $t->{'runcamdist'} . $windowshow . BindFile::BLF($profile, 'ttp','ttp_off') . $tphovermodeswitch);
+		$resetfile->SetBind($SoD->{'TTPComboKey'},'+down$$' . $teamTPPower . $t->{'detaillo'} . $t->{'flycamdist'} . $windowhide . BindFile::BLF($profile, 'ttp','ttp_on1.txt'));
+		$resetfile->SetBind($SoD->{'TTPBindKey'},'nop');
+		$resetfile->SetBind($SoD->{'TTPResetKey'},substr($t->{'detailhi'},2) . $t->{'runcamdist'} . $windowshow . BindFile::BLF($profile, 'ttp','ttp_off') . $tphovermodeswitch);
 		#  Create tp_off file
 		my $ttp_off = BindFile->new("ttp","ttp_off.txt");
-		$ttp_off->SetBind($SoD->{'TTP'}->{'ComboKey'},'+down$$' . $teamTPPower . $t->{'detaillo'} . $t->{'flycamdist'} . $windowhide . BindFile::BLF($profile, 'ttp','ttp_on1.txt'));
-		$ttp_off->SetBind($SoD->{'TTP'}->{'BindKey'},'nop');
+		$ttp_off->SetBind($SoD->{'TTPComboKey'},'+down$$' . $teamTPPower . $t->{'detaillo'} . $t->{'flycamdist'} . $windowhide . BindFile::BLF($profile, 'ttp','ttp_on1.txt'));
+		$ttp_off->SetBind($SoD->{'TTPBindKey'},'nop');
 
 		my $ttp_on1 = BindFile->new("ttp","ttp_on1.txt");
-		$ttp_on1->SetBind($SoD->{'TTP'}->{'ComboKey'},'-down$$powexecunqueue' . $t->{'detailhi'} . $t->{'runcamdist'} . $windowshow . BindFile::BLF($profile, 'ttp','ttp_off') . $tphovermodeswitch);
-		$ttp_on1->SetBind($SoD->{'TTP'}->{'BindKey'},'+down' . BindFile::BLF($profile, 'ttp','ttp_on2.txt'));
+		$ttp_on1->SetBind($SoD->{'TTPComboKey'},'-down$$powexecunqueue' . $t->{'detailhi'} . $t->{'runcamdist'} . $windowshow . BindFile::BLF($profile, 'ttp','ttp_off') . $tphovermodeswitch);
+		$ttp_on1->SetBind($SoD->{'TTPBindKey'},'+down' . BindFile::BLF($profile, 'ttp','ttp_on2.txt'));
 
 		my $ttp_on2 = BindFile->new("ttp","ttp_on2.txt");
-		$ttp_on2->SetBind($SoD->{'TTP'}->{'BindKey'},'-down$$' . $teamTPPower . BindFile::BLF($profile, 'ttp','ttp_on1.txt'));
+		$ttp_on2->SetBind($SoD->{'TTPBindKey'},'-down$$' . $teamTPPower . BindFile::BLF($profile, 'ttp','ttp_on1.txt'));
 	}
 }
 
@@ -1440,7 +1426,11 @@ sub sodResetKey {
 	my ($u, $d) = (0, 0);
 	if ($moddir eq 'up')   { $u = 1; }
 	if ($moddir eq 'down') { $d = 1; }
-	$curfile->SetBind($p->{'General'}->{'ResetKey'},'up ' . $u . '$$down ' . $d . '$$forward 0$$backward 0$$left 0$$right 0' . $turnoff . '$$t $name, SoD Binds Reset' . BindFile::BaseReset($p) . '$$bindloadfilesilent ' . $path . '000000.txt');
+	$curfile->SetBind($p->{'General'}->{'Reset Key'},
+			'up ' . $u . '$$down ' . $d . '$$forward 0$$backward 0$$left 0$$right 0' .
+			$turnoff . '$$t $name, SoD Binds Reset' . BindFile::BaseReset($p) .
+			'$$bindloadfilesilent ' . $path . '000000.txt'
+	);
 }
 
 sub sodDefaultResetKey {
@@ -1985,14 +1975,14 @@ sub findconflicts {
 
 	if ($SoD->{'NonSoD'})          { Utility::CheckConflict($SoD,"NonSoDMode","NonSoD Key") }
 	if ($SoD->{'Base'})            { Utility::CheckConflict($SoD,"BaseMode","Sprint Mode Key") }
-	if ($SoD->{'SS'}->{'SS'})      { Utility::CheckConflict($SoD,"RunMode","Speed Mode Key") }
-	if ($SoD->{'Jump'}->{'CJ'}
-		or $SoD->{'Jump'}->{'SJ'}) { Utility::CheckConflict($SoD,"JumpMode","Jump Mode Key") }
-	if ($SoD->{'Fly'}->{'Hover'}
-		or $SoD->{'Fly'}->{'Fly'}) { Utility::CheckConflict($SoD,"FlyMode","Fly Mode Key") }
-	if ($SoD->{'Fly'}->{'QFly'}
+	if ($SoD->{'SSSS'})      { Utility::CheckConflict($SoD,"RunMode","Speed Mode Key") }
+	if ($SoD->{'JumpCJ'}
+		or $SoD->{'JumpSJ'}) { Utility::CheckConflict($SoD,"JumpMode","Jump Mode Key") }
+	if ($SoD->{'FlyHover'}
+		or $SoD->{'FlyFly'}) { Utility::CheckConflict($SoD,"FlyMode","Fly Mode Key") }
+	if ($SoD->{'FlyQFly'}
 		and ($profile->{'General'}->{'Archetype'} eq "Peacebringer")) { Utility::CheckConflict($SoD,"QFlyMode","Q.Fly Mode Key") }
-	if ($SoD->{'TP'} and $SoD->{'TP'}->{'Enable'}) {
+	if ($SoD->{'TP'} and $SoD->{'TPEnable'}) {
 		Utility::CheckConflict($SoD->{'TP'},"ComboKey","TP ComboKey");
 		Utility::CheckConflict($SoD->{'TP'},"ResetKey","TP ResetKey");
 
@@ -2004,20 +1994,20 @@ sub findconflicts {
 		}
 		Utility::CheckConflict($SoD->{'TP'},"BindKey",$TPQuestion)
 	}
-	if ($SoD->{'Fly'}->{'GFly'}) { Utility::CheckConflict($SoD,"GFlyMode","Group Fly Key"); }
-	if ($SoD->{'TTP'} and $SoD->{'TTP'}->{'Enable'}) {
+	if ($SoD->{'FlyGFly'}) { Utility::CheckConflict($SoD,"GFlyMode","Group Fly Key"); }
+	if ($SoD->{'TTP'} and $SoD->{'TTPEnable'}) {
 		Utility::CheckConflict($SoD->{'TTP'},"ComboKey","TTP ComboKey");
 		Utility::CheckConflict($SoD->{'TTP'},"ResetKey","TTP ResetKey");
 		Utility::CheckConflict($SoD->{'TTP'},"BindKey","Team TP Bind");
 	}
-	if ($SoD->{'Temp'} and $SoD->{'Temp'}->{'Enable'}) {
+	if ($SoD->{'Temp'} and $SoD->{'TempEnable'}) {
 		Utility::CheckConflict($SoD,"TempMode","Temp Mode Key");
 		Utility::CheckConflict($SoD->{'Temp'},"TraySwitch","Tray Toggle Key");
 	}
 
 	if (($profile->{'General'}->{'Archetype'} eq "Peacebringer") or ($profile->{'General'}->{'Archetype'} eq "Warshade")) {
-		if ($SoD->{'Nova'}  and $SoD->{'Nova'}-> {'Enable'}) { Utility::CheckConflict($SoD->{'Nova'}, "Mode","Nova Form Bind") }
-		if ($SoD->{'Dwarf'} and $SoD->{'Dwarf'}->{'Enable'}) { Utility::CheckConflict($SoD->{'Dwarf'},"Mode","Dwarf Form Bind") }
+		if ($SoD->{'Nova'}  and $SoD->{'NovaEnable'}) { Utility::CheckConflict($SoD->{'Nova'}, "Mode","Nova Form Bind") }
+		if ($SoD->{'Dwarf'} and $SoD->{'DwarfEnable'}) { Utility::CheckConflict($SoD->{'Dwarf'},"Mode","Dwarf Form Bind") }
 	}
 }
 

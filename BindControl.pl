@@ -3,7 +3,7 @@
 use strict;
 require 5.012;
 
-use Data::Dumper;
+#use Data::Dumper;
 use Wx::Perl::Packager;
 
 use About;
