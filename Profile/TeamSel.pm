@@ -12,16 +12,23 @@ use Wx qw( :everything );
 use Wx::Event qw(EVT_BUTTON);
 use Utility qw(id);
 
-sub new {
+sub InitKeys {
 
-	my ($class, $profile) = @_;
+	my $self = shift;
 
-	my $self = $class->SUPER::new($profile);
+	$self->Profile->AddModule('TeamSelect');
 
-	$self->{'TabTitle'} = 'One-Key Team/Pet Select';
+	$self->Profile->TeamSelect ||= {};
+}
 
-	$profile->{'TeamSelect'} ||= {};
-	my $TeamSelect = $profile->{'TeamSelect'};
+
+sub FillTab {
+	my $self = shift;
+
+	$self->TabTitle = 'One-Key Team/Pet Select';
+
+	my $TeamSelect = $self->Profile->{'TeamSelect'};
+	my $Tab        = $self->Tab;
 
 	$TeamSelect->{'mode'} ||= 1;
 	for (1..8) { $TeamSelect->{"sel$_"} ||= 'UNBOUND' }
@@ -30,11 +37,11 @@ sub new {
 
 	my $headerSizer = Wx::FlexGridSizer->new(0,2,10,10);
 
-	my $enablecb = Wx::CheckBox->new( $self, id('TeamSel Enable'), 'Enable Team/Pet Select');
+	my $enablecb = Wx::CheckBox->new( $Tab, id('TeamSel Enable'), 'Enable Team/Pet Select');
 	$enablecb->SetToolTip( Wx::ToolTip->new('Check this to enable the Team/Pet Select Binds') );
 
-	my $helpbutton = Wx::BitmapButton->new($self, -1, Utility::Icon('Help'));
-	EVT_BUTTON($self, $helpbutton, sub { shift && $self->help(@_) }); 
+	my $helpbutton = Wx::BitmapButton->new($Tab, -1, Utility::Icon('Help'));
+	EVT_BUTTON($Tab, $helpbutton, sub { shift && $Tab->help(@_) }); 
 
 	$headerSizer->Add($enablecb, 0, wxALIGN_CENTER_VERTICAL);
 	$headerSizer->Add($helpbutton, wxALIGN_RIGHT, 0);
@@ -44,29 +51,28 @@ sub new {
 	my $sizer = Wx::FlexGridSizer->new(0,2,4,4);
 
 	my $picker = Wx::ComboBox->new(
-		$self, id('TeamPetMode'), '',
+		$Tab, id('TeamPetMode'), '',
 		wxDefaultPosition, wxDefaultSize, 
 		['Teammates, then pets','Pets, then teammates','Teammates Only','Pets Only'],
 		wxCB_READONLY,
 	);
 	$picker->SetToolTip( Wx::ToolTip->new('Choose the order in which teammates and pets are selected with sequential keypresses') );
-	$sizer->Add( Wx::StaticText->new($self, -1, "Select Order"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL );
+	$sizer->Add( Wx::StaticText->new($Tab, -1, "Select Order"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL );
 	$sizer->Add( $picker, 0, wxALL, 10 );
 
 	for my $selectid (1..8) {
 
-		my $button = Wx::Button->new($self, id("TeamSelect$selectid"), $TeamSelect->{"sel$selectid"});
+		my $button = Wx::Button->new($Tab, id("TeamSelect$selectid"), $TeamSelect->{"sel$selectid"});
 		$button->SetToolTip( Wx::ToolTip->new("Choose the key that will select team member / pet $selectid") );
-		$sizer->Add( Wx::StaticText->new($self, -1, "Select Teammate/Pet $selectid"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL );
+		$sizer->Add( Wx::StaticText->new($Tab, -1, "Select Teammate/Pet $selectid"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL );
 		$sizer->Add( $button, 0, wxEXPAND);
 	}
 
 	$topSizer->Add($sizer);
 
-	$self->SetSizer($topSizer);
+	$Tab->SetSizer($topSizer);
 
 	return $self;
-
 }
 
 sub makebind {

@@ -10,21 +10,27 @@ use Wx qw( :everything );
 use BindFile;
 use Utility qw(id);
 
-sub new {
+sub InitKeys {
 
-	my ($class, $profile) = @_;
+	my $self = shift;
 
-	my $self = $class->SUPER::new($profile);
+	$self->Profile->AddModule('PetSel');
 
-	$self->{'TabTitle'} = 'Single Key Pet Selection';
-
-	$profile->{'petsel'} ||= {
+	$self->Profile->PetSel ||= {
 		selnext => 'UNBOUND',
 		selprev => 'UNBOUND',
 		sizeup => 'UNBOUND',
 		sizedn => 'UNBOUND',
 	};
-	my $petsel = $profile->{'petsel'};
+}
+
+sub FillTab {
+	my $self = shift;
+
+	$self->TabTitle = 'Single Key Pet Selection';
+
+	my $PetSel = $self->Profile->PetSel;
+	my $Tab    = $self->Tab;
 
 	my $sizer = Wx::FlexGridSizer->new(0,2,4,4);
 
@@ -36,27 +42,27 @@ sub new {
 
 	my $button;
 
-	$button = Wx::Button->new($self, id('selnext'), $petsel->{'selnext'});
+	$button = Wx::Button->new($Tab, id('selnext'), $PetSel->{'selnext'});
 	$button->SetToolTip( Wx::ToolTip->new('Choose the key that will select the next pet from the one currently selected') );
-	$sizer->Add( Wx::StaticText->new($self, -1, 'Select Next Pet'), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL );
+	$sizer->Add( Wx::StaticText->new($Tab, -1, 'Select Next Pet'), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL );
 	$sizer->Add( $button, 0, wxEXPAND);
 
-	$button = Wx::Button->new($self, id('selprev'), $petsel->{'selprev'});
+	$button = Wx::Button->new($Tab, id('selprev'), $PetSel->{'selprev'});
 	$button->SetToolTip( Wx::ToolTip->new('Choose the key that will select the previous pet from the one currently selected') );
-	$sizer->Add( Wx::StaticText->new($self, -1, 'Select Previous Pet'), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL );
+	$sizer->Add( Wx::StaticText->new($Tab, -1, 'Select Previous Pet'), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL );
 	$sizer->Add( $button, 0, wxEXPAND);
 
-	$button = Wx::Button->new($self, id('sizeup'), $petsel->{'sizeup'});
+	$button = Wx::Button->new($Tab, id('sizeup'), $PetSel->{'sizeup'});
 	$button->SetToolTip( Wx::ToolTip->new('Choose the key that will increase the size of your henchman group rotation') );
-	$sizer->Add( Wx::StaticText->new($self, -1, 'Increase Pet Group Size'), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL );
+	$sizer->Add( Wx::StaticText->new($Tab, -1, 'Increase Pet Group Size'), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL );
 	$sizer->Add( $button, 0, wxEXPAND);
 
-	$button = Wx::Button->new($self, id('sizedn'), $petsel->{'sizedn'});
+	$button = Wx::Button->new($Tab, id('sizedn'), $PetSel->{'sizedn'});
 	$button->SetToolTip( Wx::ToolTip->new('Choose the key that will decrease the size of your henchman group rotation') );
-	$sizer->Add( Wx::StaticText->new($self, -1, 'Decrease Pet Group Size'), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL );
+	$sizer->Add( Wx::StaticText->new($Tab, -1, 'Decrease Pet Group Size'), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL );
 	$sizer->Add( $button, 0, wxEXPAND);
 
-	$self->SetSizer($sizer);
+	$Tab->SetSizer($sizer);
 
 	return $self;
 
@@ -95,29 +101,29 @@ sub ts2CreateSet {
 
 sub makebind {
 	my ($profile) = @_;
-	my $petsel = $profile->{'petsel'};
+	my $PetSel = $profile->PetSel;
 	cbMakeDirectory("$profile->{'base'}\\petsel");
-	ts2CreateSet($profile->{'petsel'},1,0,$profile->{'resetfile'});
+	ts2CreateSet($profile->PetSel,1,0,$profile->{'resetfile'});
 	for my $size (1..8) {
 		for my $sel (0..$size) {
-			my $file = BindFile->new("$profile.base\\petsel\\$size$sel.txt");
-			ts2CreateSet($profile,$petsel,$size,$sel,$file);
+			my $file = BindFile->new("$profile.base\\PetSel\\$size$sel.txt");
+			ts2CreateSet($profile,$PetSel,$size,$sel,$file);
 		}
 	}
 }
 
 sub findconflicts {
 	my ($profile) = @_;
-	my $petsel = $profile->{'petsel'};
-	cbCheckConflict($petsel,"selnext","Select next henchman");
-	cbCheckConflict($petsel,"selprev","Select previous henchman");
-	cbCheckConflict($petsel,"sizeup","Increase Henchman Group Size");
-	cbCheckConflict($petsel,"sizedn","Decrease Henchman Group Size");
+	my $PetSel = $profile->PetSel;
+	cbCheckConflict($PetSel,"selnext","Select next henchman");
+	cbCheckConflict($PetSel,"selprev","Select previous henchman");
+	cbCheckConflict($PetSel,"sizeup","Increase Henchman Group Size");
+	cbCheckConflict($PetSel,"sizedn","Decrease Henchman Group Size");
 }
 
 sub bindisused {
 	my ($profile) = @_;
-	return $profile->{'petsel'} ? $profile->{'petsel'}->{'enable'} : undef;
+	return $profile->{'PetSel'} ? $profile->{'PetSel'}->{'enable'} : undef;
 }
 
 1;

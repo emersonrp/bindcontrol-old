@@ -34,47 +34,56 @@ sub new {
 	# TODO -- here's where we'd load a profile from a file or something.
 
 	# Add the individual tabs, in order.
-	my $tab;
-	$tab = Profile::General->new($self);
-	$self->AddPage( $tab, $tab->{'TabTitle'} );
+	my $module;
+	$module = Profile::General->new($self);
+	$self->AddPage( $module->Tab, $module->TabTitle );
 
-	$tab = Profile::SoD->new($self);
-	$self->AddPage( $tab, $tab->{'TabTitle'} );
+	$module = Profile::SoD->new($self);
+	$self->AddPage( $module->Tab, $module->TabTitle );
 
-	$tab = Profile::BufferBinds->new($self);
-	$self->AddPage( $tab, $tab->{'TabTitle'} );
+	$module = Profile::BufferBinds->new($self);
+	$self->AddPage( $module->Tab, $module->TabTitle );
 
-	$tab = Profile::ComplexBinds->new($self);
-	$self->AddPage( $tab, $tab->{'TabTitle'} );
+	$module = Profile::ComplexBinds->new($self);
+	$self->AddPage( $module->Tab, $module->TabTitle );
 
-	$tab = Profile::CustomBinds->new($self);
-	$self->AddPage( $tab, $tab->{'TabTitle'} );
+	$module = Profile::CustomBinds->new($self);
+	$self->AddPage( $module->Tab, $module->TabTitle );
 
-	$tab = Profile::FPSDisplay->new($self);
-	$self->AddPage( $tab, $tab->{'TabTitle'} );
+	$module = Profile::FPSDisplay->new($self);
+	$self->AddPage( $module->Tab, $module->TabTitle );
 
-	$tab = Profile::InspirationPopper->new($self);
-	$self->AddPage( $tab, $tab->{'TabTitle'} );
+	$module = Profile::InspirationPopper->new($self);
+	$self->AddPage( $module->Tab, $module->TabTitle );
 
-	$tab = Profile::Mastermind->new($self);
-	$self->AddPage( $tab, $tab->{'TabTitle'} );
+	$module = Profile::Mastermind->new($self);
+	$self->AddPage( $module->Tab, $module->TabTitle );
 
-	$tab = Profile::PetSel->new($self);
-	$self->AddPage( $tab, $tab->{'TabTitle'} );
+	$module = Profile::PetSel->new($self);
+	$self->AddPage( $module->Tab, $module->TabTitle );
 
-	$tab = Profile::SimpleBinds->new($self);
-	$self->AddPage( $tab, $tab->{'TabTitle'} );
+	$module = Profile::SimpleBinds->new($self);
+	$self->AddPage( $module->Tab, $module->TabTitle );
 
-	$tab = Profile::TeamSel->new($self);
-	$self->AddPage( $tab, $tab->{'TabTitle'} );
+	$module = Profile::TeamSel->new($self);
+	$self->AddPage( $module->Tab, $module->TabTitle );
 
-	$tab = Profile::TeamSel2->new($self);
-	$self->AddPage( $tab, $tab->{'TabTitle'} );
+	$module = Profile::TeamSel2->new($self);
+	$self->AddPage( $module->Tab, $module->TabTitle );
 
-	$tab = Profile::TypingMsg->new($self);
-	$self->AddPage( $tab, $tab->{'TabTitle'} );
+	$module = Profile::TypingMsg->new($self);
+	$self->AddPage( $module->Tab, $module->TabTitle );
 
 	return $self;
 }
 
+# this is the little callback the modules use to register themselves.
+sub AddModule {
+	my $self = shift;
+	my $module = shift;
+
+	no strict 'refs';
+	*{ $module } = sub : lvalue { shift->{$module} };
+
+}
 1;

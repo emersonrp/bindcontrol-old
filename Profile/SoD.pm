@@ -13,15 +13,13 @@ use Wx::Event qw( :everything );
 
 use constant true => 1;
 
-sub new {
+sub InitKeys {
 
-	my ($class, $profile) = @_;
+	my $self = shift;
 
-	my $self = $class->SUPER::new($profile);
+	$self->Profile->AddModule('SoD');
 
-	$self->{'TabTitle'} = "Speed On Demand";
-
-	$profile->{'SoD'} ||= {
+	$self->Profile->SoD ||= {
 
 		Base => 1,
 		Up => "SPACE",
@@ -54,7 +52,7 @@ sub new {
 		Enable => undef,
 	};
 
-	my $SoD = $profile->{'SoD'};
+	my $SoD = $self->Profile->SoD;
 
 	# $SoD->{'MouseChord'} ||= undef;
 	$SoD->{'JumpMode'} ||= "T";
@@ -89,12 +87,12 @@ sub new {
 	$SoD->{'DwarfMode'} ||= "G";
 	$SoD->{'DwarfTray'} ||= "5";
 
-	if ($profile->{'General'}->{'Archetype'} eq "Peacebringer") {
+	if ($self->Profile->General->{'Archetype'} eq "Peacebringer") {
 		$SoD->{'NovaNova'} = "Bright Nova";
 		$SoD->{'DwarfDwarf'} = "White Dwarf";
 		$SoD->{'HumanFormShield'} ||= "Shining Shield";
 
-	} elsif ($profile->{'General'}->{'Archetype'} eq "Warshade") {
+	} elsif ($self->Profile->General->{'Archetype'} eq "Warshade") {
 		$SoD->{'NovaNova'} = "Dark Nova";
 		$SoD->{'DwarfDwarf'} = "Black Dwarf";
 		$SoD->{'HumanFormShield'} ||= "Gravity Shield";
@@ -114,17 +112,27 @@ sub new {
 	$SoD->{'TempTray'} ||= "6";
 	$SoD->{'TempTraySwitch'} ||= "UNBOUND";
 	$SoD->{'TempMode'} ||= "UNBOUND";
+}
+
+sub FillTab {
+
+	my $self = shift;
+
+	$self->TabTitle = "Speed On Demand";
+
+	my $SoD = $self->Profile->SoD;
+	my $Tab = $self->Tab;
 
 	my $topSizer = Wx::FlexGridSizer->new(0,2,10,10);
 
-	$topSizer->Add( Wx::CheckBox->new( $self, id('USE_SOD'), "Enable Speed On Demand Binds" ), 0, wxTOP|wxLEFT, 10);
+	$topSizer->Add( Wx::CheckBox->new( $Tab, id('USE_SOD'), "Enable Speed On Demand Binds" ), 0, wxTOP|wxLEFT, 10);
 	$topSizer->AddSpacer(1);
 
 	my $leftColumn = Wx::BoxSizer->new(wxVERTICAL);
 	my $rightColumn = Wx::BoxSizer->new(wxVERTICAL);
 
 	##### MOVEMENT KEYS
-	my $movementBox   = Wx::StaticBoxSizer->new(Wx::StaticBox->new($self, -1, 'Movement Keys'), wxVERTICAL);
+	my $movementBox   = Wx::StaticBoxSizer->new(Wx::StaticBox->new($Tab, -1, 'Movement Keys'), wxVERTICAL);
 	my $movementSizer = Wx::FlexGridSizer->new(0,2,3,3);
 
 	for ( qw(Up Down Forward Back Left Right TurnLeft TurnRight) ){
@@ -132,28 +140,28 @@ sub new {
 	}
 
 	# TODO!  fill this picker with only the appropriate bits.
-	$movementSizer->Add( Wx::StaticText->new($self, -1, "Default Movement Mode"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$movementSizer->Add( Wx::StaticText->new($Tab, -1, "Default Movement Mode"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
 	$movementSizer->Add( Wx::ComboBox->new(
-			$self, id('DEFAULT_MOVEMENT_MODE'), '',
+			$Tab, id('DEFAULT_MOVEMENT_MODE'), '',
 			wxDefaultPosition, wxDefaultSize,
 			['No SoD','Sprint','Super Speed','Jump','Fly'],
 			wxCB_READONLY,
 		));
 
 	$movementBox->Add($movementSizer, 0, wxALIGN_RIGHT);
-	$movementBox->Add( Wx::CheckBox->new($self, id('MOUSECHORD_SOD'), "Use Mousechord as SoD Forward"), 0, wxALIGN_RIGHT|wxALL, 5);
+	$movementBox->Add( Wx::CheckBox->new($Tab, id('MOUSECHORD_SOD'), "Use Mousechord as SoD Forward"), 0, wxALIGN_RIGHT|wxALL, 5);
 	$leftColumn->Add($movementBox, 0, wxEXPAND);
 
 
 	##### GENERAL SETTINGS
-	my $generalBox   = Wx::StaticBoxSizer->new(Wx::StaticBox->new($self, -1, 'General Settings'), wxVERTICAL);
+	my $generalBox   = Wx::StaticBoxSizer->new(Wx::StaticBox->new($Tab, -1, 'General Settings'), wxVERTICAL);
 
-	$generalBox->Add( Wx::CheckBox->new($self, id('AUTO_MOUSELOOK'), "Automatically Mouselook When Moving"), 0, wxALL, 5);
+	$generalBox->Add( Wx::CheckBox->new($Tab, id('AUTO_MOUSELOOK'), "Automatically Mouselook When Moving"), 0, wxALL, 5);
 
 	my $generalSizer = Wx::FlexGridSizer->new(0,2,3,3);
-	$generalSizer->Add( Wx::StaticText->new($self, -1, "Sprint Power"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	$generalSizer->Add( Wx::StaticText->new($Tab, -1, "Sprint Power"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
 	$generalSizer->Add( Wx::ComboBox->new(
-			$self, id('SPRINT_PICKER'), '',
+			$Tab, id('SPRINT_PICKER'), '',
 			wxDefaultPosition, wxDefaultSize,
 			[@GameData::SprintPowers],
 			wxCB_READONLY,
@@ -161,7 +169,7 @@ sub new {
 
 
 	# TODO -- decide what to do with this.
-	# $generalSizer->Add( Wx::CheckBox->new($self, SPRINT_UNQUEUE, "Exec powexecunqueue"));
+	# $generalSizer->Add( Wx::CheckBox->new($Tab, SPRINT_UNQUEUE, "Exec powexecunqueue"));
 
 	for ( qw(AutoRun Follow NonSoDMode) ){ # TODO - lost "Sprint-Only SoD Mode" b/c couldn't find the name in %$Labels
 		$self->addLabeledButton($generalSizer, $SoD, $_);
@@ -171,76 +179,76 @@ sub new {
 
 	$generalBox->Add($generalSizer, 0, wxALIGN_RIGHT|wxALL, 5);
 
-	$generalBox->Add( Wx::CheckBox->new($self, id('SPRINT_SOD'),           "Enable Sprint SoD"),                               0, wxALL, 5);
-	$generalBox->Add( Wx::CheckBox->new($self, id('CHANGE_TRAVEL_CAMERA'), "Change Camera Distance When Travel Power Active"), 0, wxALL, 5);
+	$generalBox->Add( Wx::CheckBox->new($Tab, id('SPRINT_SOD'),           "Enable Sprint SoD"),                               0, wxALL, 5);
+	$generalBox->Add( Wx::CheckBox->new($Tab, id('CHANGE_TRAVEL_CAMERA'), "Change Camera Distance When Travel Power Active"), 0, wxALL, 5);
 
 	# camera spinboxes
 	my $cSizer = Wx::FlexGridSizer->new(0,2,3,3);
-	$cSizer->Add( Wx::StaticText->new($self, -1, "Base Camera Distance"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
-	my $baseSpin = Wx::SpinCtrl->new($self, 0, id('BASE_CAMERA_DISTANCE'));
+	$cSizer->Add( Wx::StaticText->new($Tab, -1, "Base Camera Distance"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	my $baseSpin = Wx::SpinCtrl->new($Tab, 0, id('BASE_CAMERA_DISTANCE'));
 	$baseSpin->SetValue($SoD->{'CamdistBase'});
 	$baseSpin->SetRange(1, 100);
 	$cSizer->Add( $baseSpin, 0, wxEXPAND );
 
-	$cSizer->Add( Wx::StaticText->new($self, -1, "Travelling Camera Distance"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
-	my $travSpin = Wx::SpinCtrl->new($self, 0, id('TRAVEL_CAMERA_DISTANCE'));
+	$cSizer->Add( Wx::StaticText->new($Tab, -1, "Travelling Camera Distance"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	my $travSpin = Wx::SpinCtrl->new($Tab, 0, id('TRAVEL_CAMERA_DISTANCE'));
 	$travSpin->SetValue($SoD->{'CamdistTravelling'});
 	$travSpin->SetRange(1, 100);
 	$cSizer->Add( $travSpin, 0, wxEXPAND );
 
 	$generalBox->Add( $cSizer, 0, wxALIGN_RIGHT|wxALL, 5);
 
-	$generalBox->Add( Wx::CheckBox->new($self, id('CHANGE_TRAVEL_DETAIL'), "Change Graphic Detail When Travel Power Active"), 0, wxALL, 5);
+	$generalBox->Add( Wx::CheckBox->new($Tab, id('CHANGE_TRAVEL_DETAIL'), "Change Graphic Detail When Travel Power Active"), 0, wxALL, 5);
 
 	# detail spinboxes
 	my $dSizer = Wx::FlexGridSizer->new(0,2,3,3);
-	$dSizer->Add( Wx::StaticText->new($self, -1, "Base Detail Level"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
-	my $baseDetail = Wx::SpinCtrl->new($self, 0, id('BASE_DETAIL_LEVEL'));
+	$dSizer->Add( Wx::StaticText->new($Tab, -1, "Base Detail Level"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	my $baseDetail = Wx::SpinCtrl->new($Tab, 0, id('BASE_DETAIL_LEVEL'));
 	$baseDetail->SetValue($SoD->{'DetailBase'});
 	$baseDetail->SetRange(1, 100);
 	$dSizer->Add( $baseDetail, 0, wxEXPAND );
 
-	$dSizer->Add( Wx::StaticText->new($self, -1, "Travelling Detail Level"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
-	my $travDetail = Wx::SpinCtrl->new($self, 0, id('TRAVEL_DETAIL_LEVEL'));
+	$dSizer->Add( Wx::StaticText->new($Tab, -1, "Travelling Detail Level"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	my $travDetail = Wx::SpinCtrl->new($Tab, 0, id('TRAVEL_DETAIL_LEVEL'));
 	$travDetail->SetValue($SoD->{'DetailTravelling'});
 	$travDetail->SetRange(1, 100);
 	$dSizer->Add( $travDetail, 0, wxEXPAND );
 
 	$generalBox->Add( $dSizer, 0, wxALIGN_RIGHT|wxALL, 5);
 
-	$generalBox->Add( Wx::CheckBox->new($self, id('HIDE_WINDOWS_TELEPORTING'), "Hide Windows When Teleporting"), 0, wxALL, 5);
-	$generalBox->Add( Wx::CheckBox->new($self, id('SEND_SOD_SELF_TELLS'), "Send Self-Tells When Changing SoD Modes"), 0, wxALL, 5);
+	$generalBox->Add( Wx::CheckBox->new($Tab, id('HIDE_WINDOWS_TELEPORTING'), "Hide Windows When Teleporting"), 0, wxALL, 5);
+	$generalBox->Add( Wx::CheckBox->new($Tab, id('SEND_SOD_SELF_TELLS'), "Send Self-Tells When Changing SoD Modes"), 0, wxALL, 5);
 
 	$leftColumn->Add($generalBox, 0, wxEXPAND);
 
 
 	##### SUPER SPEED
-	my $superSpeedBox   = Wx::StaticBoxSizer->new(Wx::StaticBox->new($self, -1, 'Super Speed'), wxVERTICAL);
+	my $superSpeedBox   = Wx::StaticBoxSizer->new(Wx::StaticBox->new($Tab, -1, 'Super Speed'), wxVERTICAL);
 
 	my $superSpeedSizer = Wx::FlexGridSizer->new(0,2,3,3);
 	$self->addLabeledButton($superSpeedSizer, $SoD, 'RunMode');
 
 	$superSpeedBox->Add($superSpeedSizer, 0, wxALIGN_RIGHT);
 
-	$superSpeedBox->Add( Wx::CheckBox->new($self, id('SS_ONLY_WHEN_MOVING'), "Only Super Speed When Moving"));
-	$superSpeedBox->Add( Wx::CheckBox->new($self, id('SS_SJ_MODE'), "Enable Super Speed + Super Jump Mode"));
+	$superSpeedBox->Add( Wx::CheckBox->new($Tab, id('SS_ONLY_WHEN_MOVING'), "Only Super Speed When Moving"));
+	$superSpeedBox->Add( Wx::CheckBox->new($Tab, id('SS_SJ_MODE'), "Enable Super Speed + Super Jump Mode"));
 
 	$rightColumn->Add($superSpeedBox, 0, wxEXPAND);
 
 	##### SUPER JUMP
-	my $superJumpBox   = Wx::StaticBoxSizer->new(Wx::StaticBox->new($self, -1, 'Super Jump'), wxVERTICAL);
+	my $superJumpBox   = Wx::StaticBoxSizer->new(Wx::StaticBox->new($Tab, -1, 'Super Jump'), wxVERTICAL);
 	my $superJumpSizer = Wx::FlexGridSizer->new(0,2,3,3);
 
 	$self->addLabeledButton($superJumpSizer,  $SoD, 'JumpMode');
 
 	$superJumpBox->Add( $superJumpSizer, 0, wxALIGN_RIGHT );
-	$superJumpBox->Add( Wx::CheckBox->new($self, id('SJ_SIMPLE_TOGGLE'), "Use Simple CJ / SJ Mode Toggle"));
+	$superJumpBox->Add( Wx::CheckBox->new($Tab, id('SJ_SIMPLE_TOGGLE'), "Use Simple CJ / SJ Mode Toggle"));
 
 	$rightColumn->Add($superJumpBox, 0, wxEXPAND);
 
 
 	##### FLY
-	my $flyBox   = Wx::StaticBoxSizer->new(Wx::StaticBox->new($self, -1, 'Flight'), wxVERTICAL);
+	my $flyBox   = Wx::StaticBoxSizer->new(Wx::StaticBox->new($Tab, -1, 'Flight'), wxVERTICAL);
 	my $flySizer = Wx::FlexGridSizer->new(0,2,3,3);
 
 	$self->addLabeledButton($flySizer, $SoD, 'FlyMode');
@@ -250,7 +258,7 @@ sub new {
 	$rightColumn->Add($flyBox, 0, wxEXPAND);
 
 	##### TELEPORT
-	my $teleportBox   = Wx::StaticBoxSizer->new(Wx::StaticBox->new($self, -1, 'Teleport'), wxVERTICAL);
+	my $teleportBox   = Wx::StaticBoxSizer->new(Wx::StaticBox->new($Tab, -1, 'Teleport'), wxVERTICAL);
 
 	# if (at == peacebringer) "Dwarf Step"
 	# if (at == warshade) "Shadow Step / Dwarf Step"
@@ -262,7 +270,7 @@ sub new {
 	$teleportBox->Add( $teleportSizer, 0, wxALL|wxALIGN_RIGHT, 5 );
 
 	# if (player has hover): {
-		$teleportBox->Add( Wx::CheckBox->new($self, id('TP_HOVER_WHEN_TP'), "Auto-Hover When Teleporting"));
+		$teleportBox->Add( Wx::CheckBox->new($Tab, id('TP_HOVER_WHEN_TP'), "Auto-Hover When Teleporting"));
 	# }
 
 	# if (player has team-tp) {
@@ -273,21 +281,21 @@ sub new {
 		$teleportBox->Add( $tteleportSizer, 0, wxALL|wxALIGN_RIGHT, 5 );
 
 		# if (player has group fly) {
-			$teleportBox->Add( Wx::CheckBox->new($self, id('TP_GROUP_FLY_WHEN_TP_TEAM'), "Auto-Group-Fly When Team Teleporting"));
+			$teleportBox->Add( Wx::CheckBox->new($Tab, id('TP_GROUP_FLY_WHEN_TP_TEAM'), "Auto-Group-Fly When Team Teleporting"));
 
 		# }
 	# }
 	$rightColumn->Add($teleportBox, 0, wxEXPAND);
 
 	##### TEMP TRAVEL POWERS
-	my $tempBox   = Wx::StaticBoxSizer->new(Wx::StaticBox->new($self, -1, 'Temp Travel Powers'), wxVERTICAL);
+	my $tempBox   = Wx::StaticBoxSizer->new(Wx::StaticBox->new($Tab, -1, 'Temp Travel Powers'), wxVERTICAL);
 	my $tempSizer = Wx::FlexGridSizer->new(0,2,3,3);
 
 	# if (temp travel powers exist)?  Should this be "custom"?
 	$self->addLabeledButton($tempSizer, $SoD, 'TempMode');
 
-	$tempSizer->Add( Wx::StaticText->new($self, -1, "Temp Travel Power Tray"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
-	my $tempTraySpin = Wx::SpinCtrl->new($self, 0, id('TEMP_POWERTRAY'));
+	$tempSizer->Add( Wx::StaticText->new($Tab, -1, "Temp Travel Power Tray"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	my $tempTraySpin = Wx::SpinCtrl->new($Tab, 0, id('TEMP_POWERTRAY'));
 	$tempTraySpin->SetValue($SoD->{'TempTray'});
 	$tempTraySpin->SetRange(1, 10);
 	$tempSizer->Add( $tempTraySpin, 0, wxEXPAND );
@@ -296,21 +304,21 @@ sub new {
 	$rightColumn->Add($tempBox, 0, wxEXPAND);
 
 	##### KHELDIAN TRAVEL POWERS
-	my $kheldianBox   = Wx::StaticBoxSizer->new(Wx::StaticBox->new($self, -1, 'Nova / Dwarf Travel Powers'), wxVERTICAL);
+	my $kheldianBox   = Wx::StaticBoxSizer->new(Wx::StaticBox->new($Tab, -1, 'Nova / Dwarf Travel Powers'), wxVERTICAL);
 	my $kheldianSizer = Wx::FlexGridSizer->new(0,2,3,3);
 
 	$self->addLabeledButton($kheldianSizer, $SoD, 'NovaMode');
 
-	$kheldianSizer->Add( Wx::StaticText->new($self, -1, "Nova Powertray"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
-	my $novaTraySpin = Wx::SpinCtrl->new($self, 0, id('KHELD_NOVA_POWERTRAY'));
+	$kheldianSizer->Add( Wx::StaticText->new($Tab, -1, "Nova Powertray"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	my $novaTraySpin = Wx::SpinCtrl->new($Tab, 0, id('KHELD_NOVA_POWERTRAY'));
 	$novaTraySpin->SetValue($SoD->{'NovaTray'});
 	$novaTraySpin->SetRange(1, 10);
 	$kheldianSizer->Add( $novaTraySpin, 0, wxEXPAND );
 
 	$self->addLabeledButton($kheldianSizer, $SoD, 'DwarfMode');
 
-	$kheldianSizer->Add( Wx::StaticText->new($self, -1, "Dwarf Powertray"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
-	my $dwarfTraySpin = Wx::SpinCtrl->new($self, 0, id('KHELD_DWARF_POWERTRAY'));
+	$kheldianSizer->Add( Wx::StaticText->new($Tab, -1, "Dwarf Powertray"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	my $dwarfTraySpin = Wx::SpinCtrl->new($Tab, 0, id('KHELD_DWARF_POWERTRAY'));
 	$dwarfTraySpin->SetValue($SoD->{'DwarfTray'});
 	$dwarfTraySpin->SetRange(1, 10);
 	$kheldianSizer->Add( $dwarfTraySpin, 0, wxEXPAND );
@@ -318,8 +326,8 @@ sub new {
 	# do we want a key to change directly to human form, instead of toggles?
 	$self->addLabeledButton($kheldianSizer, $SoD, 'HumanMode');
 
-	$kheldianSizer->Add( Wx::StaticText->new($self, -1, "Human Powertray"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
-	my $humanTraySpin = Wx::SpinCtrl->new($self, 0, id('KHELD_HUMAN_POWERTRAY'));
+	$kheldianSizer->Add( Wx::StaticText->new($Tab, -1, "Human Powertray"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL,);
+	my $humanTraySpin = Wx::SpinCtrl->new($Tab, 0, id('KHELD_HUMAN_POWERTRAY'));
 	$humanTraySpin->SetValue($SoD->{'HumanTray'});
 	$humanTraySpin->SetRange(1, 10);
 	$kheldianSizer->Add( $humanTraySpin, 0, wxEXPAND );
@@ -330,7 +338,7 @@ sub new {
 	$topSizer->Add($leftColumn);
 	$topSizer->Add($rightColumn);
 
-	$self->SetSizer($topSizer);
+	$Tab->SetSizer($topSizer);
 
 	return $self;
 }
@@ -363,7 +371,7 @@ sub makeSoDFile {
 	my $turnoff    = $p->{'turnoff'}    || '';
 	my $sssj       = $p->{'sssj'}       || '';
 
-	my $SoD = $profile->{'SoD'};
+	my $SoD = $profile->SoD;
 	my $curfile;
 
 	# this wants to be $turnoff ||= $mobile, $stationary once we know what those are.  arrays?  hashes?
@@ -371,7 +379,7 @@ sub makeSoDFile {
 
 	if (($SoD->{'Default'} eq $modestr) and ($t->{'totalkeys'} == 0)) {
 
-		$curfile = $profile->{'General'}->{'ResetFile'};
+		$curfile = $profile->General->{'ResetFile'};
 		sodDefaultResetKey($mobile,$stationary);
 
 		sodUpKey     ($t,$bl,$curfile,$SoD,$mobile,$stationary,$flight,'','','',$sssj);
@@ -575,7 +583,7 @@ sub makeNonSoDModeKey{
 	my $key = $t->{'NonSoDMode'};
 	return if (not $key or $key eq 'UNBOUND');
 
-	my $feedback = $p->{'SoD'}->{'Feedback'} ? ($fb or '$$t $name, Non-SoD Mode') : '';
+	my $feedback = $p->SoD->{'Feedback'} ? ($fb or '$$t $name, Non-SoD Mode') : '';
 	$t->{'ini'} ||= '';
 	if ($bl eq "r") {
 		my $bindload = $t->bl('n');
@@ -607,9 +615,9 @@ sub makeTempModeKey  {
 	my $key = $t->{'TempMode'};
 	return if (not $key or $key eq "UNBOUND");
 
-	my $feedback = $p->{'SoD'}->{'Feedback'} ? '$$t $name, Temp Mode' : '';
+	my $feedback = $p->SoD->{'Feedback'} ? '$$t $name, Temp Mode' : '';
 	$t->{'ini'} ||= '';
-	my $trayslot = "1 $p->{'SoD'}->{'TempTray'}";
+	my $trayslot = "1 $p->SoD->{'TempTray'}";
 
 	if ($bl eq "r") {
 		my $bindload = $t->bl('t');
@@ -635,7 +643,7 @@ sub makeQFlyModeKey  {
 
 	if ($modestr eq "NonSoD") { $cur->SetBind($key, "powexecname Quantum Flight") && return; }
 
-	my $feedback = $p->{'SoD'}->{'Feedback'} ? '$$t $name, QFlight Mode' : '';
+	my $feedback = $p->SoD->{'Feedback'} ? '$$t $name, QFlight Mode' : '';
 	$t->{'ini'} ||= '';
 
 	if ($bl eq "r") {
@@ -666,7 +674,7 @@ sub makeBaseModeKey  {
 	my $key = $t->{'BaseMode'};
 	return if (not $key or $key eq "UNBOUND");
 
-	my $feedback = $p->{'SoD'}->{'Feedback'} ? ($fb or '$$t $name, Sprint-SoD Mode') : '';
+	my $feedback = $p->SoD->{'Feedback'} ? ($fb or '$$t $name, Sprint-SoD Mode') : '';
 	$t->{'ini'} ||= '';
 
 	if ($bl eq "r") {
@@ -702,7 +710,7 @@ sub makeBaseModeKey  {
 sub makeSpeedModeKey   {
 	my ($p,$t,$bl,$cur,$toff,$fix,$fb) = @_;
 	my $key = $t->{'RunMode'};
-	my $feedback = $p->{'SoD'}->{'Feedback'} ? ($fb or '$$t $name, Superspeed Mode') : '';
+	my $feedback = $p->SoD->{'Feedback'} ? ($fb or '$$t $name, Superspeed Mode') : '';
 	$t->{'ini'} ||= '';
 	if ($t->{'canss'}) {
 		if ($bl eq 's') {
@@ -741,9 +749,9 @@ sub makeSpeedModeKey   {
 sub makeJumpModeKey  {
 	my ($p,$t,$bl,$cur,$toff,$fbl) = @_;
 	my $key = $t->{'JumpMode'};
-	if ($t->{'canjmp'} and not $p->{'SoD'}->{'JumpSimple'}) {
+	if ($t->{'canjmp'} and not $p->SoD->{'JumpSimple'}) {
 
-		my $feedback = $p->{'SoD'}->{'Feedback'} ? '$$t $name, Superjump Mode' : '';
+		my $feedback = $p->SoD->{'Feedback'} ? '$$t $name, Superjump Mode' : '';
 		my $filename = $fbl . $t->KeyState . 'j.txt';
 		my $tgl = BindFile->new($filename);
 
@@ -774,7 +782,7 @@ sub makeFlyModeKey   {
 	my ($p,$t,$bl,$cur,$toff,$fix,$fb,$fb_on_a) = @_;
 	my $key = $t->{'FlyMode'};
 	return if (not $key or $key eq "UNBOUND");
-	my $feedback = $p->{'SoD'}->{'Feedback'} ? ($fb or '$$t $name, Flight Mode') : '';
+	my $feedback = $p->SoD->{'Feedback'} ? ($fb or '$$t $name, Flight Mode') : '';
 
 	$t->{'ini'} ||= '';
 	if ($t->{'canhov'} + $t->{'canfly'} > 0) {
@@ -854,8 +862,8 @@ sub iupMessage { print STDERR "ZOMG SOMEBODY IMPLEMENT A WARNING DIALOG!!!\n"; }
 sub makebind {
 	my $profile = shift;
 
-	my $resetfile = $profile->{'General'}->{'ResetFile'};
-	my $SoD = $profile->{'SoD'};
+	my $resetfile = $profile->General->{'ResetFile'};
+	my $SoD = $profile->SoD;
 
 	# $resetfile->SetBind(petselec$t->{'sel5'} . ' "petselect 5')
 	if ($SoD->{'Default'} eq "NonSoD") {
@@ -929,7 +937,7 @@ sub makebind {
 		$t->{'jump'} = "Super Jump";
 	}
 
-	if ($profile->{'General'}->{'Archetype'} eq "Peacebringer") {
+	if ($profile->General->{'Archetype'} eq "Peacebringer") {
 		if ($SoD->{'FlyHover'}) {
 			$t->{'canhov'} = 1;
 			$t->{'canfly'} = 1;
@@ -941,7 +949,7 @@ sub makebind {
 			$t->{'hover'} = "Energy Flight";
 			$t->{'flyx'} = "Energy Flight";
 		}
-	 } elsif (not ($profile->{'General'}->{'Archetype'} eq "Warshade")) {
+	 } elsif (not ($profile->General->{'Archetype'} eq "Warshade")) {
 		if ($SoD->{'FlyHover'} and not $SoD->{'FlyFly'}) {
 			$t->{'canhov'} = 1;
 			$t->{'hover'} = "Hover";
@@ -962,7 +970,7 @@ sub makebind {
 			if ($SoD->{'TPTPHover'}) { $t->{'tphover'} = '$$powexectoggleon Hover' }
 		}
 	}
-	if (($profile->{'General'}->{'Archetype'} eq "Peacebringer") and $SoD->{'FlyQFly'}) {
+	if (($profile->General->{'Archetype'} eq "Peacebringer") and $SoD->{'FlyQFly'}) {
 		$t->{'canqfly'} = 1;
 	}
 	if ($SoD->{'FlyGFly'}) {
@@ -1245,10 +1253,10 @@ sub makebind {
 	}
 
 	my ($dwarfTPPower, $normalTPPower, $teamTPPower);
-	if ($profile->{'General'}->{'Archetype'} eq "Warshade") {
+	if ($profile->General->{'Archetype'} eq "Warshade") {
 		$dwarfTPPower  = "powexecname Black Dwarf Step";
 		$normalTPPower = "powexecname Shadow Step";
-	 } elsif ($profile->{'General'}->{'Archetype'} eq "Peacebringer") {
+	 } elsif ($profile->General->{'Archetype'} eq "Peacebringer") {
 		$dwarfTPPower = "powexecname White Dwarf Step";
 	 } else {
 		$normalTPPower = "powexecname Teleport";
@@ -1262,7 +1270,7 @@ sub makebind {
 		$novapbind  = cbPBindToString($SoD->{'HumanNovaPBind'}, $profile);
 		$dwarfpbind = cbPBindToString($SoD->{'HumanDwarfPBind'},$profile);
 	}
-	if (($profile->{'General'}->{'Archetype'} eq "Peacebringer") or ($profile->{'General'}->{'Archetype'} eq "Warshade")) {
+	if (($profile->General->{'Archetype'} eq "Peacebringer") or ($profile->General->{'Archetype'} eq "Warshade")) {
 		if ($humanBindKey) {
 			$resetfile->SetBind($humanBindKey,$humanpbind);
 		}
@@ -1376,7 +1384,7 @@ sub makebind {
 		$resetfile->SetBind($SoD->{'TPBindKey'},'nop');
 		$resetfile->SetBind($SoD->{'TPResetKey'},'nop');
 	}
-	if ($SoD->{'TP'} and $SoD->{'TPEnable'} and not ($profile->{'General'}->{'Archetype'} eq "Peacebringer") and $normalTPPower) {
+	if ($SoD->{'TP'} and $SoD->{'TPEnable'} and not ($profile->General->{'Archetype'} eq "Peacebringer") and $normalTPPower) {
 		my $tphovermodeswitch = '';
 		if ($t->{'tphover'} eq '') {
 			# TODO hmm can't get this from ->KeyState directly?
@@ -1400,7 +1408,7 @@ sub makebind {
 		my $tp_on2 = BindFile->new("tp","tp_on2.txt");
 		$tp_on2->SetBind($SoD->{'TPBindKey'},'-down$$' . $normalTPPower . BindFile::BLF($profile, 'tp','tp_on1.txt'));
 	}
-	if ($SoD->{'TTP'} and $SoD->{'TTPEnable'} and not ($profile->{'General'}->{'Archetype'} eq "Peacebringer") and $teamTPPower) {
+	if ($SoD->{'TTP'} and $SoD->{'TTPEnable'} and not ($profile->General->{'Archetype'} eq "Peacebringer") and $teamTPPower) {
 		my $tphovermodeswitch = '';
 		$resetfile->SetBind($SoD->{'TTPComboKey'},'+down$$' . $teamTPPower . $t->{'detaillo'} . $t->{'flycamdist'} . $windowhide . BindFile::BLF($profile, 'ttp','ttp_on1.txt'));
 		$resetfile->SetBind($SoD->{'TTPBindKey'},'nop');
@@ -1426,7 +1434,7 @@ sub sodResetKey {
 	my ($u, $d) = (0, 0);
 	if ($moddir eq 'up')   { $u = 1; }
 	if ($moddir eq 'down') { $d = 1; }
-	$curfile->SetBind($p->{'General'}->{'Reset Key'},
+	$curfile->SetBind($p->General->{'Reset Key'},
 			'up ' . $u . '$$down ' . $d . '$$forward 0$$backward 0$$left 0$$right 0' .
 			$turnoff . '$$t $name, SoD Binds Reset' . BindFile::BaseReset($p) .
 			'$$bindloadfilesilent ' . $path . '000000.txt'
@@ -1954,14 +1962,14 @@ sub sodFollowOffKey {
 
 sub bindisused { 
 	my ($profile) = @_;
-	return if not defined $profile->{'SoD'};
-	my $SoD = $profile->{'SoD'};
+	return if not defined $profile->SoD;
+	my $SoD = $profile->SoD;
 	return $profile->{$SoD->{'Enable'}};
 }
 
 sub findconflicts {
 	my ($profile) = @_;
-	my $SoD = $profile->{'SoD'};
+	my $SoD = $profile->SoD;
 	Utility::CheckConflict($SoD,"Up","Up Key");
 	Utility::CheckConflict($SoD,"Down","Down Key");
 	Utility::CheckConflict($SoD,"Forward","Forward Key");
@@ -1981,15 +1989,15 @@ sub findconflicts {
 	if ($SoD->{'FlyHover'}
 		or $SoD->{'FlyFly'}) { Utility::CheckConflict($SoD,"FlyMode","Fly Mode Key") }
 	if ($SoD->{'FlyQFly'}
-		and ($profile->{'General'}->{'Archetype'} eq "Peacebringer")) { Utility::CheckConflict($SoD,"QFlyMode","Q.Fly Mode Key") }
+		and ($profile->General->{'Archetype'} eq "Peacebringer")) { Utility::CheckConflict($SoD,"QFlyMode","Q.Fly Mode Key") }
 	if ($SoD->{'TP'} and $SoD->{'TPEnable'}) {
 		Utility::CheckConflict($SoD->{'TP'},"ComboKey","TP ComboKey");
 		Utility::CheckConflict($SoD->{'TP'},"ResetKey","TP ResetKey");
 
 		my $TPQuestion = "Teleport Bind";
-		if ($profile->{'General'}->{'Archetype'} eq "Peacebringer") {
+		if ($profile->General->{'Archetype'} eq "Peacebringer") {
 			$TPQuestion = "Dwarf Step Bind"
-		 } elsif ($profile->{'General'}->{'Archetype'} eq "Warshade") {
+		 } elsif ($profile->General->{'Archetype'} eq "Warshade") {
 			$TPQuestion = "Shd/Dwf Step Bind"
 		}
 		Utility::CheckConflict($SoD->{'TP'},"BindKey",$TPQuestion)
@@ -2005,7 +2013,7 @@ sub findconflicts {
 		Utility::CheckConflict($SoD->{'Temp'},"TraySwitch","Tray Toggle Key");
 	}
 
-	if (($profile->{'General'}->{'Archetype'} eq "Peacebringer") or ($profile->{'General'}->{'Archetype'} eq "Warshade")) {
+	if (($profile->General->{'Archetype'} eq "Peacebringer") or ($profile->General->{'Archetype'} eq "Warshade")) {
 		if ($SoD->{'Nova'}  and $SoD->{'NovaEnable'}) { Utility::CheckConflict($SoD->{'Nova'}, "Mode","Nova Form Bind") }
 		if ($SoD->{'Dwarf'} and $SoD->{'DwarfEnable'}) { Utility::CheckConflict($SoD->{'Dwarf'},"Mode","Dwarf Form Bind") }
 	}

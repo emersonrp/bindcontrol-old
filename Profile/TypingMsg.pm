@@ -11,24 +11,31 @@ use Utility qw(id);
 
 my $Typingnotifierlimit = { cmdlist => ["Away From Keyboard","Emote"] };
 
-sub new {
+sub InitKeys {
+	my $self = shift;
 
-	my ($class, $profile) = @_;
+	$self->Profile->AddModule('Typing');
 
-	my $self = $class->SUPER::new($profile);
+	$self->Profile->Typing ||= {
+		'Enable'              => 0,
+		'Message'             => "afk Typing Message",
+		'Start Chat'          => 'ENTER',
+		'Primary Slashchat'   => '/',
+		'Secondary Slashchat' => ';',
+		'Autoreply'           => 'BACKSPACE',
+		'Tell Target'         => 'COMMA',
+		'QuickChat'           => q|'|,
+	};
+}
 
-	$self->{'TabTitle'} = 'Typing Message';
+sub FillTab {
 
-	$profile->{'Typing'} ||= { Enable => undef };
-	my $Typing = $profile->{'Typing'};
+	my $self = shift;
 
-	$Typing->{'Message'} &&= "afk $Typing->{'Message'}";
-	$Typing->{'Start Chat'}  ||= "ENTER";
-	$Typing->{'Primary Slashchat'} ||= "/";
-	$Typing->{'Secondary Slashchat'} ||= ";";
-	$Typing->{'Autoreply'}  ||= "BACKSPACE";
-	$Typing->{'Tell Target'} ||= "COMMA";
-	$Typing->{'QuickChat'}  ||= "\'";
+	$self->TabTitle = 'Typing Message';
+
+	my $Typing = $self->Profile->Typing;
+	my $Tab    = $self->Tab;
 
 	my $sizer = Wx::FlexGridSizer->new(0,2,10,10);
 
@@ -51,7 +58,7 @@ sub new {
 	# cbToolTip("Choose the message to display when you are typing chat messages or commands");
 	# my $msghbox = cbTextBox("Message",$Typing->{'Message'},cbTextBoxCB(profile,Typing,"Message"));
 
-	$self->SetSizer($sizer);
+	$Tab->SetSizer($sizer);
 
 	return $self;
 }

@@ -9,15 +9,14 @@ use Wx qw( :everything );
 
 use Utility qw(id);
 
-sub new {
+sub InitKeys {
 
-	my ($class, $profile) = @_;
+	my $self = shift;
 
-	my $self = $class->SUPER::new($profile);
 
-	$self->{'TabTitle'} = 'Inspiration Popper';
+	$self->Profile->AddModule('InspPop');
 
-	$profile->{'InspPop'} ||= {
+	$self->Profile->InspPop ||= {
 		Enable => undef,
 		AccuracyKey     => "LSHIFT+A",
 		HealthKey       => "LSHIFT+S",
@@ -27,7 +26,16 @@ sub new {
 		BreakFreeKey    => "LSHIFT+E",
 		ResistDamageKey => "LSHIFT+SPACE",
 	};
-	my $InspPop = $profile->{'InspPop'};
+}
+
+sub FillTab {
+
+	my $self = shift;
+
+	$self->TabTitle = 'Inspiration Popper';
+
+	my $InspPop = $self->Profile->InspPop;
+	my $Tab = $self->Tab;
 
 	my $sizer = Wx::BoxSizer->new(wxVERTICAL);
 
@@ -47,39 +55,39 @@ sub new {
 
 			my $RowSet = $order ? $RevInspRows : $InspRows;
 
-			$RowSet->Add ( Wx::StaticText->new($self, -1, "$order $Insp Key"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
+			$RowSet->Add ( Wx::StaticText->new($Tab, -1, "$order $Insp Key"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
 
-			$KeyPicker =  Wx::Button->    new($self, id("${order}${Insp}Key"), $InspPop->{"${order}${Insp}Key"});
+			$KeyPicker =  Wx::Button->    new($Tab, id("${order}${Insp}Key"), $InspPop->{"${order}${Insp}Key"});
 			$KeyPicker->SetToolTip( Wx::ToolTip->new("Choose the key combo to activate a $Insp inspiration") );
 			$RowSet->Add ( $KeyPicker, 0, wxEXPAND);
 
 			$RowSet->AddStretchSpacer(wxEXPAND);
 
-			$ColorsCB = Wx::CheckBox->    new($self, id("${order}${Insp}Colors"), '');
+			$ColorsCB = Wx::CheckBox->    new($Tab, id("${order}${Insp}Colors"), '');
 			$ColorsCB->SetToolTip( Wx::ToolTip->new("Colorize Inspiration-Popper chat feedback") );
 			$RowSet->Add ( $ColorsCB, 0, wxALIGN_CENTER_VERTICAL);
 
-			$RowSet->Add( Wx::StaticText->new($self, -1, "Border"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
+			$RowSet->Add( Wx::StaticText->new($Tab, -1, "Border"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
 			$bc = $InspPop->{"${order}${Insp}Colors"}->{'border'};
 			$RowSet->Add( Wx::ColourPickerCtrl->new(
-					$self, id("${order}${Insp}BorderColor"),
+					$Tab, id("${order}${Insp}BorderColor"),
 					Wx::Colour->new($bc->{'r'}, $bc->{'g'}, $bc->{'b'}),
 					wxDefaultPosition, wxDefaultSize,
 				)
 			);
 
-			$RowSet->Add( Wx::StaticText->new($self, -1, "Background"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
+			$RowSet->Add( Wx::StaticText->new($Tab, -1, "Background"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
 			$bc = $InspPop->{"${order}${Insp}Colors"}->{'background'};
 			$RowSet->Add( Wx::ColourPickerCtrl->new(
-					$self, id("${order}${Insp}BackgroundColor"),
+					$Tab, id("${order}${Insp}BackgroundColor"),
 					Wx::Colour->new($bc->{'r'}, $bc->{'g'}, $bc->{'b'}),
 					wxDefaultPosition, wxDefaultSize,
 				)
 			);
-			$RowSet->Add( Wx::StaticText->new($self, -1, "Text"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
+			$RowSet->Add( Wx::StaticText->new($Tab, -1, "Text"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
 			$fc = $InspPop->{"${order}${Insp}Colors"}->{'foreground'};
 			$RowSet->Add( Wx::ColourPickerCtrl->new(
-					$self, id("${order}${Insp}ForegroundColor"),
+					$Tab, id("${order}${Insp}ForegroundColor"),
 					Wx::Colour->new($fc->{'r'}, $fc->{'g'}, $fc->{'b'}),
 					wxDefaultPosition, wxDefaultSize,
 				)
@@ -87,19 +95,19 @@ sub new {
 		}
 	}
 
-	my $useCB = Wx::CheckBox->new( $self, -1, 'Enable Inspiration Popper Binds (prefer largest)');
+	my $useCB = Wx::CheckBox->new( $Tab, -1, 'Enable Inspiration Popper Binds (prefer largest)');
 	$useCB->SetToolTip(Wx::ToolTip->new('Check this to enable the Inspiration Popper Binds, (largest used first)'));
 	$sizer->Add($useCB, 0, wxALL, 10);
 
 	$sizer->Add($InspRows);
 
-	my $useRevCB = Wx::CheckBox->new( $self, -1, 'Enable Reverse Inspiration Popper Binds (prefer smallest)');
+	my $useRevCB = Wx::CheckBox->new( $Tab, -1, 'Enable Reverse Inspiration Popper Binds (prefer smallest)');
 	$useCB->SetToolTip(Wx::ToolTip->new('Check this to enable the Reverse Inspiration Popper Binds, (smallest used first)'));
 	$sizer->Add($useRevCB, 0, wxALL, 10);
 
 	$sizer->Add($RevInspRows);
 
-	$self->SetSizerAndFit($sizer);
+	$Tab->SetSizerAndFit($sizer);
 
 	return $self;
 }

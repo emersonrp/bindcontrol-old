@@ -7,8 +7,6 @@ use strict;
 use Wx qw( :everything );
 use Wx::Event;
 
-use parent -norequire, 'Wx::Panel';
-
 use BindFile;
 use UI::KeyBindDialog;
 use UI::Labels;
@@ -17,11 +15,19 @@ use Utility;
 sub new {
 	my ($proto, $parent) = @_;
 	my $class = ref $proto || $proto;
-	my $self = $class->SUPER::new($parent);
 
-	($self->{'TabTitle'} = ref $self) =~ s/Profile:://;
+	my $self = {};
+	bless $self, $class;
 
-	$self->{'Profile'} = $parent;
+
+	$self->Profile = $parent;
+
+	($self->TabTitle = ref $self) =~ s/Profile:://;
+
+	$self->Tab = Wx::Panel->new($parent);
+
+	$self->InitKeys;
+	$self->FillTab;
 
 	return $self;
 }
@@ -46,22 +52,26 @@ sub help {
 	return $self->{'HelpWindow'};
 }
 
-sub profile { shift()->{'Profile'} }
+sub Tab      : lvalue { shift->{'Tab'} }
+sub TabTitle : lvalue { shift->{'TabTitle'} }
+sub Profile  : lvalue { shift->{'Profile'} }
 
+sub InitKeys { 1; }
+sub FillTab  { 1; }
 sub HelpText { qq|Help not currently implemented here.|; }
 
 sub addLabeledButton {
     my ($self, $sizer, $module, $value, $tooltip) = @_;
 
-    my $button = Wx::Button->new($self, Utility::id($value), $module->{$value});
+    my $button = Wx::Button->new($self->Tab, Utility::id($value), $module->{$value});
     $button->SetToolTip( Wx::ToolTip->new($tooltip)) if $tooltip;
 
-    $sizer->Add( Wx::StaticText->new($self, -1, ($UI::Labels::Labels{$value} || $value)), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
+    $sizer->Add( Wx::StaticText->new($self->Tab, -1, ($UI::Labels::Labels{$value} || $value)), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
     $sizer->Add( $button, 0, wxEXPAND );
 
-	Wx::Event::EVT_BUTTON( $self, Utility::id($value),
+	Wx::Event::EVT_BUTTON( $self->Tab, Utility::id($value),
 		sub {
-			my $newKey = UI::KeyBindDialog::showWindow($self, $value, $module->{$value});
+			my $newKey = UI::KeyBindDialog::showWindow($self->Tab, $value, $module->{$value});
 
 			# TODO -- check for conflicts
 			# my $otherThingWithThatBind = checkConflicts($newKey);

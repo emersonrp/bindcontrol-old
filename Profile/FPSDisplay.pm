@@ -9,33 +9,39 @@ use Wx qw( :everything );
 
 use Utility qw(id);
 
-sub new {
+sub InitKeys {
+	my $self = shift;
 
-	my ($class, $profile) = @_;
+	$self->Profile->AddModule('FPS');
 
-	my $self = $class->SUPER::new($profile);
-
-	$self->{'TabTitle'} = "FPS / Netgraph";
-
-	$profile->{'FPS'} ||= {
+	$self->Profile->FPS ||= {
 		Enable => 1,
 		Bindkey => "P",
 	};
-	my $FPS = $profile->{'FPS'};
+}
+
+sub FillTab {
+
+	my $self = shift;
+
+	$self->TabTitle = "FPS / Netgraph";
+
+	my $FPS = $self->Profile->FPS;
+	my $Tab = $self->Tab;
 
 	my $sizer = Wx::BoxSizer->new(wxVERTICAL);
 
-	my $useCB = Wx::CheckBox->new( $self, id('EnableFPSBind'), 'Enable FPS Binds');
+	my $useCB = Wx::CheckBox->new( $Tab, id('EnableFPSBind'), 'Enable FPS Binds');
 	$useCB->SetToolTip(Wx::ToolTip->new('Check this to enable the FPS and Netgraph Toggle Binds'));
 	$sizer->Add($useCB, 0, wxALL, 10);
 
 	my $minisizer = Wx::FlexGridSizer->new(0,2,5,5);
-	$minisizer->Add( Wx::StaticText->new($self, -1, 'Toggle FPS/Netgraph'), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
-	$minisizer->Add( Wx::Button->    new($self, id('FPSKeySelect'), $FPS->{'Bindkey'}));
+	$minisizer->Add( Wx::StaticText->new($Tab, -1, 'Toggle FPS/Netgraph'), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
+	$minisizer->Add( Wx::Button->    new($Tab, id('FPSKeySelect'), $FPS->{'Bindkey'}));
 
 	$sizer->Add($minisizer);
 
-	$self->SetSizerAndFit($sizer);
+	$Tab->SetSizerAndFit($sizer);
 
 	return $self;
 }

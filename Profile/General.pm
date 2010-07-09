@@ -9,12 +9,12 @@ use Wx::Event qw( :everything );
 use GameData;
 use Utility qw(id);
 
-sub new {
-	my ($class, $profile) = @_;
+sub InitKeys {
+	my $self = shift;
 
-	my $self = $class->SUPER::new($profile);
+	$self->Profile->AddModule('General');
 
-	$profile->{'General'} ||= {
+	$self->Profile->General ||= {
 		Archetype => 'Scrapper',
 		Origin => "Magic",
 		Primary => 'Martial Arts',
@@ -24,80 +24,87 @@ sub new {
 		ResetFile => BindFile->new('reset.txt'),
 		'Reset Key' => 'CTRL-M',
 	};
-	my $general = $profile->{'General'};
+}
+
+sub FillTab {
+
+	my $self = shift;
+
+	$self->TabTitle = 'General';
+
+	my $General = $self->Profile->General;
+	my $Tab = $self->Tab;
 
 	my $topSizer = Wx::FlexGridSizer->new(0,2,5,5);
 
 	# Name
-	$topSizer->Add( Wx::StaticText->new( $self, -1, "Name:"), 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT,);
-	my $tc = Wx::TextCtrl->new( $self, id('PROFILE_NAMETEXT'), "",);
+	$topSizer->Add( Wx::StaticText->new( $Tab, -1, "Name:"), 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT,);
+	my $tc = Wx::TextCtrl->new( $Tab, id('PROFILE_NAMETEXT'), "",);
 	# TODO -- suss out what we want the min size to be, and set it someplace sane.
 	$tc->SetMinSize([300,-1]);
 	$topSizer->Add( $tc, 0, wxALL,) ;
 
 	# Archetype
-	$topSizer->Add( Wx::StaticText->new( $self, -1, "Archetype:"), 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT,);
+	$topSizer->Add( Wx::StaticText->new( $Tab, -1, "Archetype:"), 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT,);
 	$topSizer->Add( Wx::BitmapComboBox->new(
-			$self, id('PICKER_ARCHETYPE'), $general->{'Archetype'},
+			$Tab, id('PICKER_ARCHETYPE'), $General->{'Archetype'},
 			wxDefaultPosition, wxDefaultSize,
 			[sort keys %$GameData::Archetypes],
 			wxCB_READONLY,
 		), 0, wxALL,);
 
 	# Origin
-	$topSizer->Add( Wx::StaticText->new( $self, -1, "Origin:"), 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT,); 
+	$topSizer->Add( Wx::StaticText->new( $Tab, -1, "Origin:"), 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT,); 
 	$topSizer->Add( Wx::BitmapComboBox->new(
-			$self, id('PICKER_ORIGIN'), $general->{'Origin'},
+			$Tab, id('PICKER_ORIGIN'), $General->{'Origin'},
 			wxDefaultPosition, wxDefaultSize,
 			[@GameData::Origins],
 			wxCB_READONLY,
 		), 0, wxALL,);
 
 	# Primary
-	$topSizer->Add( Wx::StaticText->new( $self, -1, "Primary Powerset:"), 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT,);
+	$topSizer->Add( Wx::StaticText->new( $Tab, -1, "Primary Powerset:"), 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT,);
  	$topSizer->Add( Wx::BitmapComboBox->new(
- 			$self, id('PICKER_PRIMARY'), $general->{'Primary'},
+ 			$Tab, id('PICKER_PRIMARY'), $General->{'Primary'},
 			wxDefaultPosition, wxDefaultSize,
- 			[sort keys %{$GameData::PowerSets->{$general->{'Archetype'}}->{'Primary'}}],
+ 			[sort keys %{$GameData::PowerSets->{$General->{'Archetype'}}->{'Primary'}}],
 			wxCB_READONLY,
  		), 0, wxALL,);
 
 	# Secondary
-	$topSizer->Add( Wx::StaticText->new( $self, -1, "Secondary Powerset:"), 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT,);
+	$topSizer->Add( Wx::StaticText->new( $Tab, -1, "Secondary Powerset:"), 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT,);
  	$topSizer->Add( Wx::BitmapComboBox->new(
- 			$self, id('PICKER_SECONDARY'), $general->{'Secondary'},
+ 			$Tab, id('PICKER_SECONDARY'), $General->{'Secondary'},
 			wxDefaultPosition, wxDefaultSize,
- 			[sort keys %{$GameData::PowerSets->{$general->{'Archetype'}}->{'Secondary'}}],
+ 			[sort keys %{$GameData::PowerSets->{$General->{'Archetype'}}->{'Secondary'}}],
 			wxCB_READONLY,
  		), 0, wxALL,);
 
-	$topSizer->Add( Wx::StaticText->new( $self, -1, "Binds Directory:"), 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT,);
+	$topSizer->Add( Wx::StaticText->new( $Tab, -1, "Binds Directory:"), 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT,);
 	$topSizer->Add( Wx::DirPickerCtrl->new(
-			$self, -1, $general->{'BindsDir'}, 
+			$Tab, -1, $General->{'BindsDir'}, 
 			'Select Binds Directory',
 			wxDefaultPosition, wxDefaultSize,
 			wxDIRP_USE_TEXTCTRL|wxALL,
 		), 0, wxALL|wxEXPAND,);
 
-	$self->addLabeledButton($topSizer, $general, 'Reset Key', 'This key is used by certain modules to reset binds to a sane state.');
+	$self->addLabeledButton($topSizer, $General, 'Reset Key', 'This key is used by certain modules to reset binds to a sane state.');
 
-	$topSizer->Add ( Wx::CheckBox->new($self, id('Enable Reset Feedback'), 'Enable Reset Feedback'), 0, wxALL);
+	$topSizer->Add ( Wx::CheckBox->new($Tab, id('Enable Reset Feedback'), 'Enable Reset Feedback'), 0, wxALL);
 	$topSizer->AddSpacer(5);
 
 
-	$topSizer->Add( Wx::Button->new( $self, id('Write Binds Button'), 'Write Binds!' ), 0, wxALL|wxEXPAND);
+	$topSizer->Add( Wx::Button->new( $Tab, id('Write Binds Button'), 'Write Binds!' ), 0, wxALL|wxEXPAND);
 
-	EVT_BUTTON( $self, id('Write Binds Button'), \&BindFile::WriteBindFiles );
+	EVT_BUTTON( $Tab, id('Write Binds Button'), \&BindFile::WriteBindFiles );
 
 
-	$self->SetSizer($topSizer);
+	$Tab->SetSizer($topSizer);
 
-	EVT_COMBOBOX( $self, id('PICKER_ARCHETYPE'), \&pickArchetype );
-	EVT_COMBOBOX( $self, id('PICKER_ORIGIN'),    \&pickOrigin );
-	EVT_COMBOBOX( $self, id('PICKER_PRIMARY'),   \&pickPrimaryPowerSet );
-	EVT_COMBOBOX( $self, id('PICKER_SECONDARY'), \&pickSecondaryPowerSet );
-
-	$self->{'TabTitle'} = 'General';
+	EVT_COMBOBOX( $Tab, id('PICKER_ARCHETYPE'), \&pickArchetype );
+	EVT_COMBOBOX( $Tab, id('PICKER_ORIGIN'),    \&pickOrigin );
+	EVT_COMBOBOX( $Tab, id('PICKER_PRIMARY'),   \&pickPrimaryPowerSet );
+	EVT_COMBOBOX( $Tab, id('PICKER_SECONDARY'), \&pickSecondaryPowerSet );
 
 	return $self;
 

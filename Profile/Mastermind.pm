@@ -9,14 +9,13 @@ use BindFile;
 
 use Wx qw( :everything );
 
-sub new {
+sub InitKeys {
 
-	my ($class, $profile) = @_;
+	my $self = shift;
 
-	my $self = $class->SUPER::new($profile);
-	$self->{'TabTitle'} = 'Mastermind / Pet Binds';
+	$self->Profile->AddModule('MastermindPets');
 
-	$profile->{'MastermindPets'} ||= {
+	$self->Profile->MastermindPets ||= {
 		Enable => undef,
 
 		PetSelectAll => 'LALT-V',
@@ -90,27 +89,35 @@ sub new {
 		Pet5Bodyguard => 1,
 
 	};
+}
 
-	my $MMP = $profile->{'MastermindPets'};
+sub FillTab {
 
-	if ($profile->{'General'}->{'Archetype'} eq "Mastermind") {
+	my $self = shift;
+
+	$self->TabTitle = 'Mastermind / Pet Binds';
+
+	my $MMP = $self->Profile->MastermindPets;
+	my $Tab = $self->Tab;
+
+	if ($self->Profile->General->{'Archetype'} eq "Mastermind") {
 		# TODO "GameData::ATPrimaries" can probably be replaced with nice hashes.
-		$MMP->{'Primary'} = $Gamedata::ATPrimaries[$profile->{'atnumber'}][$profile->{'primaryset'}];
-		$MMP->{'Primnumber'} = $profile->{'primaryset'};
+		$MMP->{'Primary'} = $Gamedata::ATPrimaries[$self->Profile->{'atnumber'}][$self->Profile->{'primaryset'}];
+		$MMP->{'Primnumber'} = $self->Profile->{'primaryset'};
 	} else {
 		$MMP->{'Primary'} = "Mercenaries";
 	}
 
 	my $sizer = Wx::BoxSizer->new(wxVERTICAL);
 
-	my $useCB = Wx::CheckBox->new( $self, -1, 'Enable Mastermind Pet Binds');
+	my $useCB = Wx::CheckBox->new( $Tab, -1, 'Enable Mastermind Pet Binds');
 	$useCB->SetToolTip(Wx::ToolTip->new('Check this to enable the Mastermind Pet Action Binds'));
 	$sizer->Add($useCB, 0, wxALL, 10);
 
 # TODO - add checkbox handler to hide/show (enable/disable?) the bodyguard options
 # TODO -- actually, automagically enable/disable these depending on whether any pets have their
 # individual "Bodyguard" checkboxes checked.
-	my $bgCB = Wx::CheckBox->new( $self, -1, 'Enable Bodyguard Mode Binds');
+	my $bgCB = Wx::CheckBox->new( $Tab, -1, 'Enable Bodyguard Mode Binds');
 	$bgCB->SetToolTip(Wx::ToolTip->new('Check this to enable the Bodyguard Mode Binds'));
 	$bgCB->SetValue($MMP->{'PetBodyguardMode'});
 	$sizer->Add($bgCB, 0, wxALL, 10);
@@ -124,13 +131,13 @@ sub new {
 
 		my $basename = $k->{'basename'};  # all of the fieldnames we look up in the MMP are based on this value
 
-		my $al = Wx::StaticText->new($self, -1, $k->{'label'});
-		my $ab = Wx::Button->    new($self, Utility::id($basename), $MMP->{$basename});
+		my $al = Wx::StaticText->new($Tab, -1, $k->{'label'});
+		my $ab = Wx::Button->    new($Tab, Utility::id($basename), $MMP->{$basename});
 
-		my $cl = Wx::StaticText->new($self, -1, "Respond via:");
-		my $cm = Wx::ComboBox->  new($self, Utility::id("${basename}RespPicker"), $MMP->{"${basename}ResponseMethod"},
+		my $cl = Wx::StaticText->new($Tab, -1, "Respond via:");
+		my $cm = Wx::ComboBox->  new($Tab, Utility::id("${basename}RespPicker"), $MMP->{"${basename}ResponseMethod"},
 				wxDefaultPosition, wxDefaultSize, $ChatOptions, wxCB_READONLY);
-		my $cr = Wx::TextCtrl->  new($self, Utility::id("${basename}Response"),   $MMP->{"${basename}Response"});
+		my $cr = Wx::TextCtrl->  new($Tab, Utility::id("${basename}Response"),   $MMP->{"${basename}Response"});
 
 		my $tip = $k->{'tooltipdetail'};
 		$ab->SetToolTip( Wx::ToolTip->new("Choose the key combo that will $tip"));
@@ -155,25 +162,25 @@ sub new {
 	my $PetNames = Wx::FlexGridSizer->new(0,5,5,5);
 	for my $PetID (1..6) {
 
-		my $pn = Wx::TextCtrl->new($self,  Utility::id("Pet${PetID}Name"), $MMP->{"Pet${PetID}Name"});
+		my $pn = Wx::TextCtrl->new($Tab,  Utility::id("Pet${PetID}Name"), $MMP->{"Pet${PetID}Name"});
 		$pn->SetToolTip( Wx::ToolTip->new("Specify Pet ${PetID}'s Name for individual selection") );
 
-		my $cb = Wx::CheckBox->new($self, Utility::id("Pet${PetID}Bodyguard"), "Bodyguard" );
+		my $cb = Wx::CheckBox->new($Tab, Utility::id("Pet${PetID}Bodyguard"), "Bodyguard" );
 		$cb->SetValue($MMP->{"Pet${PetID}Bodyguard"});
 		$cb->SetToolTip( Wx::ToolTip->new("Select whether pet $PetID acts as Bodyguard") );
 
-		my $bn = Wx::Button->    new($self, Utility::id("PetSelect$PetID"), $MMP->{"PetSelect$PetID"});
+		my $bn = Wx::Button->    new($Tab, Utility::id("PetSelect$PetID"), $MMP->{"PetSelect$PetID"});
 		$bn->SetToolTip( Wx::ToolTip->new("Choose the Key Combo to Select Pet $PetID"));
 
-		$PetNames->Add( Wx::StaticText->new($self, -1, "Pet ${PetID}'s Name"), 0, wxALIGN_CENTER_VERTICAL);
+		$PetNames->Add( Wx::StaticText->new($Tab, -1, "Pet ${PetID}'s Name"), 0, wxALIGN_CENTER_VERTICAL);
 		$PetNames->Add( $pn );
 		$PetNames->Add( $cb, 0, wxALIGN_CENTER_VERTICAL);
-		$PetNames->Add( Wx::StaticText->new($self, -1, "Select Pet $PetID"), 0, wxALIGN_CENTER_VERTICAL);
+		$PetNames->Add( Wx::StaticText->new($Tab, -1, "Select Pet $PetID"), 0, wxALIGN_CENTER_VERTICAL);
 		$PetNames->Add( $bn );
 	}
 	$sizer->Add($PetNames);
 
-	$self->SetSizerAndFit($sizer);
+	$Tab->SetSizerAndFit($sizer);
 
 	return $self;
 }
