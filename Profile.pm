@@ -17,11 +17,9 @@ use Module::FPSDisplay;
 use Module::General;
 use Module::InspirationPopper;
 use Module::Mastermind;
-use Module::PetSel;
 use Module::SimpleBinds;
 use Module::SoD;
-use Module::TeamSel;
-use Module::TeamSel2;
+use Module::TeamPetSelect;
 use Module::TypingMsg;
 
 sub new {
@@ -34,17 +32,15 @@ sub new {
 	# Add the individual tabs, in order.
 	$self->AddModule(Module::General->new($self));
 	$self->AddModule(Module::SoD->new($self));
-	$self->AddModule(Module::BufferBinds->new($self));
-	$self->AddModule(Module::ComplexBinds->new($self));
-	$self->AddModule(Module::CustomBinds->new($self));
 	$self->AddModule(Module::FPSDisplay->new($self));
 	$self->AddModule(Module::InspirationPopper->new($self));
 	$self->AddModule(Module::Mastermind->new($self));
-	$self->AddModule(Module::PetSel->new($self));
-	$self->AddModule(Module::SimpleBinds->new($self));
-	$self->AddModule(Module::TeamSel->new($self));
-	$self->AddModule(Module::TeamSel2->new($self));
+	$self->AddModule(Module::TeamPetSelect->new($self));
 	$self->AddModule(Module::TypingMsg->new($self));
+	$self->AddModule(Module::SimpleBinds->new($self));
+	$self->AddModule(Module::BufferBinds->new($self));
+	$self->AddModule(Module::ComplexBinds->new($self));
+	$self->AddModule(Module::CustomBinds->new($self));
 
 	return $self;
 }
