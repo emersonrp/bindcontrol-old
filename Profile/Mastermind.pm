@@ -9,11 +9,11 @@ use BindFile;
 
 use Wx qw( :everything );
 
+our $ModuleName = 'MastermindPets';
+
 sub InitKeys {
 
 	my $self = shift;
-
-	$self->Profile->AddModule('MastermindPets');
 
 	$self->Profile->MastermindPets ||= {
 		Enable => undef,
@@ -70,6 +70,12 @@ sub InitKeys {
 		PetBodyguardAttack => '',
 		PetBodyguardGoto => '',
 
+		PetBackgroundAttack => 'UNBOUND',  # TODO -- need UI for this
+		PetBackgroundGoto => 'UNBOUND',  # TODO -- need UI for this
+		PetBackgroundAttackEnabled => 0,  # TODO -- need UI for this
+		PetBackgroundGotoEnabled => 0,  # TODO -- need UI for this
+
+
 		PetChatToggle => 'LALT-M',
 		PetSelect1 => 'F1',
 		PetSelect2 => 'F2',
@@ -85,8 +91,12 @@ sub InitKeys {
 		Pet5Name => 'Mike',
 		Pet6Name => 'Joel',
 
+		Pet1Bodyguard => 0,
 		Pet2Bodyguard => 1,
+		Pet3Bodyguard => 0,
+		Pet4Bodyguard => 0,
 		Pet5Bodyguard => 1,
+		Pet6Bodyguard => 0,
 
 	};
 }
@@ -195,101 +205,86 @@ sub HelpText { qq|
 |;}
 
 sub mmBGSelBind {
-	my ($profile,$file,$petaction,$saybg,$minpow,$ltspow,$bospow) = @_;
-	if ($petaction->{'bg_enable'}) {
+	my ($profile,$file,$PetBodyguardResponse,$powers) = @_;
+	my $MMP = $profile->MastermindPets;
+	if ($MMP->{'bg_enable'}) {
 		my ($bgsay, $bgset, $tier1bg, $tier2bg, $tier3bg);
-		#  fill bgsay with the right commands to have bodyguards say saybg
+		#  fill bgsay with the right commands to have bodyguards say PetBodyguardResponse
 		#  first check if any full tier groups are bodyguards.  full tier groups are either All BG or all NBG.
-		if ($petaction->{'pet1isbguard'}) { $tier1bg++; }
-		if ($petaction->{'pet2isbguard'}) { $tier1bg++; }
-		if ($petaction->{'pet3isbguard'}) { $tier1bg++; }
-		if ($petaction->{'pet4isbguard'}) { $tier2bg++; }
-		if ($petaction->{'pet5isbguard'}) { $tier2bg++; }
-		if ($petaction->{'pet6isbguard'}) { $tier3bg++; }
+		if ($MMP->{'Pet1Bodyguard'}) { $tier1bg++; }
+		if ($MMP->{'Pet2Bodyguard'}) { $tier1bg++; }
+		if ($MMP->{'Pet3Bodyguard'}) { $tier1bg++; }
+		if ($MMP->{'Pet4Bodyguard'}) { $tier2bg++; }
+		if ($MMP->{'Pet5Bodyguard'}) { $tier2bg++; }
+		if ($MMP->{'Pet6Bodyguard'}) { $tier3bg++; }
 		#  if $tier1bg is 3 or 0 then it is a full bg or full nbg group.  otherwise we have to call them by name.
 		#  if $tier2bg is 2 or 0 then it is a full bg or full nbg group.  otherwise we have to call them by name.
 		#  $tier3bg is ALWAYS a full group, with only one member, he is either BG or NBG
 		#  so, add all fullgroups into the bgsay command.
 		#  first check if $tier1bg + $tier2bg + $tier3bg == 6, if so, we can get away with petsayall.
-		if ((($tier1bg + $tier2bg + $tier3bg) == 6) or ($petaction->{'saybgmethod'} != 3)) {
+		if ((($tier1bg + $tier2bg + $tier3bg) == 6) or ($MMP->{'PetBodyguardResponseMethod'} != 3)) {
 			my @saymethall = ("local ",'tell, $name ',"petsayall ","");
-			$bgsay = $saymethall[$petaction->{'saybgmethod'}] . $saybg;
+			$bgsay = $MMP->{'PetBodyguardResponseMethod'} . $PetBodyguardResponse;
 		} else {
 			if ($tier1bg == 3) {
-				$bgsay .= '$$petsaypow ' . "$minpow $saybg";
+				$bgsay .= '$$petsaypow ' . "$powers->{'min'} $PetBodyguardResponse";
 			} else {
 				#  use petsayname commands for those $tier1s that are bodyguards.
-				if ($petaction->{'pet1isbguard'}) {
-					$bgsay .= '$$petsayname ' . "$petaction->{'pet1name'} $saybg";
-				}
-				if ($petaction->{'pet2isbguard'}) {
-					$bgsay .= '$$petsayname ' . "$petaction->{'pet2name'} $saybg";
-				}
-				if ($petaction->{'pet3isbguard'}) {
-					$bgsay .= '$$petsayname ' . "$petaction->{'pet3name'} $saybg";
-				}
+				$bgsay .= '$$petsayname ' . "$MMP->{'Pet1Name'} $PetBodyguardResponse" if ($MMP->{'Pet1Bodyguard'});
+				$bgsay .= '$$petsayname ' . "$MMP->{'Pet2Name'} $PetBodyguardResponse" if ($MMP->{'Pet2Bodyguard'});
+				$bgsay .= '$$petsayname ' . "$MMP->{'Pet3Name'} $PetBodyguardResponse" if ($MMP->{'Pet3Bodyguard'});
 			}
 			if ($tier2bg == 2) {
-				$bgsay .= '$$petsaypow ' . "ltspow $saybg";
+				$bgsay .= '$$petsaypow ' . "ltspow $PetBodyguardResponse";
 			} else {
-				if ($petaction->{'pet4isbguard'}) {
-					$bgsay .= '$$petsayname ' . "$petaction->{'pet4name'} $saybg";
-				}
-				if ($petaction->{'pet5isbguard'}) {
-					$bgsay .= '$$petsayname ' . "$petaction->{'pet5name'} $saybg";
-				}
+				$bgsay .= '$$petsayname ' . "$MMP->{'Pet4Name'} $PetBodyguardResponse" if ($MMP->{'Pet4Bodyguard'});
+				$bgsay .= '$$petsayname ' . "$MMP->{'Pet5Name'} $PetBodyguardResponse" if ($MMP->{'Pet5Bodyguard'});
 			}
 			if ($tier3bg == 1) {
-				$bgsay .= '$$petsaypow ' . "$bospow $saybg";
+				$bgsay .= '$$petsaypow ' . "$powers->{'bos'} $PetBodyguardResponse";
 			}
 		}
 		if (($tier1bg + $tier2bg + $tier3bg) == 6) {
 			$bgset = '$$petcomall def fol';
 		} else {
 			if ($tier1bg == 3) {
-				$bgset .= '$$petcompow ' . "$minpow def fol";
+				$bgset .= '$$petcompow ' . "$powers->{'min'} def fol";
 			} else {
 				#  use petsayname commands for those $tier1s that are bodyguards.
-				if ($petaction->{'pet1isbguard'}) {
-					$bgset .= '$$petcomname ' . "$petaction->{'pet1name'} def fol";
-				}
-				if ($petaction->{'pet2isbguard'}) {
-					$bgset .= '$$petcomname ' . "$petaction->{'pet2name'} def fol";
-				}
-				if ($petaction->{'pet3isbguard'}) {
-					$bgset .= '$$petcomname ' . "$petaction->{'pet3name'} def fol";
-				}
+				$bgset .= '$$petcomname ' . "$MMP->{'Pet1Name'} def fol" if ($MMP->{'Pet1Bodyguard'});
+				$bgset .= '$$petcomname ' . "$MMP->{'Pet2Name'} def fol" if ($MMP->{'Pet2Bodyguard'});
+				$bgset .= '$$petcomname ' . "$MMP->{'Pet3Name'} def fol" if ($MMP->{'Pet3Bodyguard'});
 			}
 			if ($tier2bg == 2) {
-				$bgset .= '$$petcompow ' . "$ltspow def fol";
+				$bgset .= '$$petcompow ' . "$powers->{'lts'} def fol";
 			} else {
-				if ($petaction->{'pet4isbguard'}) {
-					$bgset .= '$$petcomname ' . "$petaction->{'pet4name'} def fol";
-				}
-				if ($petaction->{'pet5isbguard'}) {
-					$bgset .= '$$petcomname ' . "$petaction->{'pet5name'} def fol";
-				}
+				$bgset .= '$$petcomname ' . "$MMP->{'Pet4Name'} def fol" if ($MMP->{'Pet4Bodyguard'});
+				$bgset .= '$$petcomname ' . "$MMP->{'Pet5Name'} def fol" if ($MMP->{'Pet5Bodyguard'});
 			}
 			if ($tier3bg == 1) {
-				$bgset .= '$$petcompow ' . "$bospow def fol";
+				$bgset .= '$$petcompow ' . "$powers->{'bos'} def fol";
 			}
 		}
-		$file->SetBind($petaction->{'selbgm'},$bgsay.$bgset.'$$bindloadfile ' . $profile->{'base'} . '\mmbinds\cbguarda.txt');
+		$file->SetBind($MMP->{'selbgm'}, $bgsay . $bgset . BindFile::BLF($profile, 'mmbinds','\cbguarda.txt'));
 	}
 }
 
 sub mmBGActBind {
-	my ($profile,$filedn,$fileup,$petaction,$key,$action,$say,$method,$minpow,$ltspow,$bospow,$fnamedn,$fnameup) = @_;
+	my ($profile,$filedn,$fileup,$action,$say,$powers) = @_;
+
+	my $MMP    = $profile->MastermindPets;
+	my $key    = $MMP->{"Pet$action"};
+	my $method = $MMP->{"Pet${action}ResponseMethod"};
 
 	my ($bgact, $bgsay, $tier1bg, $tier2bg, $tier3bg);
-	#  fill bgsay with the right commands to have bodyguards say saybg
+	#  fill bgsay with the right commands to have bodyguards say PetBodyguardResponse
 	#  first check if any full tier groups are bodyguards.  full tier groups are eaither All BG or all NBG.
-	if ($petaction->{'pet1isbguard'}) { $tier1bg++; }
-	if ($petaction->{'pet2isbguard'}) { $tier1bg++; }
-	if ($petaction->{'pet3isbguard'}) { $tier1bg++; }
-	if ($petaction->{'pet4isbguard'}) { $tier2bg++; }
-	if ($petaction->{'pet5isbguard'}) { $tier2bg++; }
-	if ($petaction->{'pet6isbguard'}) { $tier3bg++; }
+	if ($MMP->{'Pet1Bodyguard'}) { $tier1bg++; }
+	if ($MMP->{'Pet2Bodyguard'}) { $tier1bg++; }
+	if ($MMP->{'Pet3Bodyguard'}) { $tier1bg++; }
+	if ($MMP->{'Pet4Bodyguard'}) { $tier2bg++; }
+	if ($MMP->{'Pet5Bodyguard'}) { $tier2bg++; }
+	if ($MMP->{'Pet6Bodyguard'}) { $tier3bg++; }
 	#  if $tier1bg is 3 or 0 then it is a full bg or full nbg group.  otherwise we have to call them by name.
 	#  if $tier2bg is 2 or 0 then it is a full bg or full nbg group.  otherwise we have to call them by name.
 	#  $tier3bg is ALWAYS a full group, with only one member, he is either BG or NBG
@@ -297,81 +292,66 @@ sub mmBGActBind {
 	#  first check if $tier1bg + $tier2bg + $tier3bg == 6, if so, we can get away with petsayall.
 	if ((($tier1bg + $tier2bg + $tier3bg) == 0) or ($method != 3)) {
 		my @saymethall = ("local ",'tell, $name ',"petsayall ","");
-		$bgsay = $saymethall[$method] . $say;
+		$bgsay = $method . $say;
 	} else {
 		if ($tier1bg == 0) {
-			$bgsay .= '$$petsaypow ' . "$minpow $say";
+			$bgsay .= '$$petsaypow ' . "$powers->{'min'} $say";
 		} else {
 			#  use petsayname commands for those $tier1s that are bodyguards.
-			if (not $petaction->{'pet1isbguard'}) {
-				$bgsay .= '$$petsayname ' . "$petaction->{'pet1name'} $say";
-			}
-			if (not $petaction->{'pet2isbguard'}) {
-				$bgsay .= '$$petsayname ' . "$petaction->{'pet2name'} $say";
-			}
-			if (not $petaction->{'pet3isbguard'}) {
-				$bgsay .= '$$petsayname ' . "$petaction->{'pet3name'} $say";
-			}
+			$bgsay .= '$$petsayname ' . "$MMP->{'Pet1Name'} $say" if (not $MMP->{'Pet1Bodyguard'});
+			$bgsay .= '$$petsayname ' . "$MMP->{'Pet2Name'} $say" if (not $MMP->{'Pet2Bodyguard'});
+			$bgsay .= '$$petsayname ' . "$MMP->{'Pet3Name'} $say" if (not $MMP->{'Pet3Bodyguard'});
 		}
 		if ($tier2bg == 0) {
-			$bgsay .= '$$petsaypow ' . "$ltspow $say";
+			$bgsay .= '$$petsaypow ' . "$powers->{'lts'} $say";
 		} else {
-			if (not $petaction->{'pet4isbguard'}) {
-				$bgsay .= '$$petsayname ' . "$petaction->{'pet4name'} $say";
-			}
-			if (not $petaction->{'pet5isbguard'}) {
-				$bgsay .= '$$petsayname ' . "$petaction->{'pet5name'} $say";
-			}
+			$bgsay .= '$$petsayname ' . "$MMP->{'Pet4Name'} $say" if (not $MMP->{'Pet4Bodyguard'});
+			$bgsay .= '$$petsayname ' . "$MMP->{'Pet5Name'} $say" if (not $MMP->{'Pet5Bodyguard'});
 		}
 		if ($tier3bg == 0) {
-			$bgsay .= '$$petsaypow ' . "$bospow $say";
+			$bgsay .= '$$petsaypow ' . "$powers->{'bos'} $say";
 		}
 	}
 	if (($tier1bg + $tier2bg + $tier3bg) == 0) {
 		$bgact = '$$petcomall ' . $action;
 	} else {
 		if ($tier1bg == 0) {
-			$bgact .= '$$petcompow ' . "$minpow $action";
+			$bgact .= '$$petcompow ' . "$powers->{'min'} $action";
 		} else {
 			#  use petsayname commands for those $tier1s that are bodyguards.
-			if (not $petaction->{'pet1isbguard'}) {
-				$bgact .= '$$petcomname ' . "$petaction->{'pet1name'} $action";
-			}
-			if (not $petaction->{'pet2isbguard'}) {
-				$bgact .= '$$petcomname ' . "$petaction->{'pet2name'} $action";
-			}
-			if (not $petaction->{'pet3isbguard'}) {
-				$bgact .= '$$petcomname ' . "$petaction->{'pet3name'} $action";
-			}
+			$bgact .= '$$petcomname ' . "$MMP->{'Pet1Name'} $action" if (not $MMP->{'Pet1Bodyguard'});
+			$bgact .= '$$petcomname ' . "$MMP->{'Pet2Name'} $action" if (not $MMP->{'Pet2Bodyguard'});
+			$bgact .= '$$petcomname ' . "$MMP->{'Pet3Name'} $action" if (not $MMP->{'Pet3Bodyguard'});
 		}
 		if ($tier2bg == 0) {
-			$bgact .= '$$petcompow ' . "$ltspow $action";
+			$bgact .= '$$petcompow ' . "$powers->{'lts'} $action";
 		} else {
-			if (not $petaction->{'pet4isbguard'}) {
-				$bgact .= '$$petcomname ' . "$petaction->{'pet4name'} $action";
-			}
-			if (not $petaction->{'pet5isbguard'}) {
-				$bgact .= '$$petcomname ' . "$petaction->{'pet5name'} $action";
-			}
+			$bgact .= '$$petcomname ' . "$MMP->{'Pet4Name'} $action" if (not $MMP->{'Pet4Bodyguard'});
+			$bgact .= '$$petcomname ' . "$MMP->{'Pet5Name'} $action" if (not $MMP->{'Pet5Bodyguard'});
 		}
 		if ($tier3bg == 0) {
-			$bgact .= '$$petcompow ' . "$bospow $action";
+			$bgact .= '$$petcompow ' . "$powers->{'bos'} $action";
 		}
 	}
-	cbWriteToggleBind($filedn,$fileup,$key,$bgsay,$bgact,$fnamedn,$fnameup);
+	cbWriteToggleBind($filedn,$fileup,$key,$bgsay,$bgact,$filedn->BLFPath,$fileup->BLFPath);
 }
 
 sub mmBGActBGBind {
-	my ($profile,$filedn,$fileup,$petaction,$key,$action,$say,$method,$minpow,$ltspow,$bospow,$fnamedn,$fnameup) = @_;
+	my ($profile,$filedn,$fileup,$action,$say,$powers) = @_;
+
+	my $MMP =    $profile->MastermindPets;
+	my $key =    $MMP->{"PetBackground$action"};
+	my $method = $MMP->{"Pet${action}ResponseMethod"};
+
 	my ($bgact, $bgsay, $tier1bg, $tier2bg, $tier3bg);
-	#  fill bgsay with the right commands to have bodyguards say saybg
+	#  fill bgsay with the right commands to have bodyguards say PetBodyguardResponse
 	#  first check if any full tier groups are bodyguards.  full tier groups are eaither All BG or all NBG.
-	if ($petaction->{'pet1isbguard'}) { $tier1bg++; }
-	if ($petaction->{'pet2isbguard'}) { $tier1bg++; }
-	if ($petaction->{'pet3isbguard'}) { $tier1bg++; }
-	if ($petaction->{'pet4isbguard'}) { $tier2bg++; }
-	if ($petaction->{'pet5isbguard'}) { $tier2bg++; }
-	if ($petaction->{'pet6isbguard'}) { $tier3bg++; }
+	if ($MMP->{'Pet1Bodyguard'}) { $tier1bg++; }
+	if ($MMP->{'Pet2Bodyguard'}) { $tier1bg++; }
+	if ($MMP->{'Pet3Bodyguard'}) { $tier1bg++; }
+	if ($MMP->{'Pet4Bodyguard'}) { $tier2bg++; }
+	if ($MMP->{'Pet5Bodyguard'}) { $tier2bg++; }
+	if ($MMP->{'Pet6Bodyguard'}) { $tier3bg++; }
 	#  if $tier1bg is 3 or 0 then it is a full bg or full nbg group.  otherwise we have to call them by name.
 	#  if $tier2bg is 2 or 0 then it is a full bg or full nbg group.  otherwise we have to call them by name.
 	#  $tier3bg is ALWAYS a full group, with only one member, he is either BG or NBG
@@ -379,83 +359,64 @@ sub mmBGActBGBind {
 	#  first check if $tier1bg + $tier2bg + $tier3bg == 6, if so, we can get away with petsayall.
 	if ((($tier1bg + $tier2bg + $tier3bg) == 6) or ($method != 3)) {
 		my @saymethall = ("local ",'tell, $name ',"petsayall ","");
-		$bgsay = $saymethall[$method] . $say;
+		$bgsay = $method . $say;
 	} else {
 		if ($tier1bg == 3) {
-			$bgsay .= '$$petsaypow ' . "$minpow $say";
+			$bgsay .= '$$petsaypow ' . "$powers->{'min'} $say";
 		} else {
 			#  use petsayname commands for those $tier1s that are bodyguards.
-			if ($petaction->{'pet1isbguard'}) {
-				$bgsay .= '$$petsayname ' . "$petaction->{'pet1name'} $say";
-			}
-			if ($petaction->{'pet2isbguard'}) {
-				$bgsay .= '$$petsayname ' . "$petaction->{'pet2name'} $say";
-			}
-			if ($petaction->{'pet3isbguard'}) {
-				$bgsay .= '$$petsayname ' . "$petaction->{'pet3name'} $say";
-			}
+			$bgsay .= '$$petsayname ' . "$MMP->{'Pet1Name'} $say" if ($MMP->{'Pet1Bodyguard'});
+			$bgsay .= '$$petsayname ' . "$MMP->{'Pet2Name'} $say" if ($MMP->{'Pet2Bodyguard'});
+			$bgsay .= '$$petsayname ' . "$MMP->{'Pet3Name'} $say" if ($MMP->{'Pet3Bodyguard'});
 		}
 		if ($tier2bg == 2) {
-			$bgsay .= '$$petsaypow ' / "$ltspow $say";
+			$bgsay .= '$$petsaypow ' / "$powers->{'lts'} $say";
 		} else {
-			if ($petaction->{'pet4isbguard'}) {
-				$bgsay .= '$$petsayname ' . "$petaction->{'pet4name'} $say";
-			}
-			if ($petaction->{'pet5isbguard'}) {
-				$bgsay .= '$$petsayname ' . "$petaction->{'pet5name'} $say";
-			}
+			$bgsay .= '$$petsayname ' . "$MMP->{'Pet4Name'} $say" if ($MMP->{'Pet4Bodyguard'});
+			$bgsay .= '$$petsayname ' . "$MMP->{'Pet5Name'} $say" if ($MMP->{'Pet5Bodyguard'});
 		}
 		if ($tier3bg == 1) {
-			$bgsay .= '$$petsaypow ' . "$bospow $say";
+			$bgsay .= '$$petsaypow ' . "$powers->{'bos'} $say";
 		}
 	}
 	if (($tier1bg + $tier2bg + $tier3bg) == 6) {
 		$bgact = '$$petcomall ' . $action;
 	} else {
 		if ($tier1bg == 3) {
-			$bgact .= '$$petcompow ' . "$minpow $action";
+			$bgact .= '$$petcompow ' . "$powers->{'min'} $action";
 		} else {
 			#  use petsayname commands for those $tier1s that are bodyguards.
-			if ($petaction->{'pet1isbguard'}) {
-				$bgact .= '$$petcomname ' . "$petaction->{'pet1name'} $action";
-			}
-			if ($petaction->{'pet2isbguard'}) {
-				$bgact .= '$$petcomname ' . "$petaction->{'pet2name'} $action";
-			}
-			if ($petaction->{'pet3isbguard'}) {
-				$bgact .= '$$petcomname ' . "$petaction->{'pet3name'} $action";
-			}
+			$bgact .= '$$petcomname ' . "$MMP->{'Pet1Name'} $action" if ($MMP->{'Pet1Bodyguard'});
+			$bgact .= '$$petcomname ' . "$MMP->{'Pet2Name'} $action" if ($MMP->{'Pet2Bodyguard'});
+			$bgact .= '$$petcomname ' . "$MMP->{'Pet3Name'} $action" if ($MMP->{'Pet3Bodyguard'});
 		}
 		if ($tier2bg == 2) {
-			$bgact .= '$$petcompow ' . "$ltspow $action";
+			$bgact .= '$$petcompow ' . "$powers->{'lts'} $action";
 		} else {
-			if ($petaction->{'pet4isbguard'}) {
-				$bgact .= '$$petcomname ' . "$petaction->{'pet4name'} $action";
-			}
-			if ($petaction->{'pet5isbguard'}) {
-				$bgact .= '$$petcomname ' . "$petaction->{'pet5name'} $action";
-			}
+			$bgact .= '$$petcomname ' . "$MMP->{'Pet4Name'} $action" if ($MMP->{'Pet4Bodyguard'});
+			$bgact .= '$$petcomname ' . "$MMP->{'Pet5Name'} $action" if ($MMP->{'Pet5Bodyguard'});
 		}
 		if ($tier3bg == 1) {
-			$bgact .= '$$petcompow ' . "$bospow $action";
+			$bgact .= '$$petcompow ' . "$powers->{'bos'} $action";
 		}
 	}
-	# file->SetBind($petaction->{'selbgm'},bgsay.$bgset.'$$bindloadfile ' . $profile->{'base'} . '\\mmbinds\\cbguarda.txt')
-	cbWriteToggleBind($filedn,$fileup,$key,$bgsay,$bgact,$fnamedn,$fnameup);
+	# file->SetBind($MMP->{'selbgm'},bgsay.$bgset.BindFile::BLF($profile, 'mmbinds','\mmbinds\\cbguarda.txt'));
+	cbWriteToggleBind($filedn,$fileup,$key,$bgsay,$bgact,$filedn->BLFPath,$fileup->BLFPath);
 }
 
 sub mmQuietBGSelBind {
-	my ($profile,$file,$petaction,$minpow,$ltspow,$bospow) = @_;
-	if ($petaction->{'bg_enable'}) {
+	my ($profile,$file,$powers) = @_;
+	my $MMP = $profile->MastermindPets;
+	if ($MMP->{'bg_enable'}) {
 		my ($bgset, $tier1bg, $tier2bg, $tier3bg);
-		#  fill bgsay with the right commands to have bodyguards say saybg
+		#  fill bgsay with the right commands to have bodyguards say PetBodyguardResponse
 		#  first check if any full tier groups are bodyguards.  full tier groups are eaither All BG or all NBG.
-		if ($petaction->{'pet1isbguard'}) { $tier1bg++; }
-		if ($petaction->{'pet2isbguard'}) { $tier1bg++; }
-		if ($petaction->{'pet3isbguard'}) { $tier1bg++; }
-		if ($petaction->{'pet4isbguard'}) { $tier2bg++; }
-		if ($petaction->{'pet5isbguard'}) { $tier2bg++; }
-		if ($petaction->{'pet6isbguard'}) { $tier3bg++; }
+		if ($MMP->{'Pet1Bodyguard'}) { $tier1bg++; }
+		if ($MMP->{'Pet2Bodyguard'}) { $tier1bg++; }
+		if ($MMP->{'Pet3Bodyguard'}) { $tier1bg++; }
+		if ($MMP->{'Pet4Bodyguard'}) { $tier2bg++; }
+		if ($MMP->{'Pet5Bodyguard'}) { $tier2bg++; }
+		if ($MMP->{'Pet6Bodyguard'}) { $tier3bg++; }
 		#  if $tier1bg is 3 or 0 then it is a full bg or full nbg group.  otherwise we have to call them by name.
 		#  if $tier2bg is 2 or 0 then it is a full bg or full nbg group.  otherwise we have to call them by name.
 		#  $tier3bg is ALWAYS a full group, with only one member, he is either BG or NBG
@@ -465,48 +426,42 @@ sub mmQuietBGSelBind {
 			$bgset = "petcomall def fol";
 		} else {
 			if ($tier1bg == 3) {
-				$bgset .= '$$petcompow ' . "$minpow def fol";
+				$bgset .= '$$petcompow ' . "$powers->{'min'} def fol";
 			} else {
 				#  use petsayname commands for those $tier1s that are bodyguards.
-				if ($petaction->{'pet1isbguard'}) {
-					$bgset .= '$$petcomname ' . "$petaction->{'pet1name'} def fol";
-				}
-				if ($petaction->{'pet2isbguard'}) {
-					$bgset .= '$$petcomname ' . "$petaction->{'pet2name'} def fol";
-				}
-				if ($petaction->{'pet3isbguard'}) {
-					$bgset .= '$$petcomname ' . "$petaction->{'pet3name'} def fol";
-				}
+				$bgset .= '$$petcomname ' . "$MMP->{'Pet1Name'} def fol" if ($MMP->{'Pet1Bodyguard'});
+				$bgset .= '$$petcomname ' . "$MMP->{'Pet2Name'} def fol" if ($MMP->{'Pet2Bodyguard'});
+				$bgset .= '$$petcomname ' . "$MMP->{'Pet3Name'} def fol" if ($MMP->{'Pet3Bodyguard'});
 			}
 			if ($tier2bg == 2) {
-				$bgset .= '$$petcompow ' . "$ltspow def fol";
+				$bgset .= '$$petcompow ' . "$powers->{'lts'} def fol";
 			} else {
-				if ($petaction->{'pet4isbguard'}) {
-					$bgset .= '$$petcomname ' . "$petaction->{'pet4name'} def fol";
-				}
-				if ($petaction->{'pet5isbguard'}) {
-					$bgset .= '$$petcomname ' . "$petaction->{'pet5name'} def fol";
-				}
+				$bgset .= '$$petcomname ' . "$MMP->{'Pet4Name'} def fol" if ($MMP->{'Pet4Bodyguard'});
+				$bgset .= '$$petcomname ' . "$MMP->{'Pet5Name'} def fol" if ($MMP->{'Pet5Bodyguard'});
 			}
 			if ($tier3bg == 1) {
-				$bgset .= '$$petcompow ' . "$bospow def fol";
+				$bgset .= '$$petcompow ' . "$powers->{'bos'} def fol";
 			}
 		}
-		$file->SetBind($petaction->{'selbgm'},$bgset . '$$bindloadfile ' . $profile->{'base'} . '\\mmbinds\\bguarda.txt')
+		$file->SetBind($MMP->{'selbgm'},$bgset . BindFile::BLF($profile, 'mmbinds','\mmbinds\\bguarda.txt'));
 	}
 }
 
 sub mmQuietBGActBind {
-	my ($profile,$filedn,$fileup,$petaction,$key,$action,$minpow,$ltspow,$bospow) = @_;
+	my ($profile,$filedn,$fileup,$action,$powers) = @_;
+
+	my $MMP = $profile->MastermindPets;
+	my $key = $MMP->{"PetBackground$action"};
+
 	my ($bgact, $tier1bg, $tier2bg, $tier3bg);
-	#  fill bgsay with the right commands to have bodyguards say saybg
+	#  fill bgsay with the right commands to have bodyguards say PetBodyguardResponse
 	#  first check if any full tier groups are bodyguards.  full tier groups are eaither All BG or all NBG.
-	if ($petaction->{'pet1isbguard'}) { $tier1bg++; }
-	if ($petaction->{'pet2isbguard'}) { $tier1bg++; }
-	if ($petaction->{'pet3isbguard'}) { $tier1bg++; }
-	if ($petaction->{'pet4isbguard'}) { $tier2bg++; }
-	if ($petaction->{'pet5isbguard'}) { $tier2bg++; }
-	if ($petaction->{'pet6isbguard'}) { $tier3bg++; }
+	if ($MMP->{'Pet1Bodyguard'}) { $tier1bg++; }
+	if ($MMP->{'Pet2Bodyguard'}) { $tier1bg++; }
+	if ($MMP->{'Pet3Bodyguard'}) { $tier1bg++; }
+	if ($MMP->{'Pet4Bodyguard'}) { $tier2bg++; }
+	if ($MMP->{'Pet5Bodyguard'}) { $tier2bg++; }
+	if ($MMP->{'Pet6Bodyguard'}) { $tier3bg++; }
 	#  if $tier1bg is 3 or 0 then it is a full bg or full nbg group.  otherwise we have to call them by name.
 	#  if $tier2bg is 2 or 0 then it is a full bg or full nbg group.  otherwise we have to call them by name.
 	#  $tier3bg is ALWAYS a full group, with only one member, he is either BG or NBG
@@ -516,31 +471,31 @@ sub mmQuietBGActBind {
 		$bgact = "petcomall $action";
 	} else {
 		if ($tier1bg == 0) {
-			$bgact .= '$$petcompow ' . "$minpow $action";
+			$bgact .= '$$petcompow ' . "$powers->{'min'} $action";
 		} else {
 			#  use petsayname commands for those $tier1s that are bodyguards.
-			if (not $petaction->{'pet1isbguard'}) {
-				$bgact .= '$$petcomname ' . "$petaction->{'pet1name'} $action";
+			if (not $MMP->{'Pet1Bodyguard'}) {
+				$bgact .= '$$petcomname ' . "$MMP->{'Pet1Name'} $action";
 			}
-			if (not $petaction->{'pet2isbguard'}) {
-				$bgact .= '$$petcomname ' . "$petaction->{'pet2name'} $action";
+			if (not $MMP->{'Pet2Bodyguard'}) {
+				$bgact .= '$$petcomname ' . "$MMP->{'Pet2Name'} $action";
 			}
-			if (not $petaction->{'pet3isbguard'}) {
-				$bgact .= '$$petcomname ' . "$petaction->{'pet3name'} $action";
+			if (not $MMP->{'Pet3Bodyguard'}) {
+				$bgact .= '$$petcomname ' . "$MMP->{'Pet3Name'} $action";
 			}
 		}
 		if ($tier2bg == 0) {
-			$bgact .= '$$petcompow ' . "$ltspow $action";
+			$bgact .= '$$petcompow ' . "$powers->{'lts'} $action";
 		} else {
-			if (not $petaction->{'pet4isbguard'}) {
-				$bgact .= '$$petcomname ' . "$petaction->{'pet4name'} $action";
+			if (not $MMP->{'Pet4Bodyguard'}) {
+				$bgact .= '$$petcomname ' . "$MMP->{'Pet4Name'} $action";
 			}
-			if (not $petaction->{'pet5isbguard'}) {
-				$bgact .= '$$petcomname ' . "$petaction->{'pet5name'} $action";
+			if (not $MMP->{'Pet5Bodyguard'}) {
+				$bgact .= '$$petcomname ' . "$MMP->{'Pet5Name'} $action";
 			}
 		}
 		if ($tier3bg == 0) {
-			$bgact .= '$$petcompow ' . "$bospow $action";
+			$bgact .= '$$petcompow ' . "$powers->{'bos'} $action";
 		}
 	}
 	# 'petcompow ',,grp.' Stay'
@@ -548,16 +503,21 @@ sub mmQuietBGActBind {
 }
 
 sub mmQuietBGActBGBind {
-	my ($profile,$filedn,$fileup,$petaction,$key,$action,$minpow,$ltspow,$bospow) = @_;
+	my ($profile,$filedn,$fileup,$action,$powers) = @_;
+
+	my $MMP    = $profile->MastermindPets;
+	my $key    = $MMP->{"PetBackground$action"};
+	my $method = $MMP->{"Pet${action}ResponseMethod"};
+
 	my ($bgact, $tier1bg, $tier2bg, $tier3bg);
-	#  fill bgsay with the right commands to have bodyguards say saybg
+	#  fill bgsay with the right commands to have bodyguards say PetBodyguardResponse
 	#  first check if any full tier groups are bodyguards.  full tier groups are eaither All BG or all NBG.
-	if ($petaction->{'pet1isbguard'}) { $tier1bg++; }
-	if ($petaction->{'pet2isbguard'}) { $tier1bg++; }
-	if ($petaction->{'pet3isbguard'}) { $tier1bg++; }
-	if ($petaction->{'pet4isbguard'}) { $tier2bg++; }
-	if ($petaction->{'pet5isbguard'}) { $tier2bg++; }
-	if ($petaction->{'pet6isbguard'}) { $tier3bg++; }
+	if ($MMP->{'Pet1Bodyguard'}) { $tier1bg++; }
+	if ($MMP->{'Pet2Bodyguard'}) { $tier1bg++; }
+	if ($MMP->{'Pet3Bodyguard'}) { $tier1bg++; }
+	if ($MMP->{'Pet4Bodyguard'}) { $tier2bg++; }
+	if ($MMP->{'Pet5Bodyguard'}) { $tier2bg++; }
+	if ($MMP->{'Pet6Bodyguard'}) { $tier3bg++; }
 	#  if $tier1bg is 3 or 0 then it is a full bg or full nbg group.  otherwise we have to call them by name.
 	#  if $tier2bg is 2 or 0 then it is a full bg or full nbg group.  otherwise we have to call them by name.
 	#  $tier3bg is ALWAYS a full group, with only one member, he is either BG or NBG
@@ -567,31 +527,21 @@ sub mmQuietBGActBGBind {
 		$bgact = "petcomall $action";
 	} else {
 		if ($tier1bg == 3) {
-			$bgact .= '$$petcompow ' . "$minpow $action";
+			$bgact .= '$$petcompow ' . "$powers->{'min'} $action";
 		} else {
 			#  use petsayname commands for those $tier1s that are bodyguards.
-			if ($petaction->{'pet1isbguard'}) {
-				$bgact .= '$$petcomname ' . "$petaction->{'pet1name'} $action";
-			}
-			if ($petaction->{'pet2isbguard'}) {
-				$bgact .= '$$petcomname ' . "$petaction->{'pet2name'} $action";
-			}
-			if ($petaction->{'pet3isbguard'}) {
-				$bgact .= '$$petcomname ' . "$petaction->{'pet3name'} $action";
-			}
+			$bgact .= '$$petcomname ' . "$MMP->{'Pet1Name'} $action" if ($MMP->{'Pet1Bodyguard'});
+			$bgact .= '$$petcomname ' . "$MMP->{'Pet2Name'} $action" if ($MMP->{'Pet2Bodyguard'});
+			$bgact .= '$$petcomname ' . "$MMP->{'Pet3Name'} $action" if ($MMP->{'Pet3Bodyguard'});
 		}
 		if ($tier2bg == 2) {
-			$bgact .= '$$petcompow ' . "$ltspow $action";
+			$bgact .= '$$petcompow ' . "$powers->{'lts'} $action";
 		} else {
-			if ($petaction->{'pet4isbguard'}) {
-				$bgact .= '$$petcomname ' . "$petaction->{'pet4name'} $action";
-			}
-			if ($petaction->{'pet5isbguard'}) {
-				$bgact .= '$$petcomname ' . "$petaction->{'pet5name'} $action";
-			}
+			$bgact .= '$$petcomname ' . "$MMP->{'Pet4Name'} $action" if ($MMP->{'Pet4Bodyguard'});
+			$bgact .= '$$petcomname ' . "$MMP->{'Pet5Name'} $action" if ($MMP->{'Pet5Bodyguard'});
 		}
 		if ($tier3bg == 1) {
-			$bgact .= '$$petcompow ' . "$bospow $action";
+			$bgact .= '$$petcompow ' . "$powers->{'bos'} $action";
 		}
 	}
 	# 'petcompow ',,grp.' Stay'
@@ -599,277 +549,184 @@ sub mmQuietBGActBGBind {
 }
 
 sub mmSubBind {
-	my ($profile,$file,$petaction,$fn,$grp,$minpow,$ltspow,$bospow) = @_;
-	my ($sayall, $saymin, $saylts, $saybos, $sayagg, $saydef, $saypas, $sayatk, $sayfol, $saysty, $saygo, $saybg);
-	if ($petaction->{'sayallmethod'} < 4) { $sayall = $petaction->{'sayall'} . '$$' } else { $sayall = ""; }
-	if ($petaction->{'sayminmethod'} < 4) { $saymin = $petaction->{'saymin'} . '$$' } else { $saymin = ""; }
-	if ($petaction->{'sayltsmethod'} < 4) { $saylts = $petaction->{'saylts'} . '$$' } else { $saylts = ""; }
-	if ($petaction->{'saybosmethod'} < 4) { $saybos = $petaction->{'saybos'} . '$$' } else { $saybos = ""; }
-	if ($petaction->{'saybgmethod'}  < 4) { $saybg  = $petaction->{'saybg'}  . '$$' } else { $saybg  = ""; }
-	if ($petaction->{'sayaggmethod'} < 4) { $sayagg = $petaction->{'sayagg'} . '$$' } else { $sayagg = ""; }
-	if ($petaction->{'saydefmethod'} < 4) { $saydef = $petaction->{'saydef'} . '$$' } else { $saydef = ""; }
-	if ($petaction->{'saypasmethod'} < 4) { $saypas = $petaction->{'saypas'} . '$$' } else { $saypas = ""; }
-	if ($petaction->{'sayatkmethod'} < 4) { $sayatk = $petaction->{'sayatk'} . '$$' } else { $sayatk = ""; }
-	if ($petaction->{'sayfolmethod'} < 4) { $sayfol = $petaction->{'sayfol'} . '$$' } else { $sayfol = ""; }
-	if ($petaction->{'saystymethod'} < 4) { $saysty = $petaction->{'saysty'} . '$$' } else { $saysty = ""; }
-	if ($petaction->{'saygomethod'}  < 4) { $saygo  = $petaction->{'saygo'}  . '$$' } else { $saygo  = ""; }
-	my @saymethall = ("local ",'tell, $name ',"petsayall ","");
-	my @saymethmin = ("local ",'tell, $name ',"petsaypow $minpow ","");
-	my @saymethlts = ("local ",'tell, $name ',"petsaypow $ltspow ","");
-	my @saymethbos = ("local ",'tell, $name ',"petsaypow $bospow ","");
+	my ($profile,$file,$fn,$grp,$powers) = @_;
+	my $MMP = $profile->MastermindPets;
+	my %PetResponses;
+	for my $cmd (qw(SelectAll SelectMinions SelectLieutenants SelectBoss Bodyguard Aggressive Defensive Passive Attack Follow Stay Goto) ) {
+		if ($MMP->{"Pet${cmd}ResponseMethod"} ne 'None') { $PetResponses{$cmd} = $MMP->{"Pet${cmd}Response"} }
+	}
 
-	$file->SetBind($petaction->{'selall'},$saymethall[$petaction->{'sayallmethod'}] . $sayall . '$$bindloadfile ' . "$profile->{'base'}\\mmbinds\\call.txt");
-	$file->SetBind($petaction->{'selmin'},$saymethmin[$petaction->{'sayminmethod'}] . $saymin . '$$bindloadfile ' . "$profile->{'base'}\\mmbinds\\ctier1.txt");
-	$file->SetBind($petaction->{'sellts'},$saymethlts[$petaction->{'sayltsmethod'}] . $saylts . '$$bindloadfile ' . "$profile->{'base'}\\mmbinds\\ctier2.txt");
-	$file->SetBind($petaction->{'selbos'},$saymethbos[$petaction->{'saybosmethod'}] . $saybos . '$$bindloadfile ' . "$profile->{'base'}\\mmbinds\\ctier3.txt");
-	mmBGSelBind($profile,$file,$petaction,$saybg,$minpow,$ltspow,$bospow);
-	if ($grp) {
-		$file->SetBind($petaction->{'setagg'},$saymethall[$petaction->{'sayaggmethod'}] . $sayagg . '$$petcompow ' . "$grp Aggressive");
-		$file->SetBind($petaction->{'setdef'},$saymethall[$petaction->{'saydefmethod'}] . $saydef . '$$petcompow ' . "$grp Defensive");
-		$file->SetBind($petaction->{'setpas'},$saymethall[$petaction->{'saypasmethod'}] . $saypas . '$$petcompow ' . "$grp Passive");
-		$file->SetBind($petaction->{'cmdatk'},$saymethall[$petaction->{'sayatkmethod'}] . $sayatk . '$$petcompow ' . "$grp Attack");
-		$file->SetBind($petaction->{'cmdfol'},$saymethall[$petaction->{'sayfolmethod'}] . $sayfol . '$$petcompow ' . "$grp Follow");
-		$file->SetBind($petaction->{'cmdsty'},$saymethall[$petaction->{'saystymethod'}] . $saysty . '$$petcompow ' . "$grp Stay");
-		$file->SetBind($petaction->{'cmdgoto'},$saymethall[$petaction->{'saygomethod'}] . $saygo . '$$petcompow ' . "$grp Goto");
-	} else {
-		$file->SetBind($petaction->{'setagg'},$saymethall[$petaction->{'sayaggmethod'}] . $sayagg . '$$petcomall Aggressive');
-		$file->SetBind($petaction->{'setdef'},$saymethall[$petaction->{'saydefmethod'}] . $saydef . '$$petcomall Defensive');
-		$file->SetBind($petaction->{'setpas'},$saymethall[$petaction->{'saypasmethod'}] . $saypas . '$$petcomall Passive');
-		$file->SetBind($petaction->{'cmdatk'},$saymethall[$petaction->{'sayatkmethod'}] . $sayatk . '$$petcomall Attack');
-		$file->SetBind($petaction->{'cmdfol'},$saymethall[$petaction->{'sayfolmethod'}] . $sayfol . '$$petcomall Follow');
-		$file->SetBind($petaction->{'cmdsty'},$saymethall[$petaction->{'saystymethod'}] . $saysty . '$$petcomall Stay');
-		$file->SetBind($petaction->{'cmdgoto'},$saymethall[$petaction->{'saygomethod'}] . $saygo . '$$petcomall Goto');
+	$file->SetBind($MMP->{'PetSelectAll'},        $MMP->{'PetSelectAllResponseMethod'}         . " $PetResponses{'SelectAll'}"         . BindFile::BLF($profile, 'mmbinds','call.txt'));
+	$file->SetBind($MMP->{'PetSelectMinions'},    $MMP->{'PetSelectMinionsResponseMethod'}     . " $PetResponses{'SelectMinions'}"     . BindFile::BLF($profile, 'mmbinds','ctier1.txt'));
+	$file->SetBind($MMP->{'PetSelectLieutenants'},$MMP->{'PetSelectLieutenantsResponseMethod'} . " $PetResponses{'SelectLieutenants'}" . BindFile::BLF($profile, 'mmbinds','ctier2.txt'));
+	$file->SetBind($MMP->{'PetSelectBoss'},       $MMP->{'PetSelectBossResponseMethod'}        . " $PetResponses{'SelectBoss'}"        . BindFile::BLF($profile, 'mmbinds','ctier3.txt'));
+
+	mmBGSelBind($profile,$file,$PetResponses{'Bodyguard'},$powers);
+
+	my $petcom = ($grp) ? "\$\$petcompow$grp" : '$$petcomall';
+	for my $cmd (qw(Aggressive Defensive Attack Follow Stay Goto)) {
+		$file->SetBind($MMP->{"Pet$cmd"},$MMP->{"Pet${cmd}ResponseMethod"} . " $PetResponses{$cmd}$petcom $cmd");
 	}
-	if ($petaction->{'bgatkenabled'}) {
-		$file->SetBind($petaction->{'bgatk'},'nop');
-	}
-	if ($petaction->{'bggotoenabled'}) {
-		$file->SetBind($petaction->{'bggoto'},'nop');
-	}
-	$file->SetBind($petaction->{'chattykey'},'tell $name, Non-Chatty Mode$$bindloadfile ' . "$profile->{'base'}\\mmbinds\\$fn.txt");
+	if ($MMP->{'PetBackgroundAttackEnabled'})  { $file->SetBind($MMP->{'PetBackgroundAttack'},'nop'); }
+	if ($MMP->{'PetBackgroundGotoenabled'}) { $file->SetBind($MMP->{'PetBackgroundGoto'},'nop'); }
+	$file->SetBind($MMP->{'chattykey'},'tell $name, Non-Chatty Mode' . BindFile::BLF($profile, 'mmbinds',"$fn.txt"));
 }
 
 sub mmBGSubBind {
-	my ($profile,$filedn,$fileup,$petaction,$fn,$minpow,$ltspow,$bospow) = @_;
-	my ($sayall, $saymin, $saylts, $saybos, $sayagg, $saydef, $saypas, $sayatk, $sayfol, $saysty, $saygo, $saybg);
-	if ($petaction->{'sayallmethod'} < 4) { $sayall = $petaction->{'sayall'} . '$$' } else { $sayall = ""; }
-	if ($petaction->{'sayminmethod'} < 4) { $saymin = $petaction->{'saymin'} . '$$' } else { $saymin = ""; }
-	if ($petaction->{'sayltsmethod'} < 4) { $saylts = $petaction->{'saylts'} . '$$' } else { $saylts = ""; }
-	if ($petaction->{'saybosmethod'} < 4) { $saybos = $petaction->{'saybos'} . '$$' } else { $saybos = ""; }
-	if ($petaction->{'saybgmethod'}  < 4) { $saybg  = $petaction->{'saybg'}  . '$$' } else { $saybg =  ""; }
-	if ($petaction->{'sayaggmethod'} < 4) { $sayagg = $petaction->{'sayagg'} . '$$' } else { $sayagg = ""; }
-	if ($petaction->{'saydefmethod'} < 4) { $saydef = $petaction->{'saydef'} . '$$' } else { $saydef = ""; }
-	if ($petaction->{'saypasmethod'} < 4) { $saypas = $petaction->{'saypas'} . '$$' } else { $saypas = ""; }
-	if ($petaction->{'sayatkmethod'} < 4) { $sayatk = $petaction->{'sayatk'} . '$$' } else { $sayatk = ""; }
-	if ($petaction->{'sayfolmethod'} < 4) { $sayfol = $petaction->{'sayfol'} . '$$' } else { $sayfol = ""; }
-	if ($petaction->{'saystymethod'} < 4) { $saysty = $petaction->{'saysty'} . '$$' } else { $saysty = ""; }
-	if ($petaction->{'saygomethod'}  < 4) { $saygo  = $petaction->{'saygo'}  . '$$' } else { $saygo =  ""; }
-	my @saymethall = ("local ",'tell, $name ',"petsayall ","");
-	my @saymethmin = ("local ",'tell, $name ',"petsaypow $minpow ","");
-	my @saymethlts = ("local ",'tell, $name ',"petsaypow $ltspow ","");
-	my @saymethbos = ("local ",'tell, $name ',"petsaypow $bospow ","");
-
-	$filedn->SetBind($petaction->{'selall'},$saymethall[$petaction->{'sayallmethod'}] . $sayall . '$$bindloadfile ' . $profile->{'base'} . '\\mmbinds\\call.txt');
-	$filedn->SetBind($petaction->{'selmin'},$saymethmin[$petaction->{'sayminmethod'}] . $saymin . '$$bindloadfile ' . $profile->{'base'} . '\\mmbinds\\ctier1.txt');
-	$filedn->SetBind($petaction->{'sellts'},$saymethlts[$petaction->{'sayltsmethod'}] . $saylts . '$$bindloadfile ' . $profile->{'base'} . '\\mmbinds\\ctier2.txt');
-	$filedn->SetBind($petaction->{'selbos'},$saymethbos[$petaction->{'saybosmethod'}] . $saybos . '$$bindloadfile ' . $profile->{'base'} . '\\mmbinds\\ctier3.txt');
-	mmBGSelBind($profile,$filedn,$petaction,$saybg,$minpow,$ltspow,$bospow);
-
-	mmBGActBind($profile,$filedn,$fileup,$petaction,$petaction->{'setagg'},'Aggressive',$sayagg,$petaction->{'sayaggmethod'},$minpow,$ltspow,$bospow,$profile->{'base'}.'\\mmbinds\\cbguarda.txt',$profile->{'base'}.'\\mmbinds\\cbguardb.txt');
-	mmBGActBind($profile,$filedn,$fileup,$petaction,$petaction->{'setdef'},'Defensive',$saydef,$petaction->{'saydefmethod'},$minpow,$ltspow,$bospow,$profile->{'base'}.'\\mmbinds\\cbguarda.txt',$profile->{'base'}.'\\mmbinds\\cbguardb.txt');
-	mmBGActBind($profile,$filedn,$fileup,$petaction,$petaction->{'setpas'},'Passive',$saypas,$petaction->{'saypasmethod'},$minpow,$ltspow,$bospow,$profile->{'base'}.'\\mmbinds\\cbguarda.txt',$profile->{'base'}.'\\mmbinds\\cbguardb.txt');
-	mmBGActBind($profile,$filedn,$fileup,$petaction,$petaction->{'cmdatk'},'Attack',$sayatk,$petaction->{'sayatkmethod'},$minpow,$ltspow,$bospow,$profile->{'base'}.'\\mmbinds\\cbguarda.txt',$profile->{'base'}.'\\mmbinds\\cbguardb.txt');
-	if ($petaction->{'bgatkenabled'}) {
-		mmBGActBGBind($profile,$filedn,$fileup,$petaction,$petaction->{'bgatk'},'Attack',$sayatk,$petaction->{'sayatkmethod'},$minpow,$ltspow,$bospow,$profile->{'base'}.'\\mmbinds\\cbguarda.txt',$profile->{'base'}.'\\mmbinds\\cbguardb.txt');
+	my ($profile,$filedn,$fileup,$fn,$powers) = @_;
+	my $MMP = $profile->MastermindPets;
+	my %PetResponses;
+	for my $cmd (qw(SelectAll SelectMinions SelectLieutenants SelectBoss Bodyguard Aggressive Defensive Passive Attack Follow Stay Goto) ) {
+		if ($MMP->{'Pet${cmd}ResponseMethod'} ne 'None') { $PetResponses{$cmd} = $MMP->{'Pet${cmd}Response'} }
 	}
-	mmBGActBind($profile,$filedn,$fileup,$petaction,$petaction->{'cmdfol'},'Follow',$sayfol,$petaction->{'sayfolmethod'},$minpow,$ltspow,$bospow,$profile->{'base'}.'\\mmbinds\\cbguarda.txt',$profile->{'base'}.'\\mmbinds\\cbguardb.txt');
-	mmBGActBind($profile,$filedn,$fileup,$petaction,$petaction->{'cmdsty'},'Stay',$saysty,$petaction->{'saystymethod'},$minpow,$ltspow,$bospow,$profile->{'base'}.'\\mmbinds\\cbguarda.txt',$profile->{'base'}.'\\mmbinds\\cbguardb.txt');
-	mmBGActBind($profile,$filedn,$fileup,$petaction,$petaction->{'cmdgoto'},'Goto',$saygo,$petaction->{'saygomethod'},$minpow,$ltspow,$bospow,$profile->{'base'}.'\\mmbinds\\cbguarda.txt',$profile->{'base'}.'\\mmbinds\\cbguardb.txt');
-	if ($petaction->{'bggotoenabled'}) {
-		mmBGActBGBind($profile,$filedn,$fileup,$petaction,$petaction->{'bggoto'},'Goto',$saygo,$petaction->{'saygomethod'},$minpow,$ltspow,$bospow,$profile->{'base'}.'\\mmbinds\\cbguarda.txt',$profile->{'base'}.'\\mmbinds\\cbguardb.txt');
+
+	$filedn->SetBind($MMP->{'PetSelectAll'},        $MMP->{'PetSelectAllResponseMethod'}         .  " $PetResponses{'SelectAll'}"         . BindFile::BLF($profile, 'mmbinds','call.txt'));
+	$filedn->SetBind($MMP->{'PetSelectMinions'},    $MMP->{'PetSelectMinionsResponseMethod'}     .  " $PetResponses{'SelectMinions'}"     . BindFile::BLF($profile, 'mmbinds','ctier1.txt'));
+	$filedn->SetBind($MMP->{'PetSelectLieutenants'},$MMP->{'PetSelectLieutenantsResponseMethod'} .  " $PetResponses{'SelectLieutenants'}" . BindFile::BLF($profile, 'mmbinds','ctier2.txt'));
+	$filedn->SetBind($MMP->{'PetSelectBoss'},       $MMP->{'PetSelectBossResponseMethod'}        .  " $PetResponses{'SelectBoss'}"        . BindFile::BLF($profile, 'mmbinds','ctier3.txt'));
+	mmBGSelBind($profile,$filedn,$PetResponses{'Bodyguard'},$powers);
+
+	for my $cmd (qw(Aggressive Defensive Attack Follow Stay Goto)) {
+		mmBGActBind($profile,$filedn,$fileup,$cmd,$PetResponses{$cmd},$powers);
 	}
-	$filedn->SetBind($petaction->{'chattykey'},'tell $name, Non-Chatty Mode$$bindloadfile ' . "$profile->{'base'}\\mmbinds\\${fn}a.txt");
+	if ($MMP->{'PetBackgroundAttackenabled'}) {
+		mmBGActBGBind($profile,$filedn,$fileup,'Attack',$PetResponses{'Attack'},$powers);
+	}
+	if ($MMP->{'PetBackgroundGotoenabled'}) {
+		mmBGActBGBind($profile,$filedn,$fileup,'Goto',$PetResponses{'Goto'},$powers);
+	}
+	$filedn->SetBind($MMP->{'chattykey'},'tell $name, Non-Chatty Mode' . BindFile::BLF($profile, 'mmbinds',"${fn}a.txt"));
 }
 
 sub mmQuietSubBind {
-	my ($profile,$file,$petaction,$fn,$grp,$minpow,$ltspow,$bospow) = @_;
-	$file->SetBind($petaction->{'selall'},'bindloadfile ' . $profile->{'base'} . '\\mmbinds\\all.txt');
-	$file->SetBind($petaction->{'selmin'},'bindloadfile ' . $profile->{'base'} . '\\mmbinds\\tier1.txt');
-	$file->SetBind($petaction->{'sellts'},'bindloadfile ' . $profile->{'base'} . '\\mmbinds\\tier2.txt');
-	$file->SetBind($petaction->{'selbos'},'bindloadfile ' . $profile->{'base'} . '\\mmbinds\\tier3.txt');
-	mmQuietBGSelBind($profile,$file,$petaction,$minpow,$ltspow,$bospow);
-	if ($grp) {
-		$file->SetBind($petaction->{'setagg'},'petcompow ' . "$grp Aggressive");
-		$file->SetBind($petaction->{'setdef'},'petcompow ' . "$grp Defensive");
-		$file->SetBind($petaction->{'setpas'},'petcompow ' . "$grp Passive");
-		$file->SetBind($petaction->{'cmdatk'},'petcompow ' . "$grp Attack");
-		$file->SetBind($petaction->{'cmdfol'},'petcompow ' . "$grp Follow");
-		$file->SetBind($petaction->{'cmdsty'},'petcompow ' . "$grp Stay");
-		$file->SetBind($petaction->{'cmdgoto'},'petcompow ' . "$grp Goto");
-	} else {
-		$file->SetBind($petaction->{'setagg'},'petcomall Aggressive');
-		$file->SetBind($petaction->{'setdef'},'petcomall Defensive');
-		$file->SetBind($petaction->{'setpas'},'petcomall Passive');
-		$file->SetBind($petaction->{'cmdatk'},'petcomall Attack');
-		$file->SetBind($petaction->{'cmdfol'},'petcomall Follow');
-		$file->SetBind($petaction->{'cmdsty'},'petcomall Stay');
-		$file->SetBind($petaction->{'cmdgoto'},'petcomall Goto');
+	my ($profile,$file,$fn,$grp,$powers) = @_;
+	my $MMP = $profile->MastermindPets;
+	$file->SetBind($MMP->{'PetSelectAll'},        BindFile::BLFs($profile, 'mmbinds','all.txt'));
+	$file->SetBind($MMP->{'PetSelectMinions'},    BindFile::BLFs($profile, 'mmbinds','tier1.txt'));
+	$file->SetBind($MMP->{'PetSelectLieutenants'},BindFile::BLFs($profile, 'mmbinds','tier2.txt'));
+	$file->SetBind($MMP->{'PetSelectBoss'},       BindFile::BLFs($profile, 'mmbinds','tier3.txt'));
+	mmQuietBGSelBind($profile,$file,$powers);
+
+	my $petcom = ($grp) ? "\$\$petcompow$grp" : '$$petcomall';
+	for my $cmd (qw(Aggressive Defensive Attack Follow Stay Goto)) {
+		$file->SetBind($MMP->{"Pet$cmd"},"$petcom $cmd");
 	}
-	if ($petaction->{'bgatkenabled'}) {
-		$file->SetBind($petaction->{'bgatk'},'nop');
-	}
-	if ($petaction->{'bggotoenabled'}) {
-		$file->SetBind($petaction->{'bggoto'},'nop');
-	}
-	$file->SetBind($petaction->{'chattykey'},'tell $name, Chatty Mode$$bindloadfile ' . $profile->{'base'} . '\\mmbinds\\c' . $fn . '.txt');
+	if ($MMP->{'PetBackgroundAttackenabled'})  { $file->SetBind($MMP->{'PetBackgroundAttack'} ,'nop'); }
+	if ($MMP->{'PetBackgroundGotoenabled'}) { $file->SetBind($MMP->{'PetBackgroundGoto'},'nop'); }
+
+	$file->SetBind($MMP->{'chattykey'},'tell $name, Chatty Mode' . BindFile::BLF($profile, 'mmbinds','c' . $fn . '.txt'));
 }
 
 sub mmQuietBGSubBind {
-	my ($profile,$filedn,$fileup,$petaction,$fn,$minpow,$ltspow,$bospow) = @_;
-	$filedn->SetBind($petaction->{'selall'},'bindloadfile ' . $profile->{'base'} . '\\mmbinds\\all.txt');
-	$filedn->SetBind($petaction->{'selmin'},'bindloadfile ' . $profile->{'base'} . '\\mmbinds\\tier1.txt');
-	$filedn->SetBind($petaction->{'sellts'},'bindloadfile ' . $profile->{'base'} . '\\mmbinds\\tier2.txt');
-	$filedn->SetBind($petaction->{'selbos'},'bindloadfile ' . $profile->{'base'} . '\\mmbinds\\tier3.txt');
-	mmQuietBGSelBind($profile,$filedn,$petaction,$minpow,$ltspow,$bospow);
-	mmQuietBGActBind($profile,$filedn,$fileup,$petaction,$petaction->{'setagg'},'Aggressive',$minpow,$ltspow,$bospow,$profile->{'base'}.'\\mmbinds\\bguarda.txt',$profile->{'base'}.'\\mmbinds\\bguardb.txt');
-	mmQuietBGActBind($profile,$filedn,$fileup,$petaction,$petaction->{'setdef'},'Defensive',$minpow,$ltspow,$bospow,$profile->{'base'}.'\\mmbinds\\bguarda.txt',$profile->{'base'}.'\\mmbinds\\bguardb.txt');
-	mmQuietBGActBind($profile,$filedn,$fileup,$petaction,$petaction->{'setpas'},'Passive',$minpow,$ltspow,$bospow,$profile->{'base'}.'\\mmbinds\\bguarda.txt',$profile->{'base'}.'\\mmbinds\\bguardb.txt');
-	mmQuietBGActBind($profile,$filedn,$fileup,$petaction,$petaction->{'cmdatk'},'Attack',$minpow,$ltspow,$bospow,$profile->{'base'}.'\\mmbinds\\bguarda.txt',$profile->{'base'}.'\\mmbinds\\bguardb.txt');
-	if ($petaction->{'bgatkenabled'}) {
-		mmQuietBGActBGBind($profile,$filedn,$fileup,$petaction,$petaction->{'bgatk'},'Attack',$minpow,$ltspow,$bospow,$profile->{'base'}.'\\mmbinds\\bguarda.txt',$profile->{'base'}.'\\mmbinds\\bguardb.txt');
+	my ($profile,$filedn,$fileup,$fn,$powers) = @_;
+	my $MMP = $profile->MastermindPets;
+	$filedn->SetBind($MMP->{'PetSelectAll'},        BindFile::BLFs($profile, 'mmbinds','all.txt'));
+	$filedn->SetBind($MMP->{'PetSelectMinions'},    BindFile::BLFs($profile, 'mmbinds','tier1.txt'));
+	$filedn->SetBind($MMP->{'PetSelectLieutenants'},BindFile::BLFs($profile, 'mmbinds','tier2.txt'));
+	$filedn->SetBind($MMP->{'PetSelectBoss'},       BindFile::BLFs($profile, 'mmbinds','tier3.txt'));
+	mmQuietBGSelBind($profile,$filedn,$powers);
+	for my $cmd (qw(Aggressive Defensive Passive Attack Follow Stay Goto)) {
+		mmQuietBGActBind($profile,$filedn,$fileup,$cmd,$powers);
 	}
-	mmQuietBGActBind($profile,$filedn,$fileup,$petaction,$petaction->{'cmdfol'},'Follow',$minpow,$ltspow,$bospow,$profile->{'base'}.'\\mmbinds\\bguarda.txt',$profile->{'base'}.'\\mmbinds\\bguardb.txt');
-	mmQuietBGActBind($profile,$filedn,$fileup,$petaction,$petaction->{'cmdsty'},'Stay',$minpow,$ltspow,$bospow,$profile->{'base'}.'\\mmbinds\\bguarda.txt',$profile->{'base'}.'\\mmbinds\\bguardb.txt');
-	mmQuietBGActBind($profile,$filedn,$fileup,$petaction,$petaction->{'cmdgoto'},'Goto',$minpow,$ltspow,$bospow,$profile->{'base'}.'\\mmbinds\\bguarda.txt',$profile->{'base'}.'\\mmbinds\\bguardb.txt');
-	if ($petaction->{'bggotoenabled'}) {
-		mmQuietBGActBGBind($profile,$filedn,$fileup,$petaction,$petaction->{'bggoto'},'Goto',$minpow,$ltspow,$bospow,$profile->{'base'}.'\\mmbinds\\bguarda.txt',$profile->{'base'}.'\\mmbinds\\bguardb.txt');
+	if ($MMP->{'PetBackgroundAttackenabled'}) {
+		mmQuietBGActBGBind($profile,$filedn,$fileup,'Attack',$powers);
 	}
-	$filedn->SetBind($petaction->{'chattykey'},'tell $name, Chatty Mode$$bindloadfile '.$profile->{'base'}.'\\mmbinds\\c' . $fn . 'a.txt');
+	if ($MMP->{'PetBackgroundGotoenabled'}) {
+		mmQuietBGActBGBind($profile,$filedn,$fileup,'Goto',$powers);
+	}
+	$filedn->SetBind($MMP->{'chattykey'},'tell $name, Chatty Mode' . BindFile::BLF($profile, 'mmbinds','c' . $fn . 'a.txt'));
 }
 
-sub makebind {
-	my ($profile) = @_;
-	my $resetfile = $profile->{'resetfile'};
-	my $petaction = $profile->{'petaction'};
-	if ($petaction->{'petselenable'}) {
-		if ($petaction->{'pet1nameenabled'}) {
-			$resetfile->SetBind($petaction->{'sel0'},'petselectname ' . $petaction->{'pet1name'});
-		}
-		if ($petaction->{'pet2nameenabled'}) {
-			$resetfile->SetBind($petaction->{'sel1'},'petselectname ' . $petaction->{'pet2name'});
-		}
-		if ($petaction->{'pet3nameenabled'}) {
-			$resetfile->SetBind($petaction->{'sel2'},'petselectname ' . $petaction->{'pet3name'});
-		}
-		if ($petaction->{'pet4nameenabled'}) {
-			$resetfile->SetBind($petaction->{'sel3'},'petselectname ' . $petaction->{'pet4name'});
-		}
-		if ($petaction->{'pet5nameenabled'}) {
-			$resetfile->SetBind($petaction->{'sel4'},'petselectname ' . $petaction->{'pet5name'});
-		}
-		if ($petaction->{'pet6nameenabled'}) {
-			$resetfile->SetBind($petaction->{'sel5'},'petselectname ' . $petaction->{'pet6name'});
-		}
+sub PopulateBindFiles {
+	my $profile = shift->Profile;
+	my $ResetFile = $profile->General->{'ResetFile'};
+	my $MMP = $profile->MastermindPets;
+	if ($MMP->{'petselenable'}) {
+		$ResetFile->SetBind($MMP->{'sel0'},"petselectname  $MMP->{'Pet1Name'}") if ($MMP->{'Pet1Nameenabled'});
+		$ResetFile->SetBind($MMP->{'sel1'},"petselectname  $MMP->{'Pet2Name'}") if ($MMP->{'Pet2Nameenabled'});
+		$ResetFile->SetBind($MMP->{'sel2'},"petselectname  $MMP->{'Pet3Name'}") if ($MMP->{'Pet3Nameenabled'});
+		$ResetFile->SetBind($MMP->{'sel3'},"petselectname  $MMP->{'Pet4Name'}") if ($MMP->{'Pet4Nameenabled'});
+		$ResetFile->SetBind($MMP->{'sel4'},"petselectname  $MMP->{'Pet5Name'}") if ($MMP->{'Pet5Nameenabled'});
+		$ResetFile->SetBind($MMP->{'sel5'},"petselectname  $MMP->{'Pet6Name'}") if ($MMP->{'Pet6Nameenabled'});
 	}
-	cbMakeDirectory($profile->{'base'}."\\mmbinds");
-	my $allfile = BindFile->new($profile->{'base'} . "\\mmbinds\\all.txt");
-	my $minfile = BindFile->new($profile->{'base'} . "\\mmbinds\\tier1.txt");
-	my $ltsfile = BindFile->new($profile->{'base'} . "\\mmbinds\\tier2.txt");
-	my $bosfile = BindFile->new($profile->{'base'} . "\\mmbinds\\tier3.txt");
+	my $allfile = $profile->GetBindFile('mmbinds','all.txt');
+	my $minfile = $profile->GetBindFile('mmbinds','tier1.txt');
+	my $ltsfile = $profile->GetBindFile('mmbinds','tier2.txt');
+	my $bosfile = $profile->GetBindFile('mmbinds','tier3.txt');
 	my $bgfiledn;
 	my $bgfileup;
-	if ($petaction->{'bg_enable'}) {
-		$bgfiledn = BindFile->new($profile->{'base'} . "\\mmbinds\\bguarda.txt");
+	if ($MMP->{'bg_enable'}) {
+		$bgfiledn = $profile->GetBindFile('mmbinds','bguarda.txt');
 		#  since we never need to split lines up in this fashion
 		#  comment the next line out so an empty file is not created.
-		# bgfileup = BindFile->new($profile->{'base'} . "\\mmbinds\\bguardb.txt")
+		# bgfileup = $profile->GetBindFile($profile->{'base'} . "\\mmbinds\\bguardb.txt")
 	}
-	my $callfile = BindFile->new($profile->{'base'} . "\\mmbinds\\call.txt");
-	my $cminfile = BindFile->new($profile->{'base'} . "\\mmbinds\\ctier1.txt");
-	my $cltsfile = BindFile->new($profile->{'base'} . "\\mmbinds\\ctier2.txt");
-	my $cbosfile = BindFile->new($profile->{'base'} . "\\mmbinds\\ctier3.txt");
+	my $callfile = $profile->GetBindFile('mmbinds','call.txt');
+	my $cminfile = $profile->GetBindFile('mmbinds','ctier1.txt');
+	my $cltsfile = $profile->GetBindFile('mmbinds','ctier2.txt');
+	my $cbosfile = $profile->GetBindFile('mmbinds','ctier3.txt');
 	my $cbgfiledn;
 	my $cbgfileup;
-	if ($petaction->{'bg_enable'}) {
-		$cbgfiledn = BindFile->new($profile->{'base'} . "\\mmbinds\\cbguarda.txt");
-		$cbgfileup = BindFile->new($profile->{'base'} . "\\mmbinds\\cbguardb.txt");
+	if ($MMP->{'bg_enable'}) {
+		$cbgfiledn = $profile->GetBindFile('mmbinds','cbguarda.txt');
+		$cbgfileup = $profile->GetBindFile('mmbinds','cbguardb.txt');
 	}
-	my $minpow;
-	my $ltspow;
-	my $bospow;
-	if ($petaction->{'primary'} eq "Mercenaries") {
-		$minpow = "sol";
-		$ltspow = "spec";
-		$bospow = "com";
-	} elsif ($petaction->{'primary'} eq "Ninjas") {
-		$minpow = "gen";
-		$ltspow = "joun";
-		$bospow = "oni";
-	} elsif ($petaction->{'primary'} eq "Robotics") {
-		$minpow = "dron";
-		$ltspow = "prot";
-		$bospow = "ass";
-	} elsif ($petaction->{'primary'} eq "Necromancy") {
-		$minpow = "zom";
-		$ltspow = "grav";
-		$bospow = "lich";
-	} elsif ($petaction->{'primary'} eq "Thugs") {
-		$minpow = "thu";
-		$ltspow = "enf";
-		$bospow = "bru";
-	}
+	# TODO!!!  get this into / from GameData
+	my $powers = {
+		Mercenaries => { min => "sol",  lts => "spec", bos => "com", },
+		Ninjas      => { min => "gen",  lts => "joun", bos => "oni", },
+		Robotics    => { min => "dron", lts => "prot", bos => "ass", },
+		Necromancy  => { min => "zom",  lts => "grav", bos => "lich", },
+		Thugs       => { min => "thu",  lts => "enf",  bos => "bru", },
+	}->{ $MMP->{'Primary'} };
 	# "Local","Self-Tell","Petsay","None";
-	mmSubBind($profile,$resetfile,$petaction,"all",undef,$minpow,$ltspow,$bospow);
-	mmQuietSubBind($profile,$allfile,$petaction,"all",undef,$minpow,$ltspow,$bospow);
-	mmQuietSubBind($profile,$minfile,$petaction,"tier1",$minpow,$minpow,$ltspow,$bospow);
-	mmQuietSubBind($profile,$ltsfile,$petaction,"tier2",$ltspow,$minpow,$ltspow,$bospow);
-	mmQuietSubBind($profile,$bosfile,$petaction,"tier3",$bospow,$minpow,$ltspow,$bospow);
-	if ($petaction->{'bg_enable'}) {
-		mmQuietBGSubBind($profile,$bgfiledn,$bgfileup,$petaction,"bguard",$minpow,$ltspow,$bospow);
+	mmSubBind($profile,$ResetFile,"all",undef,$powers);
+	mmQuietSubBind($profile,$allfile,"all",undef,$powers);
+	mmQuietSubBind($profile,$minfile,"tier1",$powers->{'min'},$powers);
+	mmQuietSubBind($profile,$ltsfile,"tier2",$powers->{'lts'},$powers);
+	mmQuietSubBind($profile,$bosfile,"tier3",$powers->{'bos'},$powers);
+	if ($MMP->{'bg_enable'}) {
+		mmQuietBGSubBind($profile,$bgfiledn,$bgfileup,"bguard",$powers);
 	}
-	mmSubBind($profile,$callfile,$petaction,"all",undef,$minpow,$ltspow,$bospow);
-	mmSubBind($profile,$cminfile,$petaction,"tier1",$minpow,$minpow,$ltspow,$bospow);
-	mmSubBind($profile,$cltsfile,$petaction,"tier2",$ltspow,$minpow,$ltspow,$bospow);
-	mmSubBind($profile,$cbosfile,$petaction,"tier3",$bospow,$minpow,$ltspow,$bospow);
-	if ($petaction->{'bg_enable'}) {
-		mmBGSubBind($profile,$cbgfiledn,$cbgfileup,$petaction,"bguard",$minpow,$ltspow,$bospow);
+	mmSubBind($profile,$callfile,"all",undef,$powers);
+	mmSubBind($profile,$cminfile,"tier1",$powers->{'min'},$powers);
+	mmSubBind($profile,$cltsfile,"tier2",$powers->{'lts'},$powers);
+	mmSubBind($profile,$cbosfile,"tier3",$powers->{'bos'},$powers);
+	if ($MMP->{'bg_enable'}) {
+		mmBGSubBind($profile,$cbgfiledn,$cbgfileup,"bguard",$powers);
 	}
 }
 
 sub findconflicts {
 	my ($profile) = @_;
-	my $petaction = $profile->{'petaction'};
-	if ($petaction->{'petselenable'}) {
+	my $MMP = $profile->MastermindPets;
+	if ($MMP->{'petselenable'}) {
 		for my $i (1..6) {
-			if ($petaction->{'pet'.$i.'nameenabled'}) {
-				cbCheckConflict($petaction,"sel".($i-1),"Select Pet ".$i)
+			if ($MMP->{'pet'.$i.'nameenabled'}) {
+				cbCheckConflict($MMP,"sel".($i-1),"Select Pet ".$i)
 			}
 		}
 	}
-	cbCheckConflict($petaction,"selall","Select All Pets");
-	cbCheckConflict($petaction,"selmin","Select Minions");
-	cbCheckConflict($petaction,"sellts","Select Lieutenants");
-	cbCheckConflict($petaction,"selbos","Select Boss Pet");
-	cbCheckConflict($petaction,"setagg","Set Pets Aggressive");
-	cbCheckConflict($petaction,"setdef","Set Pets Defensive");
-	cbCheckConflict($petaction,"setpas","Set Pets Passive");
-	cbCheckConflict($petaction,"cmdatk","Pet Order: Attack");
-	cbCheckConflict($petaction,"cmdfol","Pet Order: Follow");
-	cbCheckConflict($petaction,"cmdsty","Pet Order: Stay");
-	cbCheckConflict($petaction,"cmdgoto","Pet Order: Goto");
-	cbCheckConflict($petaction,"chattykey","Pet Action Bind Chatty Mode Toggle");
-	if ($petaction->{'bg_enable'}) {
-		cbCheckConflict($petaction,"selbgm","Bodyguard Mode");
-		if ($petaction->{'bgatkenabled'})  { cbCheckConflict($petaction,"bgatk","Pet Order: BG Attack"); }
-		if ($petaction->{'bggotoenabled'}) { cbCheckConflict($petaction,"bggoto","Pet Order: BG Goto"); }
+	cbCheckConflict($MMP,"PetSelectAll","Select All Pets");
+	cbCheckConflict($MMP,"PetSelectMinions","Select Minions");
+	cbCheckConflict($MMP,"PetSelectLieutenants","Select Lieutenants");
+	cbCheckConflict($MMP,"PetSelectBoss","Select Boss Pet");
+	cbCheckConflict($MMP,"PetAggressive","Set Pets Aggressive");
+	cbCheckConflict($MMP,"PetDefensive","Set Pets Defensive");
+	cbCheckConflict($MMP,"PetPassive","Set Pets Passive");
+	cbCheckConflict($MMP,"PetAttack","Pet Order: Attack");
+	cbCheckConflict($MMP,"PetFollow","Pet Order: Follow");
+	cbCheckConflict($MMP,"PetStay","Pet Order: Stay");
+	cbCheckConflict($MMP,"PetGoto","Pet Order: Goto");
+	cbCheckConflict($MMP,"chattykey","Pet Action Bind Chatty Mode Toggle");
+	if ($MMP->{'bg_enable'}) {
+		cbCheckConflict($MMP,"selbgm","Bodyguard Mode");
+		if ($MMP->{'PetBackgroundAttackenabled'})  { cbCheckConflict($MMP,"PetBackgroundAttack","Pet Order: BG Attack"); }
+		if ($MMP->{'PetBackgroundGotoenabled'}) { cbCheckConflict($MMP,"PetBackgroundGoto","Pet Order: BG Goto"); }
 	}
 }
 
-sub bindisused {
-	my ($profile) = @_;
-	if ($profile->{'petaction'} == undef) { return undef; }
-	return $profile->{'petaction'}->{'enable'}
-}
+sub bindisused { shift->MastermindPets->{'Enable'} }
 
 
 sub getPetCommandKeyDefinitions {

@@ -11,10 +11,10 @@ use Utility qw(id);
 
 my $Typingnotifierlimit = { cmdlist => ["Away From Keyboard","Emote"] };
 
+our $ModuleName = 'Typing';
+
 sub InitKeys {
 	my $self = shift;
-
-	$self->Profile->AddModule('Typing');
 
 	$self->Profile->Typing ||= {
 		'Enable'              => 0,
@@ -63,10 +63,10 @@ sub FillTab {
 	return $self;
 }
 
-sub makebind {
-	my ($profile) = @_;
-	my $resetfile = $profile->{'resetfile'};
-	my $Typing = $profile->{'Typing'};
+sub PopulateBindfiles {
+	my $profile   = shift->Profile;
+	my $ResetFile = $profile->General->{'ResetFile'};
+	my $Typing    = $profile->{'Typing'};
 
 	$Typing->{'StartChat'}  ||= "ENTER";
 	$Typing->{'SlashChat1'} ||= "/";
@@ -78,12 +78,12 @@ sub makebind {
 	my $notifier = cbPBindToString($Typing->{'Message'}) || "";
 
 	$notifier &&= "\$\$$notifier";
-	cbWriteBind($resetfile,$Typing->{'StartChat'},'show chat$$startchat' . $notifier);
-	cbWriteBind($resetfile,$Typing->{'SlashChat1'},'show chat$$slashchat' . $notifier);
-	cbWriteBind($resetfile,$Typing->{'SlashChat2'},'show chat$$slashchat' . $notifier);
-	cbWriteBind($resetfile,$Typing->{'AutoReply'},'autoreply' . $notifier);
-	cbWriteBind($resetfile,$Typing->{'TellTarget'},'show chat$$beginchat /tell $target, ' . $notifier);
-	cbWriteBind($resetfile,$Typing->{'QuickChat'},'quickchat' . $notifier);
+	cbWriteBind($ResetFile,$Typing->{'StartChat'},'show chat$$startchat' . $notifier);
+	cbWriteBind($ResetFile,$Typing->{'SlashChat1'},'show chat$$slashchat' . $notifier);
+	cbWriteBind($ResetFile,$Typing->{'SlashChat2'},'show chat$$slashchat' . $notifier);
+	cbWriteBind($ResetFile,$Typing->{'AutoReply'},'autoreply' . $notifier);
+	cbWriteBind($ResetFile,$Typing->{'TellTarget'},'show chat$$beginchat /tell $target, ' . $notifier);
+	cbWriteBind($ResetFile,$Typing->{'QuickChat'},'quickchat' . $notifier);
 }
 
 sub findconflicts {

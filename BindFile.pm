@@ -5,24 +5,16 @@ package BindFile;
 use File::Spec;
 use File::Path;
 
-my %BindFiles; # keep all created objects here so we can iterate them when it's time to write them out.
+my %BindFiles; # cache of file objects so we only ever create one object per filename.
 
 sub new {
-	my ($proto, @filename) = @_;
+	my ($class, @filename) = @_;
 
 	my $filename = File::Spec->catfile(@filename);
 
 	unless ($BindFiles{$filename}) {
-
-		my $class = ref $proto || $proto;
-
-		my $self = {};
-
-		bless $self, $class;
-
-		$BindFiles{$filename} = $self;
+		$BindFiles{$filename} =  bless {filename => $filename, binds => {}}, $class;
 	}
-
 	return $BindFiles{$filename};
 }
 
@@ -41,59 +33,55 @@ sub SetBind {
 		# $resetfile2->{$key} = $s;
 	# }
 
-	$self->{$key} = $bindtext;
+	$self->{'binds'}->{$key} = $bindtext;
 }
 
 sub BaseReset {
 	my $profile = shift;
-	return '$$bindloadfilesilent ' . $profile->{'General'}->{'BindsDir'} . "\\subreset.txt";
+	return '$$bindloadfilesilent ' . $profile->General->{'BindsDir'} . "\\subreset.txt";
 }
 
-sub BLF { return '$$bindloadfilesilent ' . BLFPath(@_); }
+# BLF == full "$$bindloadfilesilent path/to/file/kthx"
+sub BLF  { return '$$' . BLFs(@_); }
+# BLFs == same as above but no '$$' for use at start of binds.  Unnecessary?
+sub BLFs { return 'bindloadfilesilent ' . BLFPath(@_); }
+# BLFPath == just the path to the file
 sub BLFPath {
 	my ($profile, @bits) = @_;
 	my $file = pop @bits;
-	my ($vol, $bdir, undef) = File::Spec->splitpath( $profile->{'General'}->{'BindsDir'}, 1 );
+	my ($vol, $bdir, undef) = File::Spec->splitpath( $profile->General->{'BindsDir'}, 1 );
 	my $dirpath = File::Spec->catdir($bdir, @bits);
 	return File::Spec->catpath($vol, $dirpath, $file);
 }
 
-sub WriteBindFiles {
-	my ($target, $event) = @_;
+sub Write {
+	my ($self, $profile) = @_;
 
-	my $profile = $target->profile;
+	# Pick apart the binds directory
+	my ($vol, $bdir, undef) = File::Spec->splitpath( $profile->General->{'BindsDir'}, 1 );
 
-# TODO this wants not to happen here, this is just for testing.
-Profile::SoD::makebind($profile);
+	# Pick apart the filename into component bits.
+	my (undef, $dir, $file) = File::Spec->splitpath( $self->{'filename'} );
 
-	# Pick apart the BindsDir so that we get volume name, if appropriate
-	my ($vol, $bdir, undef) = File::Spec->splitpath( $profile->{'General'}->{'BindsDir'}, 1 );
+	# mash together the two 'directory' parts:
+	$dir = File::Spec->catdir($bdir, $dir);
 
-	while (my ($filename, $binds) = each %BindFiles) {
+	# now we want the fully-qualified dir name so we can make sure it exists...
+	my $newpath = File::Spec->catpath( $vol, $dir, '' );
+	# and the fully-qualified filename so we can write to it.
+	my $fullname = File::Spec->catpath( $vol, $dir, $file );
 
-		# Pick apart the filename into component bits.
-		my (undef, $dir, $file) = File::Spec->splitpath( $filename );
-
-		# mash together the two 'directory' parts:
-		$dir = File::Spec->catdir($bdir, $dir);
-
-		# now we want the fully-qualified dir name so we can make sure it exists...
-		my $newpath = File::Spec->catpath( $vol, $dir, '' );
-		# and the fully-qualified filename so we can write to it.
-		my $fullname = File::Spec->catpath( $vol, $dir, $file );
-
-		# Make the dir if it doesn't exist already.
-		if ( ! -d $newpath ) {
-			File::Path::make_path( $newpath, {verbose=>1} ) or warn "can't make dir $newpath: $!";
-		}
-
-		# open the file and blast the poop into it.  whee!
-		open (my $fh, '>', $fullname ) or warn "can't write to $fullname: $!";
-		for my $k (sort keys %$binds) {
-			print $fh qq|$k "$binds->{$k}"\n|;
-		}
+	# Make the dir if it doesn't exist already.
+	if ( ! -d $newpath ) {
+		File::Path::make_path( $newpath, {verbose=>1} ) or warn "can't make dir $newpath: $!";
 	}
-	print STDERR "Done!\n";
+
+	# open the file and blast the poop into it.  whee!
+	open (my $fh, '>', $fullname ) or warn "can't write to $fullname: $!";
+	for my $k (sort keys %{ $self->{'binds'} }) {
+		print $fh qq|$k "$self->{'binds'}->{$k}"\n|;
+	}
+	# print STDERR "Done $fullname!\n";
 }
 
 1;

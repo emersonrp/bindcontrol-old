@@ -9,10 +9,10 @@ use Wx::Event qw( :everything );
 use GameData;
 use Utility qw(id);
 
+our $ModuleName = 'General';
+
 sub InitKeys {
 	my $self = shift;
-
-	$self->Profile->AddModule('General');
 
 	$self->Profile->General ||= {
 		Archetype => 'Scrapper',
@@ -21,7 +21,7 @@ sub InitKeys {
 		Secondary => 'Super Reflexes',
 		Epic => 'Weapon Mastery',
 		BindsDir => "c:\\CoHTest\\",
-		ResetFile => BindFile->new('reset.txt'),
+		ResetFile => $self->Profile->GetBindFile('reset.txt'),
 		'Reset Key' => 'CTRL-M',
 	};
 }
@@ -96,7 +96,7 @@ sub FillTab {
 
 	$topSizer->Add( Wx::Button->new( $Tab, id('Write Binds Button'), 'Write Binds!' ), 0, wxALL|wxEXPAND);
 
-	EVT_BUTTON( $Tab, id('Write Binds Button'), \&BindFile::WriteBindFiles );
+	EVT_BUTTON( $Tab, id('Write Binds Button'), sub { $self->Profile->WriteBindFiles() } );
 
 
 	$Tab->SetSizer($topSizer);
@@ -112,7 +112,7 @@ sub FillTab {
 
 sub pickArchetype {
 	my ($self, $event) = @_;
-	$self->profile->{'General'}->{'Archetype'} = $event->GetEventObject->GetValue;
+	$self->Profile->General->{'Archetype'} = $event->GetEventObject->GetValue;
 	$self->fillPickers;
 }
 
@@ -120,20 +120,20 @@ sub pickOrigin { shift()->fillPickers; }
 
 sub pickPrimaryPowerSet {
 	my ($self, $event) = @_;
-	$self->profile->{'General'}->{'Primary'} = $event->GetEventObject->GetValue;
+	$self->Profile->General->{'Primary'} = $event->GetEventObject->GetValue;
 	$self->fillPickers;
 }
 
 sub pickSecondaryPowerSet {
 	my ($self, $event) = @_;
-	$self->profile->{'General'}->{'Secondary'} = $event->GetEventObject->GetValue;
+	$self->Profile->General->{'Secondary'} = $event->GetEventObject->GetValue;
 	$self->fillPickers;
 }
 
 sub fillPickers {
 	my $self = shift;
 
-	my $g = $self->profile->{'General'};
+	my $g = $self->Profile->General;
 
 	my $ArchData = $GameData::Archetypes->{$g->{'Archetype'}};
 

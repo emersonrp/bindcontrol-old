@@ -6,6 +6,8 @@ require 5.012;
 #use Data::Dumper;
 use Wx::Perl::Packager;
 
+use Data::Dumper;
+
 use About;
 use Profile;
 use StdDefault;

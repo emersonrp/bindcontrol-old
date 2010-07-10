@@ -9,12 +9,11 @@ use Wx qw( :everything );
 
 use Utility qw(id);
 
+our $ModuleName = 'InspPop';
+
 sub InitKeys {
 
 	my $self = shift;
-
-
-	$self->Profile->AddModule('InspPop');
 
 	$self->Profile->InspPop ||= {
 		Enable => undef,
@@ -112,10 +111,10 @@ sub FillTab {
 	return $self;
 }
 
-sub makebind {
-	my $profile = shift;
+sub PopulateBindFiles {
+	my $profile = shift->Profile;
 
-	my $resetfile = $profile->{'General'}->{'ResetFile'};
+	my $ResetFile = $profile->General->{'ResetFile'};
 	my $InspPop   = $profile->{'InspPop'};
 
 	for my $Insp (sort keys %GameData::Inspirations) {
@@ -128,8 +127,8 @@ sub makebind {
 			$reverseOrder = cbChatColorOutput($InspPop->{"Rev${Insp}Colors"}) . $Insp . '$$' . $reverseOrder;
 		}
 
-		cbWriteBind($resetfile, $InspPop->{"${Insp}Key"},    $forwardOrder) if $InspPop->{'Enable'};
-		cbWriteBind($resetfile, $InspPop->{"Rev${Insp}Key"}, $reverseOrder) if $InspPop->{'Reverse'};
+		cbWriteBind($ResetFile, $InspPop->{"${Insp}Key"},    $forwardOrder) if $InspPop->{'Enable'};
+		cbWriteBind($ResetFile, $InspPop->{"Rev${Insp}Key"}, $reverseOrder) if $InspPop->{'Reverse'};
 	}
 }
 

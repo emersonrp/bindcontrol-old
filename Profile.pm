@@ -4,8 +4,8 @@ package Profile;
 use parent -norequire, 'Wx::Notebook';
 
 use strict;
-
-our $profile;
+use feature 'state';
+use File::HomeDir;  # for when we start actually saving profiles
 
 # This all used to be auto-detecty-pluginny, but
 # PAR didn't want to package up anything that wasn't
@@ -29,61 +29,59 @@ sub new {
 
 	my $self = $class->SUPER::new($parent);
 
-	$profile = {};
-
 	# TODO -- here's where we'd load a profile from a file or something.
 
 	# Add the individual tabs, in order.
-	my $module;
-	$module = Profile::General->new($self);
-	$self->AddPage( $module->Tab, $module->TabTitle );
-
-	$module = Profile::SoD->new($self);
-	$self->AddPage( $module->Tab, $module->TabTitle );
-
-	$module = Profile::BufferBinds->new($self);
-	$self->AddPage( $module->Tab, $module->TabTitle );
-
-	$module = Profile::ComplexBinds->new($self);
-	$self->AddPage( $module->Tab, $module->TabTitle );
-
-	$module = Profile::CustomBinds->new($self);
-	$self->AddPage( $module->Tab, $module->TabTitle );
-
-	$module = Profile::FPSDisplay->new($self);
-	$self->AddPage( $module->Tab, $module->TabTitle );
-
-	$module = Profile::InspirationPopper->new($self);
-	$self->AddPage( $module->Tab, $module->TabTitle );
-
-	$module = Profile::Mastermind->new($self);
-	$self->AddPage( $module->Tab, $module->TabTitle );
-
-	$module = Profile::PetSel->new($self);
-	$self->AddPage( $module->Tab, $module->TabTitle );
-
-	$module = Profile::SimpleBinds->new($self);
-	$self->AddPage( $module->Tab, $module->TabTitle );
-
-	$module = Profile::TeamSel->new($self);
-	$self->AddPage( $module->Tab, $module->TabTitle );
-
-	$module = Profile::TeamSel2->new($self);
-	$self->AddPage( $module->Tab, $module->TabTitle );
-
-	$module = Profile::TypingMsg->new($self);
-	$self->AddPage( $module->Tab, $module->TabTitle );
+	$self->AddModule(Profile::General->new($self));
+	$self->AddModule(Profile::SoD->new($self));
+	$self->AddModule(Profile::BufferBinds->new($self));
+	$self->AddModule(Profile::ComplexBinds->new($self));
+	$self->AddModule(Profile::CustomBinds->new($self));
+	$self->AddModule(Profile::FPSDisplay->new($self));
+	$self->AddModule(Profile::InspirationPopper->new($self));
+	$self->AddModule(Profile::Mastermind->new($self));
+	$self->AddModule(Profile::PetSel->new($self));
+	$self->AddModule(Profile::SimpleBinds->new($self));
+	$self->AddModule(Profile::TeamSel->new($self));
+	$self->AddModule(Profile::TeamSel2->new($self));
+	$self->AddModule(Profile::TypingMsg->new($self));
 
 	return $self;
 }
 
-# this is the little callback the modules use to register themselves.
+my @Modules;
 sub AddModule {
-	my $self = shift;
-	my $module = shift;
+	my ($self, $module) = @_;
+
+	push @Modules, $module;
 
 	no strict 'refs';
-	*{ $module } = sub : lvalue { shift->{$module} };
+	*{ $module->Name } = sub : lvalue { shift->{$module->Name} };
+	use strict;
 
+	$module->InitKeys;
+	$module->FillTab;
+
+	$self->AddPage( $module->Tab, $module->TabTitle );
 }
+sub Modules { @Modules }
+
+sub GetBindFile {
+	my ($self, $filename) = @_;
+
+	$self->{'BindFiles'}->{$filename} ||= BindFile->new($filename);
+}
+
+sub WriteBindFiles {
+	my ($self) = @_;
+
+	for my $Module ($self->Modules) {
+		my $moduleBindFiles = $Module->PopulateBindFiles;
+	}
+
+	for my $bindfile (values %{$self->{'BindFiles'}}) {
+		$bindfile->Write($self);
+	}
+}
+
 1;

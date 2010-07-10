@@ -7,6 +7,8 @@ use parent "Profile::ProfileTab";
 
 use BindFile;
 
+our $ModuleName = 'BufferBinds';
+
 sub addBBind {
 	my ($bbinds,$n,$profile) = @_;
 #	my $bbind = $bbinds[$n]
@@ -269,15 +271,15 @@ sub bindsettings {
 	}
 }
 
-sub makebind {
-	my ($profile) = @_;
-	my $resetfile = $profile->{'resetfile'};
-	my $buffer = $profile->{'buffer'};
+sub PopulateBindFiles {
+	my $profile = shift->Profile;
+
+	my $ResetFile = $profile->General->{'ResetFile'};
+	my $buffer = $profile->{'buffer'} || [];
 	my ($afile, $bfile, $cfile, $dfile);
 	#  for each bindset, create the binds.
 	for my $i (1 .. scalar @$buffer) {
 		my $bbind = $buffer->[$i];
-		cbMakeDirectory("$profile->{'base'}\\buff$i");
 
 		my $selchat = $bbind->{'selchatenabled'} ? cbPBindToString($bbind->{'selchat'}) . '$$' : '';
 		my $chat1   = $bbind->{'chat1enabled'}   ? cbPBindToString($bbind->{'chat1'})   . '$$' : '';
@@ -293,19 +295,19 @@ sub makebind {
 			for my $j (1..8) {
 				my $teamid = "team$j";
 				my $filebase = "$profile->{'base'}\\buff$i\\bufft${j}";
-				$afile = BindFile->new("${filebase}a.txt");
-				$bfile = BindFile->new("${filebase}b.txt");
+				$afile = $profile->GetBindFile("${filebase}a.txt");
+				$bfile = $profile->GetBindFile("${filebase}b.txt");
 				$afile->SetBind(    $teamid,'+down$$teamselect ' . $j . '$$' . "${selchat}bindloadfile ${filebase}b.txt");
-				$resetfile->SetBind($teamid,'+down$$teamselect ' . $j . '$$' . "${selchat}bindloadfile ${filebase}b.txt");
+				$ResetFile->SetBind($teamid,'+down$$teamselect ' . $j . '$$' . "${selchat}bindloadfile ${filebase}b.txt");
 				if ($npow == 1) {
 					$bfile->SetBind($teamid,'-down$$' . "${chat1}powexecname $bbind->{'power1'}" . '$$bindloadfile ' . "${filebase}a.txt");
 				} else {
 					$bfile->SetBind($teamid,'-down$$' . "${chat1}powexecname $bbind->{'power1'}" . '$$bindloadfile ' . "${filebase}c.txt");
-					$cfile = BindFile->new("${filebase}c.txt");
+					$cfile = $profile->GetBindFile("${filebase}c.txt");
 					if ($npow == 2) {
 						$cfile->SetBind($teamid,"${chat2}powexecname $bbind->{'power2'}" . '$$bindloadfile ' . "${filebase}a.txt");
 					} else {
-						$dfile = BindFile->new("${filebase}d.txt");
+						$dfile = $profile->GetBindFile("${filebase}d.txt");
 						$cfile->SetBind($teamid,'+down$$' . "${chat2}powexecname $bbind->{'power2'}" . '$$bindloadfile ' ."${filebase}d.txt");
 						$dfile->SetBind($teamid,'-down$$' . "${chat3}powexecname $bbind->{'power3'}" . '$$bindloadfile ' ."${filebase}a.txt");
 					}
@@ -317,12 +319,12 @@ sub makebind {
 				my $petid = "pet$j";
 				my $filebase = "$profile->{'base'}\\buff$i\\buffp${j}";
 				if ($bbind->{'usepetnames'}) {
-					$resetfile->SetBind($petid,'+down$$petselectname ' . $profile->{'petaction'}->{"pet${j}name"} . '$$' . "${selchat}bindloadfile ${filebase}b.txt");
+					$ResetFile->SetBind($petid,'+down$$petselectname ' . $profile->{'petaction'}->{"pet${j}name"} . '$$' . "${selchat}bindloadfile ${filebase}b.txt");
 				} else {
-					$resetfile->SetBind($petid,'+down$$petselect ' . ($j-1) . '$$' . "${selchat}bindloadfile ${filebase}b.txt");
+					$ResetFile->SetBind($petid,'+down$$petselect ' . ($j-1) . '$$' . "${selchat}bindloadfile ${filebase}b.txt");
 				}
-				$afile = BindFile->new("${filebase}a.txt");
-				$bfile = BindFile->new("${filebase}b.txt");
+				$afile = $profile->GetBindFile("${filebase}a.txt");
+				$bfile = $profile->GetBindFile("${filebase}b.txt");
 				if ($bbind->{'usepetnames'}) {
 					$afile->SetBind($petid,'+down$$petselectname ' . $profile->{'petaction'}->{"pet${j}name"} . '$$' . "${selchat}bindloadfile ${filebase}b.txt");
 				} else {
@@ -332,11 +334,11 @@ sub makebind {
 					$bfile->SetBind($petid,'-down$$' . "${chat1}powexecname $bbind->{'power1'}" . '$$bindloadfile '."${filebase}a.txt");
 				} else {
 					$bfile->SetBind($petid,'-down$$' . "${chat1}powexecname $bbind->{'power1'}" . '$$bindloadfile '."${filebase}c.txt");
-					$cfile = BindFile->new("${filebase}c.txt");
+					$cfile = $profile->GetBindFile("${filebase}c.txt");
 					if ($npow == 2) {
 						$cfile->SetBind($petid,"${chat2}powexecname $bbind->{'power2'}" . '$$bindloadfile '. "${filebase}a.txt");
 					} else {
-						$dfile = BindFile->new("${filebase}d.txt");
+						$dfile = $profile->GetBindFile("${filebase}d.txt");
 						$cfile->SetBind($petid,'+down$$' . "${chat2}powexecname $bbind->{'power2'}" . '$$bindloadfile '."${filebase}d.txt");
 						$dfile->SetBind($petid,'-down$$' . "${chat3}powexecname $bbind->{'power3'}" . '$$bindloadfile '."${filebase}a.txt");
 					}
@@ -348,7 +350,7 @@ sub makebind {
 
 sub findconflicts {
 	my ($profile) = @_;
-	my $resetfile = $profile->{'resetfile'};
+	my $ResetFile = $profile->General->{'ResetFile'};
 	my $buffer = $profile->{'buffer'};
 	for my $bbind (@$buffer) {
 		my $title = $bbind->{'title'} || 'unknown';

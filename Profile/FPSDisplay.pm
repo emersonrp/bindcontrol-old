@@ -9,10 +9,10 @@ use Wx qw( :everything );
 
 use Utility qw(id);
 
+our $ModuleName = 'FPS';
+
 sub InitKeys {
 	my $self = shift;
-
-	$self->Profile->AddModule('FPS');
 
 	$self->Profile->FPS ||= {
 		Enable => 1,
@@ -47,21 +47,20 @@ sub FillTab {
 }
 
 
-sub makebind {
-	my ($profile) = @_;
-	my $FPS = $profile->{'FPS'};
-	cbWriteBind($profile->{'resetfile'},$FPS->{'Bindkey'},'++showfps$$++netgraph');
+sub PopulateBindFiles {
+	my $profile = shift->Profile;
+	my $ResetFile = $profile->GetBindFile($profile->General->{'ResetFile'});
+	$ResetFile->SetBind($profile->FPS->{'Bindkey'},'++showfps$$++netgraph');
 }
 
 sub findconflicts {
-	my ($profile) = @_;
-	my $FPS = $profile->{'FPS'};
-	cbCheckConflict($FPS,"Bindkey","FPS Display Toggle")
+	my $profile = shift->Profile;
+	cbCheckConflict($profile->FPS,"Bindkey","FPS Display Toggle")
 }
 
 sub bindisused {
-	my ($profile) = @_;
-	return $profile->{'FPS'} ? $profile->{'FPS'}->{'Enable'} : undef;
+	my $profile -> shift->Profile;
+	return $profile->FPS ? $profile->FPS->{'Enable'} : undef;
 }
 
 1;

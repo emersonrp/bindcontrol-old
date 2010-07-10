@@ -5,6 +5,8 @@ use strict;
 package Profile::SimpleBinds;
 use parent "Profile::ProfileTab";
 
+our $ModuleName = 'SimpleBinds';
+
 sub addSBind {
 #	my (sbinds,n,profile) #  this returns an IUP vbox/hbox to be inserted into the SBind Dialog box
 #	my sbind = sbinds[n]
@@ -121,12 +123,12 @@ sub bindsettings {
 	}
 }
 
-sub makebind {
-	my ($profile) = @_;
-	my $resetfile = $profile->{'resetfile'};
+sub PopulateBindFiles {
+	my $profile   = shift->Profile;
+	my $ResetFile = $profile->General->{'ResetFile'};
 	my $sbinds    = $profile->{'sbinds'};
 	for my $sbind (@$sbinds) {
-		cbWriteBind($resetfile,$sbind->{'Key'},cbPBindToString($sbinds->{'Command'}));
+		cbWriteBind($ResetFile,$sbind->{'Key'},cbPBindToString($sbinds->{'Command'}));
 	}
 }
 

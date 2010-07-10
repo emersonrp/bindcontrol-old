@@ -7,6 +7,8 @@ use BindFile;
 package Profile::ComplexBinds;
 use parent "Profile::ProfileTab";
 
+our $ModuleName = 'ComplexBinds';
+
 sub addCBind {
 	my ($cbinds,$n,$profile) = @_;
 #	my $cbind = cbinds[n]
@@ -180,23 +182,22 @@ sub writeBind {
 	$file->SetBind($k,$cmd);
 }
 
-sub makebind {
-	my ($profile) = @_;
-	my $resetfile = $profile->{'resetfile'};
-	my $cbinds = $profile->{'cbinds'};
+sub PopulateBindFiles {
+	my $profile = shift->Profile;
+	my $ResetFile = $profile->General->{'ResetFile'};
+	my $cbinds = $profile->{'cbinds'} || [];
 	my ($cbindfile, $maxK, $maxC);
-	cbMakeDirectory("$profile->{'base'}\\cbinds");
 	for my $k (1..scalar @$cbinds) {#  for each complex bind set
 		$maxK = maxKeys($cbinds->[$k]);
 		$maxC = maxCycles($cbinds->[$k],$maxK);
 		for my $j (1..$maxC) { #  for each cycle in this bindset, counting the first one twice
 			# create a new bindfile if cycle is 2+
 			if ($j > 1) {
-				$cbindfile = BindFile->new("$profile->{'base'}\\cbinds\\$k-" . ($j-1) .".txt")
+				$cbindfile = $profile->GetBindFile("$profile->{'base'}\\cbinds\\$k-" . ($j-1) .".txt")
 			}
 			for my $i (1..$maxK) {
 				if ($j == 1) {
-					writeBind($resetfile,$cbinds,$i,$j,$k,$maxC-1,$profile)
+					writeBind($ResetFile,$cbinds,$i,$j,$k,$maxC-1,$profile)
 				} else {
 					writeBind($cbindfile,$cbinds,$i,$j-1,$k,$maxC-1,$profile)
 				}
@@ -207,8 +208,7 @@ sub makebind {
 
 sub findconflicts {
 	my ($profile) = @_;
-	my $resetfile = $profile->{'resetfile'};
-	my $cbinds = $profile->{'cbinds'};
+	my $cbinds = $profile->{'cbinds'} || [];
 	for my $k (1..scalar @$cbinds) {#  for each complex bind set
 		my $maxK = maxKeys($cbinds->[$k]);
 		for my $i (1..$maxK) {#  for each key in the bindset

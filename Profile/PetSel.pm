@@ -10,11 +10,11 @@ use Wx qw( :everything );
 use BindFile;
 use Utility qw(id);
 
+our $ModuleName = 'PetSel';
+
 sub InitKeys {
 
 	my $self = shift;
-
-	$self->Profile->AddModule('PetSel');
 
 	$self->Profile->PetSel ||= {
 		selnext => 'UNBOUND',
@@ -68,24 +68,24 @@ sub FillTab {
 
 }
 
-sub formatPetConfig { "[" . qw( First Second Third Fourth Fifth Sixth Seventh Eighth )[shift()] . " Pet ]" }
+sub formatPetConfig { "[" . qw( First Second Third Fourth Fifth Sixth Seventh Eighth )[shift() - 1] . " Pet ]" }
 
 sub ts2CreateSet {
 	my ($profile,$ts2,$tsize,$tsel,$file) = @_;
 	# tsize is the size of the team at the moment
 	# tpos is the position of the player at the moment, or 0 if unknown
 	# tsel is the currently selected team member as far as the bind knows, or 0 if unknown
-	#file->SetBind(ts2.reset,'tell $name, Re-Loaded Single Key Team Select Bind.$$bindloadfile '..profile.base..'\\petsel\\10.txt')
+	#file->SetBind(ts2.reset,'tell $name, Re-Loaded Single Key Team Select Bind.' . BindFile::BLF($profile, 'petsel', '10.txt');
 	if ($tsize < 8) {
-		$file->SetBind($ts2->{'sizeup'},'tell $name, ' . formatPetConfig($tsize+1) . '$$bindloadfile ' . $profile->{'base'} . '\\petsel\\'.($tsize+1) . "$tsel.txt");
+		$file->SetBind($ts2->{'sizeup'},'tell $name, ' . formatPetConfig($tsize+1) . BindFile::BLF($profile, 'petsel', ($tsize+1) . "$tsel.txt"));
 	} else {
 		$file->SetBind($ts2->{'sizeup'},'nop');
 	}
 
 	if ($tsize == 1) {
 		$file->SetBind($ts2->{'sizedn'},'nop');
-		$file->SetBind($ts2->{'selnext'},'petselect 0$$bindloadfile ' . $profile->{'base'} . '\\petsel\\' . $tsize . '1.txt');
-		$file->SetBind($ts2->{'selprev'},'petselect 0$$bindloadfile ' . $profile->{'base'} . '\\petsel\\' . $tsize . '1.txt');
+		$file->SetBind($ts2->{'selnext'},'petselect 0' . BindFile::BLF($profile, 'petsel', $tsize . '1.txt'));
+		$file->SetBind($ts2->{'selprev'},'petselect 0' . BindFile::BLF($profile, 'petsel', $tsize . '1.txt'));
 	} else {
 		my ($selnext,$selprev) = ($tsel+1,$tsel-1);
 		if ($selnext > $tsize) { $selnext = 1 }
@@ -93,20 +93,19 @@ sub ts2CreateSet {
 		my $newsel = $tsel;
 		if ($tsize-1 < $tsel) { $newsel = $tsize-1 }
 		if ($tsize == 2) { $newsel = 0 }
-		$file->SetBind($ts2->{'sizedn'},'tell $name, ' . formatPetConfig($tsize-1) . '$$bindloadfile ' . $profile->{'base'} . '\\petsel\\' . ($tsize-1) . $newsel . '.txt');
-		$file->SetBind($ts2->{'selnext'},'petselect ' . ($selnext-1) . '$$bindloadfile ' . $profile->{'base'} . '\\petsel\\' . $tsize . $selnext . '.txt');
-		$file->SetBind($ts2->{'selprev'},'petselect ' . ($selprev-1) . '$$bindloadfile ' . $profile->{'base'} . '\\petsel\\' . $tsize . $selprev . '.txt');
+		$file->SetBind($ts2->{'sizedn'},'tell $name, ' . formatPetConfig($tsize-1) . BindFile::BLF($profile, 'petsel', ($tsize-1) . $newsel . '.txt'));
+		$file->SetBind($ts2->{'selnext'},'petselect ' . ($selnext-1) . BindFile::BLF($profile, 'petsel', $tsize . $selnext . '.txt'));
+		$file->SetBind($ts2->{'selprev'},'petselect ' . ($selprev-1) . BindFile::BLF($profile, 'petsel', $tsize . $selprev . '.txt'));
 	}
 }
 
-sub makebind {
-	my ($profile) = @_;
+sub PopulateBindFiles {
+	my $profile = shift->Profile;
 	my $PetSel = $profile->PetSel;
-	cbMakeDirectory("$profile->{'base'}\\petsel");
-	ts2CreateSet($profile->PetSel,1,0,$profile->{'resetfile'});
+	ts2CreateSet($profile,$PetSel,1,0,$profile->General->{'ResetFile'});
 	for my $size (1..8) {
 		for my $sel (0..$size) {
-			my $file = BindFile->new("$profile.base\\PetSel\\$size$sel.txt");
+			my $file = $profile->GetBindFile("petsel","$size$sel.txt");
 			ts2CreateSet($profile,$PetSel,$size,$sel,$file);
 		}
 	}

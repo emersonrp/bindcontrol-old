@@ -5,15 +5,23 @@ use strict;
 package Profile::TeamSel2;
 use parent "Profile::ProfileTab";
 
-sub bindsettings {
-	my ($profile) = @_;
-	my $teamsel2 = $profile->{'teamsel2'};
-	unless ($teamsel2) {
-		$profile->{'teamsel2'} = $teamsel2 = {};
+our $ModuleName = 'TeamSel2';
+
+sub InitKeys {
+	my $Profile = shift->Profile;
+	$Profile->TeamSel2 ||= {
+		'reset' => 'UNBOUND',
+		'sizeup' => '',
+		'sizedn' => '',
+		'posup' => '',
+		'posdn' => '',
+		'selnext' => '',
+		'selprev' => '',
+		'enable' => 0,
 	}
-	if ($teamsel2->{'dialog'}) {
+	#if ($teamsel2->{'dialog'}) {
 #		teamsel2.dialog:show()
-	} else {
+	#} else {
 #		my $credits = iup.hbox{iup.fill{};iup.vbox{iup.fill{size="5"};iup.label{title="Single Key Team Selection binds\nbased on binds from Weap0nX."};iup.fill{size="5"};alignment="ACENTER"};iup.fill{};alignment="ACENTER";rastersize="300x"}
 #		cbToolTip("Check this to enable the Single Key Team Select Binds")
 #		my $teamselenable = cbCheckBox("Enable Team Selector",teamsel2.enable,cbCheckBoxCB(profile,teamsel2,"enable"),300)
@@ -29,7 +37,7 @@ sub bindsettings {
 #		my $typdlg = iup.dialog{iup.vbox{credits,teamselenable,selnext,selprev,sizeup,sizedn,posup,posdn,reset,expimpbtn};title = "Gameplay : Single Key Team Selector",maxbox="NO",resize="NO",mdichild="YES",mdiclient=mdiClient}
 #		cbShowDialog(typdlg,218,10,profile,function(self) teamsel2.dialog = nil })
 #		teamsel2.dialog = typdlg
-	}
+	#}
 }
 
 my @post = qw( First Second Third Fourth Fifth Sixth Seventh Eighth );
@@ -50,9 +58,9 @@ sub ts2CreateSet {
 	#  tsize is the size of the team at the moment
 	#  tpos is the position of the player at the moment, or 0 if unknown
 	#  tsel is the currently selected team member as far as the bind knows, or 0 if unknown
-	$file->SetBind($ts2->{'reset'},'tell $name, Re-Loaded Single Key Team Select Bind.$$bindloadfile ' . $profile->{'base'} . '\\teamsel2\\100.txt');
+	$file->SetBind($ts2->{'reset'},'tell $name, Re-Loaded Single Key Team Select Bind' . BindFile::BLF($profile, 'teamsel2', '100.txt'));
 	if ($tsize < 8) {
-		$file->SetBind($ts2->{'sizeup'},'tell $name, ' . formatTeamConfig($tsize+1,$tpos) . '$$bindloadfile ' . $profile->{'base'} . '\\teamsel2\\' . ($tsize+1) . $tpos . $tsel . '.txt');
+		$file->SetBind($ts2->{'sizeup'},'tell $name, ' . formatTeamConfig($tsize+1,$tpos) . BindFile::BLF($profile, 'teamsel2',($tsize+1) . $tpos . $tsel . '.txt'));
 	} else {
 		$file->SetBind($ts2->{'sizeup'},'nop');
 	}
@@ -80,26 +88,28 @@ sub ts2CreateSet {
 		if ($tsize-1 < $tsel) { $newsel = $tsize-1 }
 		if ($tsize == 2)      { $newpos = $newsel = 0 }
 
-		$file->SetBind($ts2->{'sizedn'},'tell $name, ' . formatTeamConfig($tsize-1,$newpos) . '$$bindloadfile ' . $profile->{'base'} . "\\teamsel2\\" . ($tsize-1) . $newpos . $newsel . '.txt');
-		$file->SetBind($ts2->{'posup'}, 'tell $name, ' . formatTeamConfig($tsize,  $tposup) . '$$bindloadfile ' . $profile->{'base'} . "\\teamsel2\\" . $tsize . $tposup . $tsel . '.txt');
-		$file->SetBind($ts2->{'posdn'}, 'tell $name, ' . formatTeamConfig($tsize,  $tposdn) . '$$bindloadfile ' . $profile->{'base'} . "\\teamsel2\\" . $tsize . $tposdn . $tsel . '.txt');
+		$file->SetBind($ts2->{'sizedn'},'tell $name, ' . formatTeamConfig($tsize-1,$newpos) . BindFile::BLF($profile, 'teamsel2', ($tsize-1) . $newpos . $newsel . '.txt'));
+		$file->SetBind($ts2->{'posup'}, 'tell $name, ' . formatTeamConfig($tsize,  $tposup) . BindFile::BLF($profile, 'teamsel2', $tsize . $tposup . $tsel . '.txt'));
+		$file->SetBind($ts2->{'posdn'}, 'tell $name, ' . formatTeamConfig($tsize,  $tposdn) . BindFile::BLF($profile, 'teamsel2', $tsize . $tposdn . $tsel . '.txt'));
 
-		$file->SetBind($ts2->{'selnext'},'teamselect ' . $selnext . '$$bindloadfile ' . $profile->{'base'} . "\\teamsel2\\" . $tsize . $tpos . $selnext . '.txt');
-		$file->SetBind($ts2->{'selprev'},'teamselect ' . $selprev . '$$bindloadfile ' . $profile->{'base'} . "\\teamsel2\\" . $tsize . $tpos . $selprev . '.txt');
+		$file->SetBind($ts2->{'selnext'},'teamselect ' . $selnext . BindFile::BLF($profile, 'teamsel2', $tsize . $tpos . $selnext . '.txt'));
+		$file->SetBind($ts2->{'selprev'},'teamselect ' . $selprev . BindFile::BLF($profile, 'teamsel2', $tsize . $tpos . $selprev . '.txt'));
 	}
 }
 
-sub makebind {
-	my ($profile) = @_;
-	my $teamsel2 = $profile->{'teamsel2'};
-	cbMakeDirectory($profile->{'base'} . '\\teamsel2');
-	ts2CreateSet($profile,$teamsel2,1,0,0,$profile->{'resetfile'});
+sub PopulateBindFiles {
+	my $profile = shift->Profile;
+	my $TeamSel2 = $profile->TeamSel2;
+
+	return unless $TeamSel2->{'enable'};
+
+	ts2CreateSet($profile,$TeamSel2,1,0,0,$profile->General->{'ResetFile'});
 	for my $size (1..8) {
 		for my $pos (0..$size) {
 			for my $sel (0..$size) {
-				unless (($sel != pos) or ($sel == 0)) {
-					my $file = BindFile->new($profile->{'base'} . '\\teamsel2\\' . $size . $pos . $sel . '.txt');
-					ts2CreateSet($profile,$teamsel2,$size,$pos,$sel,$file);
+				unless (($sel != $pos) or ($sel == 0)) {
+					my $file = $profile->GetBindFile("teamsel2", $size . $pos . $sel . '.txt');
+					ts2CreateSet($profile,$TeamSel2,$size,$pos,$sel,$file);
 				}
 			}
 		}

@@ -19,15 +19,12 @@ sub new {
 	my $self = {};
 	bless $self, $class;
 
+	no strict 'refs';
+	$self->Name = ${"${class}::ModuleName"};
+	use strict;
 
 	$self->Profile = $parent;
-
-	($self->TabTitle = ref $self) =~ s/Profile:://;
-
 	$self->Tab = Wx::Panel->new($parent);
-
-	$self->InitKeys;
-	$self->FillTab;
 
 	return $self;
 }
@@ -52,14 +49,20 @@ sub help {
 	return $self->{'HelpWindow'};
 }
 
-sub Tab      : lvalue { shift->{'Tab'} }
-sub TabTitle : lvalue { shift->{'TabTitle'} }
-sub Profile  : lvalue { shift->{'Profile'} }
+# Accessors
+sub Tab        : lvalue { shift->{'Tab'} }
+sub Name       : lvalue { shift->{'Name'} }
+sub TabTitle   : lvalue { shift->{'TabTitle'} }
+sub Profile    : lvalue { shift->{'Profile'} }
 
-sub InitKeys { 1; }
-sub FillTab  { 1; }
-sub HelpText { qq|Help not currently implemented here.|; }
+# stubs
+sub InitKeys          { 1; }
+sub PopulateBindFiles { 1; }
+sub FillTab           { my $self = shift; ($self->TabTitle   = ref $self) =~ s/Profile:://; }
+sub HelpText          { qq|Help not currently implemented here.|; }
 
+
+# TODO this really doesn't completely belong here, hmm.
 sub addLabeledButton {
     my ($self, $sizer, $module, $value, $tooltip) = @_;
 

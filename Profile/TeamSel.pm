@@ -12,12 +12,11 @@ use Wx qw( :everything );
 use Wx::Event qw(EVT_BUTTON);
 use Utility qw(id);
 
+our $ModuleName = 'TeamSelect';
+
 sub InitKeys {
 
 	my $self = shift;
-
-	$self->Profile->AddModule('TeamSelect');
-
 	$self->Profile->TeamSelect ||= {};
 }
 
@@ -75,11 +74,10 @@ sub FillTab {
 	return $self;
 }
 
-sub makebind {
-	my ($profile) = @_;
-	my $resetfile = $profile->{'resetfile'};
+sub PopulateBindFiles {
+	my $profile    = shift->Profile;
+	my $ResetFile  = $profile->General->{'ResetFile'};
 	my $TeamSelect = $profile->{'TeamSelect'};
-	cbMakeDirectory($profile->{'base'}.'\\TeamSelect');
 	if ($TeamSelect->{'mode'} < 3) {
 		my $selmethod = "teamselect";
 		my $selnummod = 0;
@@ -91,16 +89,16 @@ sub makebind {
 			$selmethod1 = "teamselect";
 			$selnummod1 = 0;
 		}
-		my $selresetfile = BindFile->new("$profile->{'base'}\\teamsel\\reset.txt");
+		my $selresetfile = $profile->GetBindFile("teamsel","reset.txt");
 		for my $i (1..8) {
-			my $selfile = BindFile->new("$profile->{'base'}\\teamsel\\sel${i}.txt");
-			$resetfile->   SetBind($TeamSelect->{"sel$i"},"$selmethod " . ($i - $selnummod) . '$$bindloadfile ' . "$profile->{'base'}\\teamsel\\sel${i}.txt");
-			$selresetfile->SetBind($TeamSelect->{"sel$i"},"$selmethod " . ($i - $selnummod) . '$$bindloadfile ' . "$profile->{'base'}\\teamsel\\sel${i}.txt");
+			my $selfile = $profile->GetBindFile("teamsel","sel${i}.txt");
+			$ResetFile->   SetBind($TeamSelect->{"sel$i"},"$selmethod " . ($i - $selnummod) . BindFile::BLF($profile,'teamsel',"sel${i}.txt"));
+			$selresetfile->SetBind($TeamSelect->{"sel$i"},"$selmethod " . ($i - $selnummod) . BindFile::BLF($profile,'teamsel',"sel${i}.txt"));
 			for my $j (1..8) {
 				if ($i == $j) {
-					$selfile->SetBind($TeamSelect->{"sel$j"},"$selmethod1 " . ($j - $selnummod1) . '$$bindloadfile ' . "$profile->{'base'}\\teamsel\\reset.txt");
+					$selfile->SetBind($TeamSelect->{"sel$j"},"$selmethod1 " . ($j - $selnummod1) . BindFile::BLF($profile,'teamsel',"reset.txt"));
 				} else {
-					$selfile->SetBind($TeamSelect->{"sel$j"},"$selmethod " .  ($j - $selnummod)  . '$$bindloadfile ' . "$profile->{'base'}\\teamsel\\sel$j.txt");
+					$selfile->SetBind($TeamSelect->{"sel$j"},"$selmethod " .  ($j - $selnummod)  . BindFile::BLF($profile,'teamsel',"sel$j.txt"));
 				}
 			}
 		}
@@ -112,7 +110,7 @@ sub makebind {
 			$selnummod = 1;
 		}
 		for my $i (1..8) {
-			$resetfile->SetBind($TeamSelect->{'sel1'},"$selmethod " . ($i - $selnummod));
+			$ResetFile->SetBind($TeamSelect->{'sel1'},"$selmethod " . ($i - $selnummod));
 		}
 	}
 }
