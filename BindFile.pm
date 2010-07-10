@@ -11,7 +11,6 @@ sub new {
 	my ($class, @filename) = @_;
 
 	my $filename = File::Spec->catfile(@filename);
-
 	unless ($BindFiles{$filename}) {
 		$BindFiles{$filename} =  bless {filename => $filename, binds => {}}, $class;
 	}
@@ -70,7 +69,6 @@ sub Write {
 	my $newpath = File::Spec->catpath( $vol, $dir, '' );
 	# and the fully-qualified filename so we can write to it.
 	my $fullname = File::Spec->catpath( $vol, $dir, $file );
-
 	# Make the dir if it doesn't exist already.
 	if ( ! -d $newpath ) {
 		File::Path::make_path( $newpath, {verbose=>1} ) or warn "can't make dir $newpath: $!";

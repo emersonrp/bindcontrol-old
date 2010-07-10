@@ -369,7 +369,7 @@ sub makeSoDFile {
 	my $curfile;
 
 	# this wants to be $turnoff ||= $mobile, $stationary once we know what those are.  arrays?  hashes?
-	# $turnoff ||= {mobile,stationary}
+	$turnoff ||= {$mobile,$stationary};
 
 	if (($SoD->{'Default'} eq $modestr) and ($t->{'totalkeys'} == 0)) {
 
@@ -399,7 +399,7 @@ sub makeSoDFile {
 
 	if ($flight and ($flight eq "Fly") and $pathbo) {
 		#  blast off
-		$curfile = $profile->GetBindFile($pathbo . $t->KeyState . ".txt");
+		$curfile = $profile->GetBindFile($pathbo);
 		sodResetKey($curfile,$profile,$path,actPower_toggle(undef,1,$stationary,$mobile),'');
 
 		sodUpKey     ($t,$blbo,$curfile,$SoD,$mobile,$stationary,$flight,'','',"bo",$sssj);
@@ -447,7 +447,7 @@ sub makeSoDFile {
 
 		sodFollowKey($t,$blf,$curfile,$SoD,$mobile);
 
-		# $curfile = $profile->GetBindFile($pathsd . $t->KeyState . ".txt");
+		# $curfile = $profile->GetBindFile($pathsd);
 
 		sodResetKey($curfile,$profile,$path,actPower_toggle(undef,1,$stationary,$mobile),'');
 
@@ -469,7 +469,7 @@ sub makeSoDFile {
 		sodFollowKey($t,$blf,$curfile,$SoD,$mobile);
 	}
 
-	$curfile = $profile->GetBindFile($path . $t->KeyState . ".txt");
+	$curfile = $profile->GetBindFile($path);
 
 	sodResetKey($curfile,$profile,$path,actPower_toggle(undef,1,$stationary,$mobile),'');
 
@@ -485,7 +485,7 @@ sub makeSoDFile {
 		if ($modestr eq "NonSoD") { makeNonSoDModeKey($profile,$t,"r",$curfile,{$mobile,$stationary},\&sodSetDownFix); }
 		if ($modestr eq "Base")   { makeBaseModeKey  ($profile,$t,"r",$curfile,$turnoff,\&sodSetDownFix); }
 		# if ($t->{'BaseMode'}) {
-			# $curfile->SetBind($t->{'BaseMode'},"+down$$down 1" . actPower_name(undef,1,$mobile) . $t->{'detailhi'} . $t->{'runcamdist'} . $t->{'blsd'} . $t->KeyState . ".txt")
+			# $curfile->SetBind($t->{'BaseMode'},"+down$$down 1" . actPower_name(undef,1,$mobile) . $t->{'detailhi'} . $t->{'runcamdist'} . $t->{'blsd'})
 		#}
 		if ($modestr eq "Run")     { makeSpeedModeKey ($profile,$t,"s", $curfile,$turnoff,\&sodSetDownFix); }
 		if ($modestr eq "Fly")     { makeFlyModeKey   ($profile,$t,"bo",$curfile,$turnoff,$fix); }
@@ -511,7 +511,7 @@ sub makeSoDFile {
 	sodFollowKey($t,$blf,$curfile,$SoD,$mobile);
 
 # AutoRun Binds
-	$curfile = $profile->GetBindFile($pathr . $t->KeyState . ".txt");
+	$curfile = $profile->GetBindFile($pathr);
 
 	sodResetKey($curfile,$profile,$path,actPower_toggle(undef,1,$stationary,$mobile),'');
 
@@ -541,7 +541,7 @@ sub makeSoDFile {
 	$curfile->SetBind($SoD->{'Follow'},'nop');
 
 # FollowRun Binds
-	$curfile = $profile->GetBindFile($pathf . $t->KeyState . ".txt");
+	$curfile = $profile->GetBindFile($pathf);
 
    	sodResetKey($curfile,$profile,$path,actPower_toggle(undef,1,$stationary,$mobile),'');
    
@@ -617,8 +617,8 @@ sub makeTempModeKey  {
 		my $bindload = $t->bl('t');
 		$cur->SetBind($key, $t->{'ini'} . actPower(undef,1,$trayslot,$toff) . $t->dirs('UDFBLR') . $t->{'detaillo'} . $t->{'flycamdist'} . $feedback . $bindload);
 	} elsif ($bl eq "ar") {
-		my $bindload  = $t->path('at');
-		my $bindload2 = $t->path('at','_t');
+		my $bindload  = $t->bl('at');
+		my $bindload2 = $t->bl('at','_t');
 		my $tgl = $p->GetBindFile($bindload2);
 		$cur->SetBind($key, $t->{'in'} . actPower(undef,1,$trayslot,$toff) . $t->{'detaillo'} . $t->{'flycamdist'} . '$$up 0' . $t->dirs('DLR') . $feedback . $bindload2);
 		$tgl->SetBind($key, $t->{'in'} . actPower(undef,1,$trayslot,$toff) . $t->{'detaillo'} . $t->{'flycamdist'} . '$$up 0' . $t->dirs('DLR') . $feedback . $bindload);
@@ -641,8 +641,8 @@ sub makeQFlyModeKey  {
 	$t->{'ini'} ||= '';
 
 	if ($bl eq "r") {
-		my $bindload  = $t->path('n');
-		my $bindload2 = $t->path('n'.'_q');
+		my $bindload  = $t->bl('n');
+		my $bindload2 = $t->bl('n'.'_q');
 		my $tgl = $p->GetBindFile($bindload2);
 
 		my $tray = ($modestr eq 'Nova' or $modestr eq 'Dwarf') ? '$$gototray 1' : '';
@@ -651,8 +651,8 @@ sub makeQFlyModeKey  {
 		$tgl->SetBind($key, $t->{'ini'} . actPower(undef,1,'Quantum Flight', $toff) . $tray . $t->dirs('UDFBLR') . $t->{'detaillo'} . $t->{'flycamdist'} . $feedback . $bindload);
 
 	} elsif ($bl eq "ar") {
-		my $bindload  = $t->path('an');
-		my $bindload2 = $t->path('an','_t');
+		my $bindload  = $t->bl('an');
+		my $bindload2 = $t->bl('an','_t');
 		my $tgl = $p->GetBindFile($bindload2);
 		$cur->SetBind($key, $t->{'in'} . actPower(undef,1,'Quantum Flight', $toff) . $t->{'detaillo'} . $t->{'flycamdist'} . '$$up 0' . $t->dirs('DLR') . $feedback . $bindload2);
 		$tgl->SetBind($key, $t->{'in'} . actPower(undef,1,'Quantum Flight', $toff) . $t->{'detaillo'} . $t->{'flycamdist'} . '$$up 0' . $t->dirs('DLR') . $feedback . $bindload);
@@ -721,8 +721,8 @@ sub makeSpeedModeKey   {
 			} elsif (not $feedback) {
 				$cur->SetBind($key,$t->{'ini'} . actPower_toggle(1,1,$t->{'speed'},$toff) . $t->dirs('UDLR') . $t->{'detaillo'} . $t->{'flycamdist'} . $feedback . $bindload);
 			} else {
-				my $bindload  = $t->path('as');
-				my $bindload2 = $t->path('as','_s');
+				my $bindload  = $t->bl('as');
+				my $bindload2 = $t->bl('as','_s');
 				my $tgl = $p->GetBindFile($bindload2);
 				$cur->SetBind($key,$t->{'ini'} . actPower_toggle(1,1,$t->{'speed'},$toff) . $t->dirs('UDLR') . $t->{'detaillo'} . $t->{'flycamdist'} . $feedback . $bindload2);
 				$tgl->SetBind($key,$t->{'ini'} . actPower_toggle(1,1,$t->{'speed'},$toff) . $t->dirs('UDLR') . $t->{'detaillo'} . $t->{'flycamdist'} . $feedback . $bindload);
@@ -746,8 +746,7 @@ sub makeJumpModeKey  {
 	if ($t->{'canjmp'} and not $p->SoD->{'JumpSimple'}) {
 
 		my $feedback = $p->SoD->{'Feedback'} ? '$$t $name, Superjump Mode' : '';
-		my $filename = $fbl . $t->KeyState . 'j.txt';
-		my $tgl = $p->GetBindFile($filename);
+		my $tgl = $p->GetBindFile($fbl);
 
 		if ($bl eq "j") {
 			my $a;
@@ -758,14 +757,14 @@ sub makeJumpModeKey  {
 			}
 			my $bindload = $t->bl('j');
 			$tgl->SetBind($key, '-down' . $a . $t->{'detaillo'} . $t->{'flycamdist'} . $bindload);
-			$cur->SetBind($key, '+down' . $feedback . '$$bindloadfilesilent ' . $filename)
+			$cur->SetBind($key, '+down' . $feedback . BindFile::BLF($p, $fbl));
 		} elsif ($bl eq "aj") {
 			my $bindload = $t->bl('aj');
 			$tgl->SetBind($key, '-down' . actPower(undef,1,$t->{'jump'},$toff) . '$$up 1' . $t->{'detaillo'} . $t->{'flycamdist'} . $t->dirs('DLR') . $bindload);
-			$cur->SetBind($key, '+down' . $feedback . '$$bindloadfilesilent ' . $filename);
+			$cur->SetBind($key, '+down' . $feedback . BindFile::BLF($p, $fbl));
 		} else {
 			$tgl->SetBind($key, '-down' . actPower(undef,1,$t->{'jump'},$toff) . '$$up 1' . $t->{'detaillo'} . $t->{'flycamdist'} . $t->bl('fj'));
-			$cur->SetBind($key, '+down' . $feedback . '$$bindloadfilesilent ' . $filename);
+			$cur->SetBind($key, '+down' . $feedback . BindFile::BLF($p, $fbl));
 		}
 	}
 	$t->{'ini'} = '';
@@ -853,7 +852,8 @@ sub makeGFlyModeKey  {
 
 sub iupMessage { print STDERR "ZOMG SOMEBODY IMPLEMENT A WARNING DIALOG!!!\n"; }
 
-sub PopulateBindfiles {
+sub PopulateBindFiles {
+
 	my $profile = shift->Profile;
 
 	my $ResetFile = $profile->General->{'ResetFile'};
@@ -1151,8 +1151,8 @@ sub PopulateBindfiles {
 									stationary => $t->{'hover'},
 									modestr => "Fly",
 									flight => "Fly",
-									pathbo => $t->path('bo'),
-									pathsd => $t->path('sd'),
+									pathbo => 'bo',
+									pathsd => 'sd',
 									blbo => 'bo',
 									blsd => 'sd',
 								});
@@ -1396,7 +1396,7 @@ sub PopulateBindfiles {
 		my $tp_on1 = $profile->GetBindFile("tp","tp_on1.txt");
 		my $zoomin = $t->{'detailhi'} . $t->{'runcamdist'};
 		if ($t->{'tphover'}) { $zoomin = '' }
-		$tp_on1->SetBind($SoD->{'TPComboKey'},'-down$$powexecunqueue' . $zoomin . $windowshow . '$$bindloadfilesilent ' . BindFile::BLF($profile, 'tp','tp_off.txt') . $tphovermodeswitch);
+		$tp_on1->SetBind($SoD->{'TPComboKey'},'-down$$powexecunqueue' . $zoomin . $windowshow . BindFile::BLF($profile, 'tp','tp_off.txt') . $tphovermodeswitch);
 		$tp_on1->SetBind($SoD->{'TPBindKey'},'+down' . $t->{'tphover'} . BindFile::BLF($profile, 'tp','tp_on2.txt'));
 
 		my $tp_on2 = $profile->GetBindFile("tp","tp_on2.txt");
@@ -1425,13 +1425,14 @@ sub PopulateBindfiles {
 sub sodResetKey {
 	my ($curfile,$p,$path,$turnoff,$moddir) = @_;
 
+	$path =~ s/\d\d\d\d\d\d/000000/;  # ick ick ick
+
 	my ($u, $d) = (0, 0);
 	if ($moddir eq 'up')   { $u = 1; }
 	if ($moddir eq 'down') { $d = 1; }
 	$curfile->SetBind($p->General->{'Reset Key'},
 			'up ' . $u . '$$down ' . $d . '$$forward 0$$backward 0$$left 0$$right 0' .
-			$turnoff . '$$t $name, SoD Binds Reset' . BindFile::BaseReset($p) .
-			'$$bindloadfilesilent ' . $path . '000000.txt'
+			$turnoff . '$$t $name, SoD Binds Reset' . BindFile::BaseReset($p) . BindFile::BLF($p, $path)
 	);
 }
 
@@ -2159,7 +2160,7 @@ sub sodJumpFix {
 	my $tglfile = $profile->GetBindFile($filename);
 	$t->{'ini'} = '-down$$';
 	&$makeModeKey($profile,$t,$bl,$tglfile,$turnoff,undef,1);
-	$curfile->SetBind($key,"+down" . $feedback . actPower_name(undef,1,$t->{'cjmp'}) . '$$bindloadfilesilent ' . $filename);
+	$curfile->SetBind($key,"+down" . $feedback . actPower_name(undef,1,$t->{'cjmp'}) . BindFile::BLF($profile, $filename));
 }
 
 sub sodSetDownFix {
@@ -2169,7 +2170,7 @@ sub sodSetDownFix {
 	my $tglfile = $profile->GetBindFile($filename);
 	$t->{'ini'} = '-down$$';
 	&$makeModeKey($profile,$t,$bl,$tglfile,$turnoff,undef,1);
-	$curfile->SetBind($key,'+down' . $feedback . '$$bindloadfilesilent ' . $filename);
+	$curfile->SetBind($key,'+down' . $feedback . BindFile::BLF($profile, $filename));
 }
 
 
@@ -2228,6 +2229,9 @@ sub KeyState {
 	return $ret;
 }
 
+# These next two subs are terrible.  This stuff should all be squirreled away in BindFile.
+
+# This will return "$$bindloadfilesilent C:\path\CODE\CODE1010101<suffix>.txt"
 sub bl {
 	my $self = shift;
 	my $code = shift;
@@ -2236,12 +2240,12 @@ sub bl {
 	return BindFile::BLF($p, uc($code), uc($code) . $self->KeyState . $suffix . '.txt');
 }
 
+# This will return "CODE\CODE1010101<suffix>.txt"
 sub path {
 	my $self = shift;
 	my $code = shift;
 	my $suffix = shift || '';
-	my $p = $self->{'profile'};
-	return BindFile::BLFPath($p, uc($code), uc($code) . $self->KeyState . $suffix . '.txt');
+	return File::Spec->catpath(undef, uc($code), uc($code) . $self->KeyState . $suffix . '.txt');
 }
 
 sub dirs {

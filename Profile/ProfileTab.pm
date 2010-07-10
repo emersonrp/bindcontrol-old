@@ -57,7 +57,7 @@ sub Profile    : lvalue { shift->{'Profile'} }
 
 # stubs
 sub InitKeys          { 1; }
-sub PopulateBindFiles { 1; }
+sub PopulateBindFiles {print STDERR "stub PopBindFiles\n"; 1; }
 sub FillTab           { my $self = shift; ($self->TabTitle   = ref $self) =~ s/Profile:://; }
 sub HelpText          { qq|Help not currently implemented here.|; }
 

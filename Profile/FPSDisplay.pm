@@ -49,7 +49,7 @@ sub FillTab {
 
 sub PopulateBindFiles {
 	my $profile = shift->Profile;
-	my $ResetFile = $profile->GetBindFile($profile->General->{'ResetFile'});
+	my $ResetFile = $profile->General->{'ResetFile'};
 	$ResetFile->SetBind($profile->FPS->{'Bindkey'},'++showfps$$++netgraph');
 }
 

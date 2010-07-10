@@ -50,6 +50,7 @@ sub new {
 }
 
 my @Modules;
+sub Modules { @Modules }
 sub AddModule {
 	my ($self, $module) = @_;
 
@@ -64,24 +65,21 @@ sub AddModule {
 
 	$self->AddPage( $module->Tab, $module->TabTitle );
 }
-sub Modules { @Modules }
 
+# TODO - hacking together the catfile() by hand here seems ugly.
 sub GetBindFile {
-	my ($self, $filename) = @_;
+	my ($self, @filename) = @_;
 
-	$self->{'BindFiles'}->{$filename} ||= BindFile->new($filename);
+	my $filename = File::Spec->catfile(@filename);
+	$self->{'BindFiles'}->{$filename} ||= BindFile->new(@filename);
 }
 
 sub WriteBindFiles {
 	my ($self) = @_;
 
-	for my $Module ($self->Modules) {
-		my $moduleBindFiles = $Module->PopulateBindFiles;
-	}
+	for my $Module ($self->Modules) {print STDERR $Module->Name . "\n"; $Module->PopulateBindFiles; }
 
-	for my $bindfile (values %{$self->{'BindFiles'}}) {
-		$bindfile->Write($self);
-	}
+	for my $bindfile (values %{$self->{'BindFiles'}}) { $bindfile->Write($self); }
 }
 
 1;
