@@ -2,8 +2,8 @@
 
 use strict;
 
-package Profile::FPSDisplay;
-use parent "Profile::ProfileTab";
+package Module::FPSDisplay;
+use parent "Module::Module";
 
 use Wx qw( :everything );
 

@@ -2,8 +2,8 @@
 
 use strict;
 
-package Profile::SimpleBinds;
-use parent "Profile::ProfileTab";
+package Module::SimpleBinds;
+use parent "Module::Module";
 
 our $ModuleName = 'SimpleBinds';
 

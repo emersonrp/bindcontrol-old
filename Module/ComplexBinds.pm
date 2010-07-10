@@ -4,8 +4,8 @@ use strict;
 
 use BindFile;
 
-package Profile::ComplexBinds;
-use parent "Profile::ProfileTab";
+package Module::ComplexBinds;
+use parent "Module::Module";
 
 our $ModuleName = 'ComplexBinds';
 

@@ -10,19 +10,19 @@ use File::HomeDir;  # for when we start actually saving profiles
 # This all used to be auto-detecty-pluginny, but
 # PAR didn't want to package up anything that wasn't
 # explicitly 'use'd.  There's probably a better solution.
-use Profile::BufferBinds;
-use Profile::ComplexBinds;
-use Profile::CustomBinds;
-use Profile::FPSDisplay;
-use Profile::General;
-use Profile::InspirationPopper;
-use Profile::Mastermind;
-use Profile::PetSel;
-use Profile::SimpleBinds;
-use Profile::SoD;
-use Profile::TeamSel;
-use Profile::TeamSel2;
-use Profile::TypingMsg;
+use Module::BufferBinds;
+use Module::ComplexBinds;
+use Module::CustomBinds;
+use Module::FPSDisplay;
+use Module::General;
+use Module::InspirationPopper;
+use Module::Mastermind;
+use Module::PetSel;
+use Module::SimpleBinds;
+use Module::SoD;
+use Module::TeamSel;
+use Module::TeamSel2;
+use Module::TypingMsg;
 
 sub new {
 	my ($class, $parent) = @_;
@@ -32,19 +32,19 @@ sub new {
 	# TODO -- here's where we'd load a profile from a file or something.
 
 	# Add the individual tabs, in order.
-	$self->AddModule(Profile::General->new($self));
-	$self->AddModule(Profile::SoD->new($self));
-	$self->AddModule(Profile::BufferBinds->new($self));
-	$self->AddModule(Profile::ComplexBinds->new($self));
-	$self->AddModule(Profile::CustomBinds->new($self));
-	$self->AddModule(Profile::FPSDisplay->new($self));
-	$self->AddModule(Profile::InspirationPopper->new($self));
-	$self->AddModule(Profile::Mastermind->new($self));
-	$self->AddModule(Profile::PetSel->new($self));
-	$self->AddModule(Profile::SimpleBinds->new($self));
-	$self->AddModule(Profile::TeamSel->new($self));
-	$self->AddModule(Profile::TeamSel2->new($self));
-	$self->AddModule(Profile::TypingMsg->new($self));
+	$self->AddModule(Module::General->new($self));
+	$self->AddModule(Module::SoD->new($self));
+	$self->AddModule(Module::BufferBinds->new($self));
+	$self->AddModule(Module::ComplexBinds->new($self));
+	$self->AddModule(Module::CustomBinds->new($self));
+	$self->AddModule(Module::FPSDisplay->new($self));
+	$self->AddModule(Module::InspirationPopper->new($self));
+	$self->AddModule(Module::Mastermind->new($self));
+	$self->AddModule(Module::PetSel->new($self));
+	$self->AddModule(Module::SimpleBinds->new($self));
+	$self->AddModule(Module::TeamSel->new($self));
+	$self->AddModule(Module::TeamSel2->new($self));
+	$self->AddModule(Module::TypingMsg->new($self));
 
 	return $self;
 }

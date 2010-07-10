@@ -2,8 +2,8 @@
 
 use strict;
 
-package Profile::InspirationPopper;
-use parent "Profile::ProfileTab";
+package Module::InspirationPopper;
+use parent "Module::Module";
 
 use Wx qw( :everything );
 

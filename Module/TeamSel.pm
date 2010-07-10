@@ -2,8 +2,8 @@
 
 use strict;
 
-package Profile::TeamSel;
-use parent "Profile::ProfileTab";
+package Module::TeamSel;
+use parent "Module::Module";
 
 use BindFile;
 
@@ -40,7 +40,7 @@ sub FillTab {
 	$enablecb->SetToolTip( Wx::ToolTip->new('Check this to enable the Team/Pet Select Binds') );
 
 	my $helpbutton = Wx::BitmapButton->new($Tab, -1, Utility::Icon('Help'));
-	EVT_BUTTON($Tab, $helpbutton, sub { shift && $Tab->help(@_) }); 
+	EVT_BUTTON($Tab, $helpbutton, sub { shift && $self->help(@_) }); 
 
 	$headerSizer->Add($enablecb, 0, wxALIGN_CENTER_VERTICAL);
 	$headerSizer->Add($helpbutton, wxALIGN_RIGHT, 0);

@@ -2,8 +2,8 @@
 
 use strict;
 
-package Profile::TypingMsg;
-use parent "Profile::ProfileTab";
+package Module::TypingMsg;
+use parent "Module::Module";
 
 use Wx qw( :everything );
 

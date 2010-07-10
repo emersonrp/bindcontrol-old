@@ -2,8 +2,8 @@
 
 use strict;
 
-package Profile::SoD;
-use parent "Profile::ProfileTab";
+package Module::SoD;
+use parent "Module::Module";
 
 use File::Spec;
 
@@ -885,7 +885,7 @@ sub PopulateBindFiles {
 		$SoD->{'Default'} = "NonSoD";
 	}
 
-	my $t = Profile::SoD::Table->new({
+	my $t = Module::SoD::Table->new({
 		profile => $profile,
 		sprint => '',
 		speed => '',
@@ -2205,7 +2205,7 @@ UI::Labels::Add(
 	}
 );
 
-package Profile::SoD::Table;
+package Module::SoD::Table;
 
 sub new {
 	my ($class, $init) = @_;

@@ -1,6 +1,6 @@
 # UI / logic for the 'general' panel
-package Profile::General;
-use parent "Profile::ProfileTab";
+package Module::General;
+use parent "Module::Module";
 
 use strict;
 use Wx qw( :everything );
@@ -46,7 +46,7 @@ sub FillTab {
 
 	# Archetype
 	$topSizer->Add( Wx::StaticText->new( $Tab, -1, "Archetype:"), 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT,);
-	$topSizer->Add( Wx::BitmapComboBox->new(
+	$topSizer->Add( Wx::ComboBox->new(
 			$Tab, id('PICKER_ARCHETYPE'), $General->{'Archetype'},
 			wxDefaultPosition, wxDefaultSize,
 			[sort keys %$GameData::Archetypes],
@@ -55,7 +55,7 @@ sub FillTab {
 
 	# Origin
 	$topSizer->Add( Wx::StaticText->new( $Tab, -1, "Origin:"), 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT,); 
-	$topSizer->Add( Wx::BitmapComboBox->new(
+	$topSizer->Add( Wx::ComboBox->new(
 			$Tab, id('PICKER_ORIGIN'), $General->{'Origin'},
 			wxDefaultPosition, wxDefaultSize,
 			[@GameData::Origins],
@@ -64,7 +64,7 @@ sub FillTab {
 
 	# Primary
 	$topSizer->Add( Wx::StaticText->new( $Tab, -1, "Primary Powerset:"), 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT,);
- 	$topSizer->Add( Wx::BitmapComboBox->new(
+ 	$topSizer->Add( Wx::ComboBox->new(
  			$Tab, id('PICKER_PRIMARY'), $General->{'Primary'},
 			wxDefaultPosition, wxDefaultSize,
  			[sort keys %{$GameData::PowerSets->{$General->{'Archetype'}}->{'Primary'}}],
@@ -73,7 +73,7 @@ sub FillTab {
 
 	# Secondary
 	$topSizer->Add( Wx::StaticText->new( $Tab, -1, "Secondary Powerset:"), 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT,);
- 	$topSizer->Add( Wx::BitmapComboBox->new(
+ 	$topSizer->Add( Wx::ComboBox->new(
  			$Tab, id('PICKER_SECONDARY'), $General->{'Secondary'},
 			wxDefaultPosition, wxDefaultSize,
  			[sort keys %{$GameData::PowerSets->{$General->{'Archetype'}}->{'Secondary'}}],
@@ -107,12 +107,12 @@ sub FillTab {
 	EVT_COMBOBOX( $Tab, id('PICKER_SECONDARY'), \&pickSecondaryPowerSet );
 
 	return $self;
-
 }
 
 sub pickArchetype {
 	my ($self, $event) = @_;
-	$self->Profile->General->{'Archetype'} = $event->GetEventObject->GetValue;
+
+	$self->GetParent->General->{'Archetype'} = $event->GetEventObject->GetValue;
 	$self->fillPickers;
 }
 
@@ -120,20 +120,20 @@ sub pickOrigin { shift()->fillPickers; }
 
 sub pickPrimaryPowerSet {
 	my ($self, $event) = @_;
-	$self->Profile->General->{'Primary'} = $event->GetEventObject->GetValue;
+	$self->GetParent->General->{'Primary'} = $event->GetEventObject->GetValue;
 	$self->fillPickers;
 }
 
 sub pickSecondaryPowerSet {
 	my ($self, $event) = @_;
-	$self->Profile->General->{'Secondary'} = $event->GetEventObject->GetValue;
+	$self->GetParent->General->{'Secondary'} = $event->GetEventObject->GetValue;
 	$self->fillPickers;
 }
 
 sub fillPickers {
 	my $self = shift;
 
-	my $g = $self->Profile->General;
+	my $g = $self->GetParent->General;
 
 	my $ArchData = $GameData::Archetypes->{$g->{'Archetype'}};
 
@@ -145,12 +145,10 @@ sub fillPickers {
 
 	my $pPicker = Wx::Window::FindWindowById(id('PICKER_PRIMARY'));
 	$pPicker->Clear();
-	for (sort keys %{$ArchData->{'Primary'}}) { $pPicker->Append($_, wxNullBitmap); }
 	$pPicker->SetStringSelection($g->{'Primary'});
 
 	my $sPicker = Wx::Window::FindWindowById(id('PICKER_SECONDARY'));
 	$sPicker->Clear();
-	for (sort keys %{$ArchData->{'Secondary'}}) { $sPicker->Append($_, wxNullBitmap); }
 	$sPicker->SetStringSelection($g->{'Secondary'});
 
 }

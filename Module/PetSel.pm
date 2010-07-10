@@ -2,8 +2,8 @@
 
 use strict;
 
-package Profile::PetSel;
-use parent "Profile::ProfileTab";
+package Module::PetSel;
+use parent "Module::Module";
 
 use Wx qw( :everything );
 

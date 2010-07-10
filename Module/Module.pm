@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 # base class for all the individual tabs
-package Profile::ProfileTab;
+package Module::Module;
 
 use strict;
 use Wx qw( :everything );
@@ -58,7 +58,7 @@ sub Profile    : lvalue { shift->{'Profile'} }
 # stubs
 sub InitKeys          { 1; }
 sub PopulateBindFiles {print STDERR "stub PopBindFiles\n"; 1; }
-sub FillTab           { my $self = shift; ($self->TabTitle   = ref $self) =~ s/Profile:://; }
+sub FillTab           { my $self = shift; ($self->TabTitle   = ref $self) =~ s/Module:://; }
 sub HelpText          { qq|Help not currently implemented here.|; }
 
 

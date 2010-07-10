@@ -2,8 +2,8 @@
 
 use strict;
 
-package Profile::Mastermind;
-use parent "Profile::ProfileTab";
+package Module::Mastermind;
+use parent "Module::Module";
 
 use BindFile;
 
