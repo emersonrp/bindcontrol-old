@@ -7,7 +7,7 @@ use parent "Module::Module";
 
 use BindFile;
 
-use Wx qw( :everything );
+use Wx qw();
 
 our $ModuleName = 'MastermindPets';
 
@@ -118,11 +118,11 @@ sub FillTab {
 		$MMP->{'Primary'} = "Mercenaries";
 	}
 
-	my $sizer = Wx::BoxSizer->new(wxVERTICAL);
+	my $sizer = Wx::BoxSizer->new(Wx::wxVERTICAL);
 
 	my $useCB = Wx::CheckBox->new( $Tab, -1, 'Enable Mastermind Pet Binds');
 	$useCB->SetToolTip(Wx::ToolTip->new('Check this to enable the Mastermind Pet Action Binds'));
-	$sizer->Add($useCB, 0, wxALL, 10);
+	$sizer->Add($useCB, 0, Wx::wxALL, 10);
 
 # TODO - add checkbox handler to hide/show (enable/disable?) the bodyguard options
 # TODO -- actually, automagically enable/disable these depending on whether any pets have their
@@ -130,7 +130,7 @@ sub FillTab {
 	my $bgCB = Wx::CheckBox->new( $Tab, -1, 'Enable Bodyguard Mode Binds');
 	$bgCB->SetToolTip(Wx::ToolTip->new('Check this to enable the Bodyguard Mode Binds'));
 	$bgCB->SetValue($MMP->{'PetBodyguardMode'});
-	$sizer->Add($bgCB, 0, wxALL, 10);
+	$sizer->Add($bgCB, 0, Wx::wxALL, 10);
 
 	$sizer->AddSpacer(10);
 
@@ -146,7 +146,7 @@ sub FillTab {
 
 		my $cl = Wx::StaticText->new($Tab, -1, "Respond via:");
 		my $cm = Wx::ComboBox->  new($Tab, Utility::id("${basename}RespPicker"), $MMP->{"${basename}ResponseMethod"},
-				wxDefaultPosition, wxDefaultSize, $ChatOptions, wxCB_READONLY);
+				Wx::wxDefaultPosition, Wx::wxDefaultSize, $ChatOptions, Wx::wxCB_READONLY);
 		my $cr = Wx::TextCtrl->  new($Tab, Utility::id("${basename}Response"),   $MMP->{"${basename}Response"});
 
 		my $tip = $k->{'tooltipdetail'};
@@ -155,11 +155,11 @@ sub FillTab {
 		$cr->SetToolTip( Wx::ToolTip->new("Choose the chat response your pets will give when you $tip"));
 		$cr->SetMinSize( [250, -1] );
 
-		$PetCommandKeyRows->Add($al, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
-		$PetCommandKeyRows->Add($ab, 0, wxEXPAND);
-		$PetCommandKeyRows->Add($cl, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
+		$PetCommandKeyRows->Add($al, 0, Wx::wxALIGN_RIGHT|Wx::wxALIGN_CENTER_VERTICAL);
+		$PetCommandKeyRows->Add($ab, 0, Wx::wxEXPAND);
+		$PetCommandKeyRows->Add($cl, 0, Wx::wxALIGN_RIGHT|Wx::wxALIGN_CENTER_VERTICAL);
 		$PetCommandKeyRows->Add($cm);
-		$PetCommandKeyRows->Add($cr, 0, wxEXPAND);
+		$PetCommandKeyRows->Add($cr, 0, Wx::wxEXPAND);
 
 	}
 	$sizer->Add($PetCommandKeyRows);
@@ -182,10 +182,10 @@ sub FillTab {
 		my $bn = Wx::Button->    new($Tab, Utility::id("PetSelect$PetID"), $MMP->{"PetSelect$PetID"});
 		$bn->SetToolTip( Wx::ToolTip->new("Choose the Key Combo to Select Pet $PetID"));
 
-		$PetNames->Add( Wx::StaticText->new($Tab, -1, "Pet ${PetID}'s Name"), 0, wxALIGN_CENTER_VERTICAL);
+		$PetNames->Add( Wx::StaticText->new($Tab, -1, "Pet ${PetID}'s Name"), 0, Wx::wxALIGN_CENTER_VERTICAL);
 		$PetNames->Add( $pn );
-		$PetNames->Add( $cb, 0, wxALIGN_CENTER_VERTICAL);
-		$PetNames->Add( Wx::StaticText->new($Tab, -1, "Select Pet $PetID"), 0, wxALIGN_CENTER_VERTICAL);
+		$PetNames->Add( $cb, 0, Wx::wxALIGN_CENTER_VERTICAL);
+		$PetNames->Add( Wx::StaticText->new($Tab, -1, "Select Pet $PetID"), 0, Wx::wxALIGN_CENTER_VERTICAL);
 		$PetNames->Add( $bn );
 	}
 	$sizer->Add($PetNames);

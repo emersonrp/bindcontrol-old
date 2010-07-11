@@ -5,7 +5,7 @@ use strict;
 package Module::TypingMsg;
 use parent "Module::Module";
 
-use Wx qw( :everything );
+use Wx qw();
 
 use Utility qw(id);
 

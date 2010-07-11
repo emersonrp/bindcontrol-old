@@ -5,7 +5,7 @@ use strict;
 package Module::FPSDisplay;
 use parent "Module::Module";
 
-use Wx qw( :everything );
+use Wx qw();
 
 use Utility qw(id);
 
@@ -29,14 +29,14 @@ sub FillTab {
 	my $FPS = $self->Profile->FPS;
 	my $Tab = $self->Tab;
 
-	my $sizer = Wx::BoxSizer->new(wxVERTICAL);
+	my $sizer = Wx::BoxSizer->new(Wx::wxVERTICAL);
 
 	my $useCB = Wx::CheckBox->new( $Tab, id('EnableFPSBind'), 'Enable FPS Binds');
 	$useCB->SetToolTip(Wx::ToolTip->new('Check this to enable the FPS and Netgraph Toggle Binds'));
-	$sizer->Add($useCB, 0, wxALL, 10);
+	$sizer->Add($useCB, 0, Wx::wxALL, 10);
 
 	my $minisizer = Wx::FlexGridSizer->new(0,2,5,5);
-	$minisizer->Add( Wx::StaticText->new($Tab, -1, 'Toggle FPS/Netgraph'), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
+	$minisizer->Add( Wx::StaticText->new($Tab, -1, 'Toggle FPS/Netgraph'), 0, Wx::wxALIGN_RIGHT|Wx::wxALIGN_CENTER_VERTICAL);
 	$minisizer->Add( Wx::Button->    new($Tab, id('FPSKeySelect'), $FPS->{'Bindkey'}));
 
 	$sizer->Add($minisizer);

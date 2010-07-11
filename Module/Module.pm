@@ -4,7 +4,7 @@
 package Module::Module;
 
 use strict;
-use Wx qw( :everything );
+use Wx qw();
 use Wx::Event;
 
 use BindFile;
@@ -34,10 +34,10 @@ sub help {
 
 	unless ($self->{'HelpWindow'}) {
 		my $HelpWindow = Wx::MiniFrame ->new( undef, -1, "$self->{'TabTitle'} Help",);
-		my $BoxSizer   = Wx::BoxSizer  ->new( wxVERTICAL );
+		my $BoxSizer   = Wx::BoxSizer  ->new( Wx::wxVERTICAL );
 		my $HelpText   = Wx::StaticText->new( $HelpWindow, -1, $self->HelpText );
 
-		$BoxSizer->Add( $HelpText, 0, wxALIGN_CENTER_VERTICAL, );
+		$BoxSizer->Add( $HelpText, 0, Wx::wxALIGN_CENTER_VERTICAL, );
 
 		$HelpWindow->SetSizer($BoxSizer);
 
@@ -69,8 +69,8 @@ sub addLabeledButton {
     my $button = Wx::Button->new($self->Tab, Utility::id($value), $module->{$value});
     $button->SetToolTip( Wx::ToolTip->new($tooltip)) if $tooltip;
 
-    $sizer->Add( Wx::StaticText->new($self->Tab, -1, ($UI::Labels::Labels{$value} || $value)), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL);
-    $sizer->Add( $button, 0, wxEXPAND );
+    $sizer->Add( Wx::StaticText->new($self->Tab, -1, ($UI::Labels::Labels{$value} || $value)), 0, Wx::wxALIGN_RIGHT|Wx::wxALIGN_CENTER_VERTICAL);
+    $sizer->Add( $button, 0, Wx::wxEXPAND );
 
 	Wx::Event::EVT_BUTTON( $self->Tab, Utility::id($value),
 		sub {

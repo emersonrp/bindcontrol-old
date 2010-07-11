@@ -7,9 +7,8 @@ use parent "Module::Module";
 
 use BindFile;
 
-use Wx qw( :everything );
+use Wx qw();
 
-use Wx::Event qw(EVT_BUTTON);
 use Utility qw(id);
 
 our $ModuleName = 'TeamPetSelect';
@@ -53,7 +52,7 @@ sub FillTab {
 	$TPS->{'mode'} ||= 1;
 	for (1..8) { $TPS->{"sel$_"} ||= 'UNBOUND' }
 
-	my $topSizer = Wx::BoxSizer->new(wxVERTICAL);
+	my $topSizer = Wx::BoxSizer->new(Wx::wxVERTICAL);
 
 	##### header
 	my $headerSizer = Wx::FlexGridSizer->new(0,2,10,10);
@@ -62,26 +61,26 @@ sub FillTab {
 	$enablecb->SetToolTip( Wx::ToolTip->new('Check this to enable the Team/Pet Select Binds') );
 
 	my $helpbutton = Wx::BitmapButton->new($Tab, -1, Utility::Icon('Help'));
-	EVT_BUTTON($Tab, $helpbutton, sub { shift && $self->help(@_) }); 
+	Wx::Event::EVT_BUTTON($Tab, $helpbutton, sub { shift && $self->help(@_) }); 
 
-	$headerSizer->Add($enablecb, 0, wxALIGN_CENTER_VERTICAL);
-	$headerSizer->Add($helpbutton, wxALIGN_RIGHT, 0);
+	$headerSizer->Add($enablecb, 0, Wx::wxALIGN_CENTER_VERTICAL);
+	$headerSizer->Add($helpbutton, Wx::wxALIGN_RIGHT, 0);
 
 	$topSizer->Add($headerSizer);
 
 	##### direct-select keys
-	my $TPSDirectBox = Wx::StaticBoxSizer->new(Wx::StaticBox->new($Tab, -1, 'Direct Team/Pet Select'), wxVERTICAL);
+	my $TPSDirectBox = Wx::StaticBoxSizer->new(Wx::StaticBox->new($Tab, -1, 'Direct Team/Pet Select'), Wx::wxVERTICAL);
 	my $TPSDirectSizer = Wx::FlexGridSizer->new(0,2,4,4);
 
 	my $picker = Wx::ComboBox->new(
 		$Tab, id('TeamPetMode'), '',
-		wxDefaultPosition, wxDefaultSize, 
+		Wx::wxDefaultPosition, Wx::wxDefaultSize, 
 		['Teammates, then pets','Pets, then teammates','Teammates Only','Pets Only'],
-		wxCB_READONLY,
+		Wx::wxCB_READONLY,
 	);
 	$picker->SetToolTip( Wx::ToolTip->new('Choose the order in which teammates and pets are selected with sequential keypresses') );
-	$TPSDirectSizer->Add( Wx::StaticText->new($Tab, -1, "Select Order"), 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL );
-	$TPSDirectSizer->Add( $picker, 0, wxALL, 10 );
+	$TPSDirectSizer->Add( Wx::StaticText->new($Tab, -1, "Select Order"), 0, Wx::wxALIGN_RIGHT|Wx::wxALIGN_CENTER_VERTICAL );
+	$TPSDirectSizer->Add( $picker, 0, Wx::wxALL, 10 );
 
 	for my $selectid (1..8) {
 
@@ -94,7 +93,7 @@ sub FillTab {
 
 
 	##### Pet Select Binds
-	my $PetSelBox =  Wx::StaticBoxSizer->new(Wx::StaticBox->new($Tab, -1, 'Pet Select'), wxVERTICAL); 
+	my $PetSelBox =  Wx::StaticBoxSizer->new(Wx::StaticBox->new($Tab, -1, 'Pet Select'), Wx::wxVERTICAL); 
 	my $PetSelSizer = Wx::FlexGridSizer->new(0,2,4,4);
 
 	$self->addLabeledButton($PetSelSizer, $TPS, 'SelNextPet',
@@ -110,7 +109,7 @@ sub FillTab {
 	$topSizer->Add($PetSelBox);
 
 	##### Team Select Binds
-	my $TeamSelBox =  Wx::StaticBoxSizer->new(Wx::StaticBox->new($Tab, -1, 'Team Select'), wxVERTICAL); 
+	my $TeamSelBox =  Wx::StaticBoxSizer->new(Wx::StaticBox->new($Tab, -1, 'Team Select'), Wx::wxVERTICAL); 
 	my $TeamSelSizer = Wx::FlexGridSizer->new(0,2,4,4);
 	$self->addLabeledButton($TeamSelSizer, $TPS, 'SelNextTeam',
 		'Choose the key that will select the next teammate from the currently selected one');

@@ -4,7 +4,7 @@ package UI::KeyBindDialog;
 
 use strict;
 use feature 'state';
-use Wx qw( :everything );
+use Wx qw( :dialog :keycode :misc :sizer :window  wxEVT_KEY_DOWN);
 use parent -norequire, 'Wx::Dialog';
 
 sub showWindow {
@@ -81,7 +81,7 @@ sub handleBind {
 	if ($evtType == wxEVT_KEY_DOWN) {
 		my $code = eval { $event->GetKeyCode; };
 		# press escape to cancel
-		if ($code == Wx::WXK_ESCAPE) { $self->EndModal(wxCANCEL); }
+		if ($code == WXK_ESCAPE) { $self->EndModal(wxCANCEL); }
 		$KeyToBind = $self->{'keymap'}->{$code};
 	} else {
 		$KeyToBind = [

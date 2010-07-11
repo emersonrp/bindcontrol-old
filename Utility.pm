@@ -4,7 +4,7 @@ use strict;
 use parent 'Exporter';
 use feature 'state';
 
-use Wx qw( :everything );
+use Wx qw( :bitmap );
 Wx::InitAllImageHandlers();
 
 our @EXPORT_OK = qw( id );

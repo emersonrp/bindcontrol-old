@@ -41,8 +41,7 @@ sub OnInit{
 package BCMainWindow;
 use parent -norequire, 'Wx::Frame';
 
-use Wx qw( :everything );
-use Wx::Event;
+use Wx qw();
 
 use Utility qw(id);
 
@@ -104,7 +103,7 @@ sub new {
 # TODO TODO TODO -- remove this once we actually start making and saving profiles
 	my $sizer = Wx::BoxSizer->new(Wx::wxVERTICAL);
 	my $profile = Profile->new($self);
-	$sizer->Add($profile, 1, wxEXPAND |  wxALL, 3);
+	$sizer->Add($profile, 1, Wx::wxEXPAND |  Wx::wxALL, 3);
 	$self->SetSizerAndFit($sizer);
 # TODO TODO TODO
 
