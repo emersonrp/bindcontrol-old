@@ -3,10 +3,11 @@ package Module::General;
 use parent "Module::Module";
 
 use strict;
-use Wx qw( wxCB_READONLY wxDIRP_USE_TEXTCTRL );
+use Wx qw();
 
 use GameData;
 use Utility qw(id);
+use UI::ControlGroup;
 
 our $ModuleName = 'General';
 
@@ -14,13 +15,13 @@ sub InitKeys {
 	my $self = shift;
 
 	$self->Profile->General ||= {
-		Archetype => 'Scrapper',
-		Origin => "Magic",
-		Primary => 'Martial Arts',
-		Secondary => 'Super Reflexes',
-		Epic => 'Weapon Mastery',
-		BindsDir => "c:\\CoHTest\\",
-		ResetFile => $self->Profile->GetBindFile('reset.txt'),
+		'Archetype' => 'Scrapper',
+		'Origin' => "Magic",
+		'Primary Powerset' => 'Martial Arts',
+		'Secondary Powerset' => 'Super Reflexes',
+		'Epic Powerset' => 'Weapon Mastery',
+		'Binds Directory' => "c:\\CoHTest\\",
+		'Reset File' => $self->Profile->GetBindFile('reset.txt'),
 		'Reset Key' => 'CTRL-M',
 	};
 }
@@ -28,90 +29,133 @@ sub InitKeys {
 sub FillTab {
 
 	my $self = shift;
+	my $General = $self->Profile->General;
+
+	my $topSizer = UI::ControlGroup->new($self, 'Powers and Info');
+
+	my $ArchData = $GameData::Archetypes->{$General->{'Archetype'}};
+
+	$topSizer->AddLabeledControl({
+		value => 'Name',
+		type => 'text',
+		parent => $self,
+		module => $General,
+	});
+	$topSizer->AddLabeledControl({
+		value => 'Archetype',
+		type => 'combo',
+		parent => $self,
+		module => $General,
+		contents => [sort keys %$GameData::Archetypes],
+		tooltip => '',
+		callback => \&pickArchetype,
+	});
+	$topSizer->AddLabeledControl({
+		value => 'Origin',
+		type => 'combo',
+		parent => $self,
+		module => $General,
+		contents => [@GameData::Origins],
+		tooltip => '',
+		callback => \&pickOrigin,
+	});
+	$topSizer->AddLabeledControl({
+		value => 'Primary Powerset',
+		type => 'combo',
+		parent => $self,
+		module => $General,
+		contents => [sort keys %{$ArchData->{'Primary Powerset'}}],
+		tooltip => '',
+		callback => \&pickPrimaryPowerSet,
+	});
+	$topSizer->AddLabeledControl({
+		value => 'Secondary Powerset',
+		type => 'combo',
+		parent => $self,
+		module => $General,
+		contents => [sort keys %{$ArchData->{'Secondary Powerset'}}],
+		tooltip => '',
+		callback => \&pickSecondaryPowerSet,
+	});
+	$topSizer->AddLabeledControl({
+		value => 'Epic Powerset',
+		type => 'combo',
+		parent => $self,
+		module => $General,
+		contents => [sort keys %{$ArchData->{'Epic Powerset'}}],
+		tooltip => '',
+		callback => \&pickEpicPowerSet,
+	});
+	$topSizer->AddLabeledControl({
+		value => 'Power Pool 1',
+		type => 'combo',
+		parent => $self,
+		module => $General,
+		contents => [sort keys %{$GameData::MiscPowers->{'Pool'}}],
+		tooltip => '',
+		callback => \&pickPoolPower,
+	});
+	$topSizer->AddLabeledControl({
+		value => 'Power Pool 2',
+		type => 'combo',
+		parent => $self,
+		module => $General,
+		contents => [sort keys %{$GameData::MiscPowers->{'Pool'}}],
+		tooltip => '',
+		callback => \&pickPoolPower,
+	});
+	$topSizer->AddLabeledControl({
+		value => 'Power Pool 3',
+		type => 'combo',
+		parent => $self,
+		module => $General,
+		contents => [sort keys %{$GameData::MiscPowers->{'Pool'}}],
+		tooltip => '',
+		callback => \&pickPoolPower,
+	});
+	$topSizer->AddLabeledControl({
+		value => 'Power Pool 4',
+		type => 'combo',
+		parent => $self,
+		module => $General,
+		contents => [sort keys %{$GameData::MiscPowers->{'Pool'}}],
+		tooltip => '',
+		callback => \&pickPoolPower,
+	});
+	$topSizer->AddLabeledControl({
+		value => 'Binds Directory',
+		type => 'dirpicker',
+		parent => $self,
+		module => $General,
+	});
+	$topSizer->AddLabeledControl({
+		value => 'Reset Key',
+		type => 'keybutton',
+		parent => $self,
+		module => $General,
+		tooltip => 'This key is used by certain modules to reset binds to a sane state.',
+	});
+
+	$topSizer->AddLabeledControl({
+		value => 'Reset Feedback',
+		type => 'checkbox',
+		parent => $self,
+		module => $General,
+	});
+
+
+	$topSizer->Add( Wx::Button->new( $self, id('Write Binds Button'), 'Write Binds!' ), 0, Wx::wxALL|Wx::wxEXPAND);
+	Wx::Event::EVT_BUTTON( $self, id('Write Binds Button'), sub { $self->Profile->WriteBindFiles() } );
+
 
 	$self->TabTitle = 'General';
-
-	my $General = $self->Profile->General;
-	my $Tab = $self->Tab;
-
-	my $topSizer = Wx::FlexGridSizer->new(0,2,5,5);
-
-	# Name
-	$topSizer->Add( Wx::StaticText->new( $Tab, -1, "Name:"), 0, Wx::wxALIGN_CENTER_VERTICAL|Wx::wxALIGN_RIGHT,);
-	my $tc = Wx::TextCtrl->new( $Tab, id('PROFILE_NAMETEXT'), "",);
-	# TODO -- suss out what we want the min size to be, and set it someplace sane.
-	$tc->SetMinSize([300,-1]);
-	$topSizer->Add( $tc, 0, Wx::wxALL,) ;
-
-	# Archetype
-	$topSizer->Add( Wx::StaticText->new( $Tab, -1, "Archetype:"), 0, Wx::wxALIGN_CENTER_VERTICAL|Wx::wxALIGN_RIGHT,);
-	$topSizer->Add( Wx::ComboBox->new(
-			$Tab, id('PICKER_ARCHETYPE'), $General->{'Archetype'},
-			Wx::wxDefaultPosition, Wx::wxDefaultSize,
-			[sort keys %$GameData::Archetypes],
-			Wx::wxCB_READONLY,
-		), 0, Wx::wxALL,);
-
-	# Origin
-	$topSizer->Add( Wx::StaticText->new( $Tab, -1, "Origin:"), 0, Wx::wxALIGN_CENTER_VERTICAL|Wx::wxALIGN_RIGHT,); 
-	$topSizer->Add( Wx::ComboBox->new(
-			$Tab, id('PICKER_ORIGIN'), $General->{'Origin'},
-			Wx::wxDefaultPosition, Wx::wxDefaultSize,
-			[@GameData::Origins],
-			Wx::wxCB_READONLY,
-		), 0, Wx::wxALL,);
-
-	# Primary
-	$topSizer->Add( Wx::StaticText->new( $Tab, -1, "Primary Powerset:"), 0, Wx::wxALIGN_CENTER_VERTICAL|Wx::wxALIGN_RIGHT,);
- 	$topSizer->Add( Wx::ComboBox->new(
- 			$Tab, id('PICKER_PRIMARY'), $General->{'Primary'},
-			Wx::wxDefaultPosition, Wx::wxDefaultSize,
- 			[sort keys %{$GameData::PowerSets->{$General->{'Archetype'}}->{'Primary'}}],
-			Wx::wxCB_READONLY,
- 		), 0, Wx::wxALL,);
-
-	# Secondary
-	$topSizer->Add( Wx::StaticText->new( $Tab, -1, "Secondary Powerset:"), 0, Wx::wxALIGN_CENTER_VERTICAL|Wx::wxALIGN_RIGHT,);
- 	$topSizer->Add( Wx::ComboBox->new(
- 			$Tab, id('PICKER_SECONDARY'), $General->{'Secondary'},
-			Wx::wxDefaultPosition, Wx::wxDefaultSize,
- 			[sort keys %{$GameData::PowerSets->{$General->{'Archetype'}}->{'Secondary'}}],
-			Wx::wxCB_READONLY,
- 		), 0, Wx::wxALL,);
-
-	$topSizer->Add( Wx::StaticText->new( $Tab, -1, "Binds Directory:"), 0, Wx::wxALIGN_CENTER_VERTICAL|Wx::wxALIGN_RIGHT,);
-	$topSizer->Add( Wx::DirPickerCtrl->new(
-			$Tab, -1, $General->{'BindsDir'}, 
-			'Select Binds Directory',
-			Wx::wxDefaultPosition, Wx::wxDefaultSize,
-			Wx::wxDIRP_USE_TEXTCTRL|Wx::wxALL,
-		), 0, Wx::wxALL|Wx::wxEXPAND,);
-
-	$self->addLabeledButton($topSizer, $General, 'Reset Key', 'This key is used by certain modules to reset binds to a sane state.');
-
-	$topSizer->Add ( Wx::CheckBox->new($Tab, id('Enable Reset Feedback'), 'Enable Reset Feedback'), 0, Wx::wxALL);
-	$topSizer->AddSpacer(5);
-
-
-	$topSizer->Add( Wx::Button->new( $Tab, id('Write Binds Button'), 'Write Binds!' ), 0, Wx::wxALL|Wx::wxEXPAND);
-
-	Wx::Event::EVT_BUTTON( $Tab, id('Write Binds Button'), sub { $self->Profile->WriteBindFiles() } );
-
-
-	$Tab->SetSizer($topSizer);
-
-	Wx::Event::EVT_COMBOBOX( $Tab, id('PICKER_ARCHETYPE'), \&pickArchetype );
-	Wx::Event::EVT_COMBOBOX( $Tab, id('PICKER_ORIGIN'),    \&pickOrigin );
-	Wx::Event::EVT_COMBOBOX( $Tab, id('PICKER_PRIMARY'),   \&pickPrimaryPowerSet );
-	Wx::Event::EVT_COMBOBOX( $Tab, id('PICKER_SECONDARY'), \&pickSecondaryPowerSet );
-
+	$self->SetSizer($topSizer);
 	return $self;
 }
 
 sub pickArchetype {
 	my ($self, $event) = @_;
-
-	$self->GetParent->General->{'Archetype'} = $event->GetEventObject->GetValue;
+	$self->Profile->General->{'Archetype'} = $event->GetEventObject->GetValue;
 	$self->fillPickers;
 }
 
@@ -119,37 +163,55 @@ sub pickOrigin { shift()->fillPickers; }
 
 sub pickPrimaryPowerSet {
 	my ($self, $event) = @_;
-	$self->GetParent->General->{'Primary'} = $event->GetEventObject->GetValue;
+	$self->Profile->General->{'Primary Powerset'} = $event->GetEventObject->GetValue;
 	$self->fillPickers;
 }
 
 sub pickSecondaryPowerSet {
 	my ($self, $event) = @_;
-	$self->GetParent->General->{'Secondary'} = $event->GetEventObject->GetValue;
+	$self->Profile->General->{'Secondary Powerset'} = $event->GetEventObject->GetValue;
+	$self->fillPickers;
+}
+
+sub pickEpicPowerSet {
+	my ($self, $event) = @_;
+	$self->Profile->General->{'Epic Powerset'} = $event->GetEventObject->GetValue;
 	$self->fillPickers;
 }
 
 sub fillPickers {
 	my $self = shift;
 
-	my $g = $self->GetParent->General;
+	my $g = $self->Profile->General;
 
 	my $ArchData = $GameData::Archetypes->{$g->{'Archetype'}};
-
-	my $aPicker = Wx::Window::FindWindowById(id('PICKER_ARCHETYPE'));
+	my $aPicker = Wx::Window::FindWindowById(id('Archetype'));
 	$aPicker->SetStringSelection($g->{'Archetype'});
 
-	my $oPicker = Wx::Window::FindWindowById(id('PICKER_ORIGIN'));
+	my $oPicker = Wx::Window::FindWindowById(id('Origin'));
 	$oPicker->SetStringSelection($g->{'Origin'});
 
-	my $pPicker = Wx::Window::FindWindowById(id('PICKER_PRIMARY'));
+	my $pPicker = Wx::Window::FindWindowById(id('Primary Powerset'));
 	$pPicker->Clear();
-	$pPicker->SetStringSelection($g->{'Primary'});
+	$pPicker->Append([sort keys %{$ArchData->{'Primary Powerset'}}]);
+	$pPicker->SetStringSelection($g->{'Primary Powerset'}) or $pPicker->SetSelection(1);
 
-	my $sPicker = Wx::Window::FindWindowById(id('PICKER_SECONDARY'));
+	my $sPicker = Wx::Window::FindWindowById(id('Secondary Powerset'));
 	$sPicker->Clear();
-	$sPicker->SetStringSelection($g->{'Secondary'});
+	$sPicker->Append([sort keys %{$ArchData->{'Secondary Powerset'}}]);
+	$sPicker->SetStringSelection($g->{'Secondary Powerset'}) or $sPicker->SetSelection(1);
 
+	my $ePicker = Wx::Window::FindWindowById(id('Epic Powerset'));
+	$ePicker->Clear();
+	$ePicker->Append([sort keys %{$ArchData->{'Epic Powerset'}}]);
+	$ePicker->SetStringSelection($g->{'Epic Powerset'}) or $sPicker->SetSelection(1);
+
+	for my $i (1..4) {
+		my $ppPicker = Wx::Window::FindWindowById(id("Power Pool $i"));
+		$ppPicker->Clear();
+		$ppPicker->Append([sort keys %{$GameData::MiscPowers->{'Pool'}}]);
+		$ppPicker->SetStringSelection($g->{"Power Pool $i"}) or $ppPicker->SetSelection(1);
+	}
 }
 
 1;

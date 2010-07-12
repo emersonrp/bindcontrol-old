@@ -27,21 +27,20 @@ sub FillTab {
 	$self->TabTitle = "FPS / Netgraph";
 
 	my $FPS = $self->Profile->FPS;
-	my $Tab = $self->Tab;
 
 	my $sizer = Wx::BoxSizer->new(Wx::wxVERTICAL);
 
-	my $useCB = Wx::CheckBox->new( $Tab, id('EnableFPSBind'), 'Enable FPS Binds');
+	my $useCB = Wx::CheckBox->new( $self, id('EnableFPSBind'), 'Enable FPS Binds');
 	$useCB->SetToolTip(Wx::ToolTip->new('Check this to enable the FPS and Netgraph Toggle Binds'));
 	$sizer->Add($useCB, 0, Wx::wxALL, 10);
 
 	my $minisizer = Wx::FlexGridSizer->new(0,2,5,5);
-	$minisizer->Add( Wx::StaticText->new($Tab, -1, 'Toggle FPS/Netgraph'), 0, Wx::wxALIGN_RIGHT|Wx::wxALIGN_CENTER_VERTICAL);
-	$minisizer->Add( Wx::Button->    new($Tab, id('FPSKeySelect'), $FPS->{'Bindkey'}));
+	$minisizer->Add( Wx::StaticText->new($self, -1, 'Toggle FPS/Netgraph'), 0, Wx::wxALIGN_RIGHT|Wx::wxALIGN_CENTER_VERTICAL);
+	$minisizer->Add( Wx::Button->    new($self, id('FPSKeySelect'), $FPS->{'Bindkey'}));
 
 	$sizer->Add($minisizer);
 
-	$Tab->SetSizerAndFit($sizer);
+	$self->SetSizerAndFit($sizer);
 
 	return $self;
 }

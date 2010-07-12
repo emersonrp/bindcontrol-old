@@ -6,7 +6,7 @@ our @Origins = qw( Magic Mutation Natural Science Technology);
 our $Archetypes = {
 	"Arachnos Soldier" => {
 		'Faction' => 'V',
-		"Epic" => {
+		"Epic Powerset" => {
 			"Mace Mastery" => [
 				"Mace Blast",
 				"Web Envelope",
@@ -32,7 +32,7 @@ our $Archetypes = {
 				"Summon Striker",
 			],
 		},
-		"Primary" => {
+		"Primary Powerset" => {
 			"Arachnos Soldier" => [
 				"Single Shot",
 				"Pummel",
@@ -68,7 +68,7 @@ our $Archetypes = {
 				"Crowd Control",
 			],
 		},
-		"Secondary" => {
+		"Secondary Powerset" => {
 			"Training and Gadgets" => [
 				"Tactical Training: Maneuvers",
 				"Tactical Training: Assault",
@@ -88,7 +88,7 @@ our $Archetypes = {
 	},
 	"Arachnos Widow" => {
 		'Faction' => 'V',
-		"Epic" => {
+		"Epic Powerset" => {
 			"Mace Mastery" => [
 				"Mace Blast",
 				"Web Envelope",
@@ -114,7 +114,7 @@ our $Archetypes = {
 				"Summon Striker",
 			],
 		},
-		"Primary" => {
+		"Primary Powerset" => {
 			"Widow Training" => [
 				"Poison Dart",
 				"Swipe",
@@ -146,7 +146,7 @@ our $Archetypes = {
 				"Psychic Wail",
 			],
 		},
-		"Secondary" => {
+		"Secondary Powerset" => {
 			"Teamwork" => [
 				"Tactical Training: Maneuvers",
 				"Indomitable Will",
@@ -171,7 +171,7 @@ our $Archetypes = {
 	},
 	Blaster => {
 		'Faction' => 'H',
-		"Epic" => {
+		"Epic Powerset" => {
 			"Cold Mastery" => [
 				"Snow Storm",
 				"Flash Freeze",
@@ -202,7 +202,7 @@ our $Archetypes = {
 				"Cryo Freeze Ray",
 			],
 		},
-		"Primary" => {
+		"Primary Powerset" => {
 			"Archery" => [
 				"Snap Shot",
 				"Aimed Shot",
@@ -314,7 +314,7 @@ our $Archetypes = {
 				"Dreadful Wail",
 			],
 		},
-		"Secondary" => {
+		"Secondary Powerset" => {
 			"Devices" => [
 				"Web Grenade",
 				"Caltrops",
@@ -385,7 +385,7 @@ our $Archetypes = {
 	},
 	Brute => {
 		'Faction' => 'V',
-		"Epic" => {
+		"Epic Powerset" => {
 			"Mace Mastery" => [
 				"Mace Blast",
 				"Web Envelope",
@@ -411,7 +411,7 @@ our $Archetypes = {
 				"Summon Striker",
 			],
 		},
-		"Primary" => {
+		"Primary Powerset" => {
 			"Battle Axe" => [
 				"Beheader",
 				"Chop",
@@ -523,7 +523,7 @@ our $Archetypes = {
 				"Crowd Control",
 			],
 		},
-		"Secondary" => {
+		"Secondary Powerset" => {
 			"Dark Armor" => [
 				"Dark Embrace",
 				"Death Shroud",
@@ -599,7 +599,7 @@ our $Archetypes = {
 	},
 	Controller => {
 		'Faction' => 'H',
-		"Epic" => {
+		"Epic Powerset" => {
 			"Fire Mastery" => [
 				"Fire Blast",
 				"Fire Ball",
@@ -631,7 +631,7 @@ our $Archetypes = {
 				"Earth's Embrace",
 			],
 		},
-		"Primary" => {
+		"Primary Powerset" => {
 			"Earth Control" => [
 				"Stone Prison",
 				"Fossilize",
@@ -710,7 +710,7 @@ our $Archetypes = {
 				"Fly Trap",
 			],
 		},
-		"Secondary" => {
+		"Secondary Powerset" => {
 			"Cold Domination" => [
 				"Infrigidate",
 				"Ice Shield",
@@ -814,7 +814,7 @@ our $Archetypes = {
 	},
 	Corruptor => {
 		'Faction' => 'V',
-		"Epic" => {
+		"Epic Powerset" => {
 			"Mace Mastery" => [
 				"Web Envelope",
 				"Scorpion Shield",
@@ -839,7 +839,7 @@ our $Archetypes = {
 				"Charged Armor",
 			],
 		},
-		"Primary" => {
+		"Primary Powerset" => {
 			"Archery" => [
 				"Snap Shot",
 				"Aimed Shot",
@@ -951,7 +951,7 @@ our $Archetypes = {
 				"Dreadful Wail",
 			],
 		},
-		"Secondary" => {
+		"Secondary Powerset" => {
 			"Cold Domination" => [
 				"Infrigidate",
 				"Ice Shield",
@@ -1066,7 +1066,7 @@ our $Archetypes = {
 	},
 	Defender => {
 		'Faction' => 'H',
-		"Epic" => {
+		"Epic Powerset" => {
 			"Dark Mastery" => [
 				"Oppressive Gloom",
 				"Dark Consumption",
@@ -1092,7 +1092,7 @@ our $Archetypes = {
 				"Telekinesis",
 			],
 		},
-		"Primary" => {
+		"Primary Powerset" => {
 			"Cold Domination" => [
 				"Infrigidate",
 				"Ice Shield",
@@ -1204,7 +1204,7 @@ our $Archetypes = {
 				"EM Pulse Arrow",
 			],
 		},
-		"Secondary" => {
+		"Secondary Powerset" => {
 			"Archery" => [
 				"Snap Shot",
 				"Aim",
@@ -1319,7 +1319,7 @@ our $Archetypes = {
 	},
 	Dominator => {
 		'Faction' => 'V',
-		"Epic" => {
+		"Epic Powerset" => {
 			"Mace Mastery" => [
 				"Poisonous Ray",
 				"Scorpion Shield",
@@ -1344,7 +1344,7 @@ our $Archetypes = {
 				"Summon Guardian",
 			],
 		},
-		"Primary" => {
+		"Primary Powerset" => {
 			"Earth Control" => [
 				"Stone Prison",
 				"Fossilize",
@@ -1412,7 +1412,7 @@ our $Archetypes = {
 				"Fly Trap",
 			],
 		},
-		"Secondary" => {
+		"Secondary Powerset" => {
 			"Earth Assault" => [
 				"Stone Spears",
 				"Stone Mallet",
@@ -1494,7 +1494,7 @@ our $Archetypes = {
 	},
 	Mastermind => {
 		'Faction' => 'V',
-		"Epic" => {
+		"Epic Powerset" => {
 			"Mace Mastery" => [
 				"Web Envelope",
 				"Scorpion Shield",
@@ -1519,7 +1519,7 @@ our $Archetypes = {
 				"Electrifying Fences",
 			],
 		},
-		"Primary" => {
+		"Primary Powerset" => {
 			"Mercenaries" => [
 				"Burst",
 				"Soldiers",
@@ -1587,7 +1587,7 @@ our $Archetypes = {
 				"Abyssal Empowerment",
 			],
 		},
-		"Secondary" => {
+		"Secondary Powerset" => {
 			"Dark Miasma" => [
 				"Twilight Grasp",
 				"Tar Patch",
@@ -1702,7 +1702,7 @@ our $Archetypes = {
 				"Energy Flight",
 			],
 		},
-		"Primary" => {
+		"Primary Powerset" => {
 			"Luminous Blast" => [
 				"Gleaming Bolt",
 				"Glinting Eye",
@@ -1720,7 +1720,7 @@ our $Archetypes = {
 				"Dawn Strike",
 			],
 		},
-		"Secondary" => {
+		"Secondary Powerset" => {
 			"Luminous Aura" => [
 				"Shining Shield",
 				"Essence Boost",
@@ -1738,7 +1738,7 @@ our $Archetypes = {
 	},
 	Scrapper => {
 		'Faction' => 'H',
-		"Epic" => {
+		"Epic Powerset" => {
 			"Body Mastery" => [
 				"Conserve Power",
 				"Focused Accuracy",
@@ -1758,7 +1758,7 @@ our $Archetypes = {
 				"Exploding Shurken",
 			],
 		},
-		"Primary" => {
+		"Primary Powerset" => {
 			"Broad Sword" => [
 				"Hack",
 				"Slash",
@@ -1859,7 +1859,7 @@ our $Archetypes = {
 				"Throw Spines",
 			],
 		},
-		"Secondary" => {
+		"Secondary Powerset" => {
 			"Dark Armor" => [
 				"Dark Embrace",
 				"Death Shroud",
@@ -1936,7 +1936,7 @@ our $Archetypes = {
 	},
 	Stalker => {
 		'Faction' => 'V',
-		"Epic" => {
+		"Epic Powerset" => {
 			"Mace Mastery" => [
 				"Summon Blaster",
 				"Mace Blast",
@@ -1962,7 +1962,7 @@ our $Archetypes = {
 				"Summon Adept",
 			],
 		},
-		"Primary" => {
+		"Primary Powerset" => {
 			"Broad Sword" => [
 				"Hack",
 				"Slash",
@@ -2063,7 +2063,7 @@ our $Archetypes = {
 				"Placate",
 			],
 		},
-		"Secondary" => {
+		"Secondary Powerset" => {
 			"Dark Armor" => [
 				"Hide",
 				"Dark Embrace",
@@ -2134,7 +2134,7 @@ our $Archetypes = {
 	},
 	Tanker => {
 		'Faction' => 'H',
-		"Epic" => {
+		"Epic Powerset" => {
 			"Arctic Mastery" => [
 				"Chilblain",
 				"Block of Ice",
@@ -2160,7 +2160,7 @@ our $Archetypes = {
 				"Fire Ball",
 			],
 		},
-		"Primary" => {
+		"Primary Powerset" => {
 			"Dark Armor" => [
 				"Dark Embrace",
 				"Death Shroud",
@@ -2238,7 +2238,7 @@ our $Archetypes = {
 				"Strength of Will",
 			],
 		},
-		"Secondary" => {
+		"Secondary Powerset" => {
 			"Battle Axe" => [
 				"Gash",
 				"Chop",
@@ -2375,7 +2375,7 @@ our $Archetypes = {
 				"Shadow Step",
 			],
 		},
-		"Primary" => {
+		"Primary Powerset" => {
 			"Umbral Blast" => [
 				"Shadow Bolt",
 				"Ebon Eye",
@@ -2393,7 +2393,7 @@ our $Archetypes = {
 				"Starless Step",
 			],
 		},
-		"Secondary" => {
+		"Secondary Powerset" => {
 			"Umbral Aura" => [
 				"Gravity Shield",
 				"Orbiting Death",
@@ -2413,91 +2413,90 @@ our $Archetypes = {
 
 our $MiscPowers = {
 # -- TODO!!! split accolades by hero / villain
-	General => {
-		"Badge" => {
-			"Accolade" => [
-				"Eye of the Magus",
-				"Crey CBX-9 Pistol",
-				"Demonic Aura",
-				"Elusive Mind",
-				"Force of Nature",
-				"Geas of the Kind Ones",
-				"Portable Workbench",
-				"Stolen Immobilizer Ray",
-				"Megalomaniac",
-				"Vanguard Medal",
-			],
-		},
-		"General" => {
-			"General" => [
-				"Sprint",
-				"Brawl",
-				"Rest",
-				"Prestige Power Slide",
-				"Prestige Power Rush",
-				"Prestige Power Dash",
-				"Prestige Power Surge ",
-				"Prestige Power Quick",
-			],
-		},
-		"Pool" => {
-			"Concealment" => [
-				"Stealth",
-				"Grant Invisibility",
-				"Invisibility",
-				"Phase Shift",
-			],
-			"Fighting" => [
-				"Boxing",
-				"Kick",
-				"Tough",
-				"Weave",
-			],
-			"Flight" => [
-				"Hover",
-				"Air Superiority",
-				"Fly",
-				"Group Fly",
-			],
-			"Leadership" => [
-				"Maneuvers",
-				"Assault",
-				"Tactics",
-				"Vengeance",
-			],
-			"Leaping" => [
-				"Jump Kick",
-				"Combat Jumping",
-				"Super Jump",
-				"Acrobatics",
-			],
-			"Medicine" => [
-				"Aid Other",
-				"Stimulant",
-				"Aid Self",
-				"Resuscitate",
-			],
-			"Presence" => [
-				"Challenge",
-				"Provoke",
-				"Intimidate",
-				"Invoke Panic",
-			],
-			"Speed" => [
-				"Flurry",
-				"Hasten",
-				"Super Speed",
-				"Whirlwind",
-			],
-			"Teleportation" => [
-				"Recall Friend",
-				"Teleport Foe",
-				"Teleport",
-				"Team Teleport",
-			],
-		},
+	"Badge" => {
+		"Accolade" => [
+			"Eye of the Magus",
+			"Crey CBX-9 Pistol",
+			"Demonic Aura",
+			"Elusive Mind",
+			"Force of Nature",
+			"Geas of the Kind Ones",
+			"Portable Workbench",
+			"Stolen Immobilizer Ray",
+			"Megalomaniac",
+			"Vanguard Medal",
+		],
+	},
+	"General" => {
+		"General" => [
+			"Sprint",
+			"Brawl",
+			"Rest",
+			"Prestige Power Slide",
+			"Prestige Power Rush",
+			"Prestige Power Dash",
+			"Prestige Power Surge ",
+			"Prestige Power Quick",
+		],
+	},
+	"Pool" => {
+		"Concealment" => [
+			"Stealth",
+			"Grant Invisibility",
+			"Invisibility",
+			"Phase Shift",
+		],
+		"Fighting" => [
+			"Boxing",
+			"Kick",
+			"Tough",
+			"Weave",
+		],
+		"Flight" => [
+			"Hover",
+			"Air Superiority",
+			"Fly",
+			"Group Fly",
+		],
+		"Leadership" => [
+			"Maneuvers",
+			"Assault",
+			"Tactics",
+			"Vengeance",
+		],
+		"Leaping" => [
+			"Jump Kick",
+			"Combat Jumping",
+			"Super Jump",
+			"Acrobatics",
+		],
+		"Medicine" => [
+			"Aid Other",
+			"Stimulant",
+			"Aid Self",
+			"Resuscitate",
+		],
+		"Presence" => [
+			"Challenge",
+			"Provoke",
+			"Intimidate",
+			"Invoke Panic",
+		],
+		"Speed" => [
+			"Flurry",
+			"Hasten",
+			"Super Speed",
+			"Whirlwind",
+		],
+		"Teleportation" => [
+			"Recall Friend",
+			"Teleport Foe",
+			"Teleport",
+			"Team Teleport",
+		],
 	},
 };
+
 
 ################# TODO Do we need these separately, or can they be deduced from the above?
 

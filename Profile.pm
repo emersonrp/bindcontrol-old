@@ -59,7 +59,7 @@ sub AddModule {
 	$module->InitKeys;
 	$module->FillTab;
 
-	$self->AddPage( $module->Tab, $module->TabTitle );
+	$self->AddPage( $module, $module->TabTitle );
 }
 
 # TODO - hacking together the catfile() by hand here seems ugly.

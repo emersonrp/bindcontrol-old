@@ -35,7 +35,6 @@ sub FillTab {
 	$self->TabTitle = 'Typing Message';
 
 	my $Typing = $self->Profile->Typing;
-	my $Tab    = $self->Tab;
 
 	my $sizer = Wx::FlexGridSizer->new(0,2,10,10);
 
@@ -58,7 +57,7 @@ sub FillTab {
 	# cbToolTip("Choose the message to display when you are typing chat messages or commands");
 	# my $msghbox = cbTextBox("Message",$Typing->{'Message'},cbTextBoxCB(profile,Typing,"Message"));
 
-	$Tab->SetSizer($sizer);
+	$self->SetSizer($sizer);
 
 	return $self;
 }
