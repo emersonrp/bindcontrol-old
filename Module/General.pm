@@ -31,17 +31,20 @@ sub FillTab {
 	my $self = shift;
 	my $General = $self->Profile->General;
 
-	my $topSizer = UI::ControlGroup->new($self, 'Powers and Info');
 
 	my $ArchData = $GameData::Archetypes->{$General->{'Archetype'}};
 
-	$topSizer->AddLabeledControl({
+	my $topSizer = Wx::BoxSizer->new(Wx::wxVERTICAL);
+
+
+	my $powersBox = UI::ControlGroup->new($self, 'Powers and Info');
+	$powersBox->AddLabeledControl({
 		value => 'Name',
 		type => 'text',
 		parent => $self,
 		module => $General,
 	});
-	$topSizer->AddLabeledControl({
+	$powersBox->AddLabeledControl({
 		value => 'Archetype',
 		type => 'combo',
 		parent => $self,
@@ -50,7 +53,7 @@ sub FillTab {
 		tooltip => '',
 		callback => \&pickArchetype,
 	});
-	$topSizer->AddLabeledControl({
+	$powersBox->AddLabeledControl({
 		value => 'Origin',
 		type => 'combo',
 		parent => $self,
@@ -59,7 +62,7 @@ sub FillTab {
 		tooltip => '',
 		callback => \&pickOrigin,
 	});
-	$topSizer->AddLabeledControl({
+	$powersBox->AddLabeledControl({
 		value => 'Primary Powerset',
 		type => 'combo',
 		parent => $self,
@@ -68,7 +71,7 @@ sub FillTab {
 		tooltip => '',
 		callback => \&pickPrimaryPowerSet,
 	});
-	$topSizer->AddLabeledControl({
+	$powersBox->AddLabeledControl({
 		value => 'Secondary Powerset',
 		type => 'combo',
 		parent => $self,
@@ -77,7 +80,7 @@ sub FillTab {
 		tooltip => '',
 		callback => \&pickSecondaryPowerSet,
 	});
-	$topSizer->AddLabeledControl({
+	$powersBox->AddLabeledControl({
 		value => 'Epic Powerset',
 		type => 'combo',
 		parent => $self,
@@ -86,7 +89,7 @@ sub FillTab {
 		tooltip => '',
 		callback => \&pickEpicPowerSet,
 	});
-	$topSizer->AddLabeledControl({
+	$powersBox->AddLabeledControl({
 		value => 'Power Pool 1',
 		type => 'combo',
 		parent => $self,
@@ -95,7 +98,7 @@ sub FillTab {
 		tooltip => '',
 		callback => \&pickPoolPower,
 	});
-	$topSizer->AddLabeledControl({
+	$powersBox->AddLabeledControl({
 		value => 'Power Pool 2',
 		type => 'combo',
 		parent => $self,
@@ -104,7 +107,7 @@ sub FillTab {
 		tooltip => '',
 		callback => \&pickPoolPower,
 	});
-	$topSizer->AddLabeledControl({
+	$powersBox->AddLabeledControl({
 		value => 'Power Pool 3',
 		type => 'combo',
 		parent => $self,
@@ -113,7 +116,7 @@ sub FillTab {
 		tooltip => '',
 		callback => \&pickPoolPower,
 	});
-	$topSizer->AddLabeledControl({
+	$powersBox->AddLabeledControl({
 		value => 'Power Pool 4',
 		type => 'combo',
 		parent => $self,
@@ -122,13 +125,13 @@ sub FillTab {
 		tooltip => '',
 		callback => \&pickPoolPower,
 	});
-	$topSizer->AddLabeledControl({
+	$powersBox->AddLabeledControl({
 		value => 'Binds Directory',
 		type => 'dirpicker',
 		parent => $self,
 		module => $General,
 	});
-	$topSizer->AddLabeledControl({
+	$powersBox->AddLabeledControl({
 		value => 'Reset Key',
 		type => 'keybutton',
 		parent => $self,
@@ -136,7 +139,7 @@ sub FillTab {
 		tooltip => 'This key is used by certain modules to reset binds to a sane state.',
 	});
 
-	$topSizer->AddLabeledControl({
+	$powersBox->AddLabeledControl({
 		value => 'Reset Feedback',
 		type => 'checkbox',
 		parent => $self,
@@ -144,10 +147,10 @@ sub FillTab {
 	});
 
 
-	$topSizer->Add( Wx::Button->new( $self, id('Write Binds Button'), 'Write Binds!' ), 0, Wx::wxALL|Wx::wxEXPAND);
+	$powersBox->Add( Wx::Button->new( $self, id('Write Binds Button'), 'Write Binds!' ), 0, Wx::wxALL);
 	Wx::Event::EVT_BUTTON( $self, id('Write Binds Button'), sub { $self->Profile->WriteBindFiles() } );
 
-
+	$topSizer->Add($powersBox);
 	$self->TabTitle = 'General';
 	$self->SetSizer($topSizer);
 	return $self;

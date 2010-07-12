@@ -20,8 +20,8 @@ sub new {
 
 	bless $self, $class;
 
-	$self->InnerSizer = Wx::FlexGridSizer->new(0,2,PADDING, PADDING);
-	$self->Add($self->InnerSizer);
+	$self->InnerSizer = Wx::FlexGridSizer->new(0,2,PADDING,PADDING);
+	$self->Add($self->InnerSizer, 0, Wx::wxALIGN_RIGHT, PADDING);
 
 	return $self;
 
@@ -42,7 +42,7 @@ sub AddLabeledControl {
 	my $callback = $p->{'callback'};
 
 
-	my $text = Wx::StaticText->new($parent, -1, ($UI::Labels::Labels{$value} || $value) . ':');
+	my $text = Wx::StaticText->new($parent, -1, UI::Labels::Label($value) . ':');
 
 	my $control;
 	given ($type) {
@@ -56,7 +56,7 @@ sub AddLabeledControl {
 				Wx::wxDefaultPosition, Wx::wxDefaultSize,
 				$contents,
 				Wx::wxCB_READONLY);
-			Wx::Event::EVT_COMBOBOX( $parent, $control, $callback );
+			Wx::Event::EVT_COMBOBOX( $parent, $control, $callback ) if $callback;
 		}
 		when (/text/) {
 			$control = Wx::TextCtrl->new($parent, id($value), $module->{$value});
@@ -65,6 +65,11 @@ sub AddLabeledControl {
 			$control = Wx::CheckBox->new($parent, id($value), $UI::Labels::Labels{$value} || $value);
 			$text->SetLabel('');
 		}
+		when (/spinbox/) {
+			$control = Wx::SpinCtrl->new($parent, 0, id($value));
+			$control->SetValue($module->{$value});
+			$control->SetRange(@$contents);
+		}
 		when (/dirpicker/) {
 			$control = Wx::DirPickerCtrl->new(
 				$parent, -1, $module->{$value}, $value, 
@@ -72,11 +77,15 @@ sub AddLabeledControl {
 				Wx::wxDIRP_USE_TEXTCTRL|Wx::wxALL,
 			);
 		}
+		default { die "wtf?!  I don't know how to make a $type"; }
 	}
 	$control->SetToolTip( Wx::ToolTip->new($tooltip)) if $tooltip;
 
 	$sizer->Add( $text,    0, Wx::wxALIGN_RIGHT|Wx::wxALIGN_CENTER_VERTICAL);
-	$sizer->Add( $control, 0, Wx::wxALL|Wx::wxEXPAND );
+	$sizer->Add( $control, 0, Wx::wxALL|Wx::wxEXPAND);
+
+	$self->Layout;
+
 }
 
 sub KeyPickerDialog {
