@@ -35,9 +35,10 @@ sub help {
 	unless ($self->{'HelpWindow'}) {
 		my $HelpWindow = Wx::MiniFrame ->new( undef, -1, $self->TabTitle . " Help",);
 		my $BoxSizer   = Wx::BoxSizer  ->new( Wx::wxVERTICAL );
-		my $HelpText   = Wx::StaticText->new( $HelpWindow, -1, $self->HelpText );
+		my $Panel      = Wx::Panel     ->new( $HelpWindow, -1 );
+		my $HelpText   = Wx::StaticText->new( $Panel, -1, $self->HelpText, [10,10] );
 
-		$BoxSizer->Add( $HelpText, 0, Wx::wxALIGN_CENTER_VERTICAL, );
+		$BoxSizer->Add( $Panel, 1, Wx::wxEXPAND );
 
 		$HelpWindow->SetSizer($BoxSizer);
 
@@ -57,34 +58,7 @@ sub Profile    : lvalue { shift->{'Profile'} }
 # stubs
 sub InitKeys          { 1; }
 sub PopulateBindFiles {print STDERR "stub PopBindFiles\n"; 1; }
-sub FillTab           { my $self = shift; ($self->TabTitle   = ref $self) =~ s/Module:://; }
+sub FillTab           { my $self = shift; ($self->TabTitle = ref $self) =~ s/Module:://; }
 sub HelpText          { qq|Help not currently implemented here.|; }
-
-
-# TODO this really doesn't completely belong here, hmm.
-sub addLabeledButton {
-    my ($self, $sizer, $module, $value, $tooltip) = @_;
-
-    my $button = Wx::Button->new($self, Utility::id($value), $module->{$value});
-    $button->SetToolTip( Wx::ToolTip->new($tooltip)) if $tooltip;
-
-    $sizer->Add( Wx::StaticText->new($self, -1, ($UI::Labels::Labels{$value} || $value)), 0, Wx::wxALIGN_RIGHT|Wx::wxALIGN_CENTER_VERTICAL);
-    $sizer->Add( $button, 0, Wx::wxEXPAND );
-
-	Wx::Event::EVT_BUTTON( $self, Utility::id($value),
-		sub {
-			my $newKey = UI::KeyBindDialog::showWindow($self, $value, $module->{$value});
-
-			# TODO -- check for conflicts
-			# my $otherThingWithThatBind = checkConflicts($newKey);
-
-			# update the associated profile var
-			$module->{$value} = $newKey;
-
-			# re-label the button
-			Wx::Window::FindWindowById(Utility::id($value))->SetLabel($newKey);
-		}
-	);
-}
 
 1;
