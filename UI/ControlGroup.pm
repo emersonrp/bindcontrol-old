@@ -64,6 +64,7 @@ sub AddLabeledControl {
 		when (/checkbox/) {
 			$control = Wx::CheckBox->new($parent, id($value), $UI::Labels::Labels{$value} || $value);
 			$text->SetLabel('');
+			$control->SetValue($module->{$value});
 		}
 		when (/spinbox/) {
 			$control = Wx::SpinCtrl->new($parent, 0, id($value));

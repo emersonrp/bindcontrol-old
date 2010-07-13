@@ -6,7 +6,7 @@ our @Origins = qw( Magic Mutation Natural Science Technology);
 our $Archetypes = {
 	"Arachnos Soldier" => {
 		'Faction' => 'V',
-		"Epic Powerset" => {
+		"Epic" => {
 			"Mace Mastery" => [
 				"Mace Blast",
 				"Web Envelope",
@@ -32,7 +32,7 @@ our $Archetypes = {
 				"Summon Striker",
 			],
 		},
-		"Primary Powerset" => {
+		"Primary" => {
 			"Arachnos Soldier" => [
 				"Single Shot",
 				"Pummel",
@@ -68,7 +68,7 @@ our $Archetypes = {
 				"Crowd Control",
 			],
 		},
-		"Secondary Powerset" => {
+		"Secondary" => {
 			"Training and Gadgets" => [
 				"Tactical Training: Maneuvers",
 				"Tactical Training: Assault",
@@ -88,7 +88,7 @@ our $Archetypes = {
 	},
 	"Arachnos Widow" => {
 		'Faction' => 'V',
-		"Epic Powerset" => {
+		"Epic" => {
 			"Mace Mastery" => [
 				"Mace Blast",
 				"Web Envelope",
@@ -114,7 +114,7 @@ our $Archetypes = {
 				"Summon Striker",
 			],
 		},
-		"Primary Powerset" => {
+		"Primary" => {
 			"Widow Training" => [
 				"Poison Dart",
 				"Swipe",
@@ -146,7 +146,7 @@ our $Archetypes = {
 				"Psychic Wail",
 			],
 		},
-		"Secondary Powerset" => {
+		"Secondary" => {
 			"Teamwork" => [
 				"Tactical Training: Maneuvers",
 				"Indomitable Will",
@@ -171,7 +171,7 @@ our $Archetypes = {
 	},
 	Blaster => {
 		'Faction' => 'H',
-		"Epic Powerset" => {
+		"Epic" => {
 			"Cold Mastery" => [
 				"Snow Storm",
 				"Flash Freeze",
@@ -202,7 +202,7 @@ our $Archetypes = {
 				"Cryo Freeze Ray",
 			],
 		},
-		"Primary Powerset" => {
+		"Primary" => {
 			"Archery" => [
 				"Snap Shot",
 				"Aimed Shot",
@@ -314,7 +314,7 @@ our $Archetypes = {
 				"Dreadful Wail",
 			],
 		},
-		"Secondary Powerset" => {
+		"Secondary" => {
 			"Devices" => [
 				"Web Grenade",
 				"Caltrops",
@@ -385,7 +385,7 @@ our $Archetypes = {
 	},
 	Brute => {
 		'Faction' => 'V',
-		"Epic Powerset" => {
+		"Epic" => {
 			"Mace Mastery" => [
 				"Mace Blast",
 				"Web Envelope",
@@ -411,7 +411,7 @@ our $Archetypes = {
 				"Summon Striker",
 			],
 		},
-		"Primary Powerset" => {
+		"Primary" => {
 			"Battle Axe" => [
 				"Beheader",
 				"Chop",
@@ -523,7 +523,7 @@ our $Archetypes = {
 				"Crowd Control",
 			],
 		},
-		"Secondary Powerset" => {
+		"Secondary" => {
 			"Dark Armor" => [
 				"Dark Embrace",
 				"Death Shroud",
@@ -599,7 +599,7 @@ our $Archetypes = {
 	},
 	Controller => {
 		'Faction' => 'H',
-		"Epic Powerset" => {
+		"Epic" => {
 			"Fire Mastery" => [
 				"Fire Blast",
 				"Fire Ball",
@@ -631,7 +631,7 @@ our $Archetypes = {
 				"Earth's Embrace",
 			],
 		},
-		"Primary Powerset" => {
+		"Primary" => {
 			"Earth Control" => [
 				"Stone Prison",
 				"Fossilize",
@@ -710,7 +710,7 @@ our $Archetypes = {
 				"Fly Trap",
 			],
 		},
-		"Secondary Powerset" => {
+		"Secondary" => {
 			"Cold Domination" => [
 				"Infrigidate",
 				"Ice Shield",
@@ -814,7 +814,7 @@ our $Archetypes = {
 	},
 	Corruptor => {
 		'Faction' => 'V',
-		"Epic Powerset" => {
+		"Epic" => {
 			"Mace Mastery" => [
 				"Web Envelope",
 				"Scorpion Shield",
@@ -839,7 +839,7 @@ our $Archetypes = {
 				"Charged Armor",
 			],
 		},
-		"Primary Powerset" => {
+		"Primary" => {
 			"Archery" => [
 				"Snap Shot",
 				"Aimed Shot",
@@ -951,7 +951,7 @@ our $Archetypes = {
 				"Dreadful Wail",
 			],
 		},
-		"Secondary Powerset" => {
+		"Secondary" => {
 			"Cold Domination" => [
 				"Infrigidate",
 				"Ice Shield",
@@ -1066,7 +1066,7 @@ our $Archetypes = {
 	},
 	Defender => {
 		'Faction' => 'H',
-		"Epic Powerset" => {
+		"Epic" => {
 			"Dark Mastery" => [
 				"Oppressive Gloom",
 				"Dark Consumption",
@@ -1092,7 +1092,7 @@ our $Archetypes = {
 				"Telekinesis",
 			],
 		},
-		"Primary Powerset" => {
+		"Primary" => {
 			"Cold Domination" => [
 				"Infrigidate",
 				"Ice Shield",
@@ -1204,7 +1204,7 @@ our $Archetypes = {
 				"EM Pulse Arrow",
 			],
 		},
-		"Secondary Powerset" => {
+		"Secondary" => {
 			"Archery" => [
 				"Snap Shot",
 				"Aim",
@@ -1319,7 +1319,7 @@ our $Archetypes = {
 	},
 	Dominator => {
 		'Faction' => 'V',
-		"Epic Powerset" => {
+		"Epic" => {
 			"Mace Mastery" => [
 				"Poisonous Ray",
 				"Scorpion Shield",
@@ -1344,7 +1344,7 @@ our $Archetypes = {
 				"Summon Guardian",
 			],
 		},
-		"Primary Powerset" => {
+		"Primary" => {
 			"Earth Control" => [
 				"Stone Prison",
 				"Fossilize",
@@ -1412,7 +1412,7 @@ our $Archetypes = {
 				"Fly Trap",
 			],
 		},
-		"Secondary Powerset" => {
+		"Secondary" => {
 			"Earth Assault" => [
 				"Stone Spears",
 				"Stone Mallet",
@@ -1494,7 +1494,7 @@ our $Archetypes = {
 	},
 	Mastermind => {
 		'Faction' => 'V',
-		"Epic Powerset" => {
+		"Epic" => {
 			"Mace Mastery" => [
 				"Web Envelope",
 				"Scorpion Shield",
@@ -1519,7 +1519,7 @@ our $Archetypes = {
 				"Electrifying Fences",
 			],
 		},
-		"Primary Powerset" => {
+		"Primary" => {
 			"Mercenaries" => [
 				"Burst",
 				"Soldiers",
@@ -1587,7 +1587,7 @@ our $Archetypes = {
 				"Abyssal Empowerment",
 			],
 		},
-		"Secondary Powerset" => {
+		"Secondary" => {
 			"Dark Miasma" => [
 				"Twilight Grasp",
 				"Tar Patch",
@@ -1702,7 +1702,7 @@ our $Archetypes = {
 				"Energy Flight",
 			],
 		},
-		"Primary Powerset" => {
+		"Primary" => {
 			"Luminous Blast" => [
 				"Gleaming Bolt",
 				"Glinting Eye",
@@ -1720,7 +1720,7 @@ our $Archetypes = {
 				"Dawn Strike",
 			],
 		},
-		"Secondary Powerset" => {
+		"Secondary" => {
 			"Luminous Aura" => [
 				"Shining Shield",
 				"Essence Boost",
@@ -1738,7 +1738,7 @@ our $Archetypes = {
 	},
 	Scrapper => {
 		'Faction' => 'H',
-		"Epic Powerset" => {
+		"Epic" => {
 			"Body Mastery" => [
 				"Conserve Power",
 				"Focused Accuracy",
@@ -1758,7 +1758,7 @@ our $Archetypes = {
 				"Exploding Shurken",
 			],
 		},
-		"Primary Powerset" => {
+		"Primary" => {
 			"Broad Sword" => [
 				"Hack",
 				"Slash",
@@ -1859,7 +1859,7 @@ our $Archetypes = {
 				"Throw Spines",
 			],
 		},
-		"Secondary Powerset" => {
+		"Secondary" => {
 			"Dark Armor" => [
 				"Dark Embrace",
 				"Death Shroud",
@@ -1936,7 +1936,7 @@ our $Archetypes = {
 	},
 	Stalker => {
 		'Faction' => 'V',
-		"Epic Powerset" => {
+		"Epic" => {
 			"Mace Mastery" => [
 				"Summon Blaster",
 				"Mace Blast",
@@ -1962,7 +1962,7 @@ our $Archetypes = {
 				"Summon Adept",
 			],
 		},
-		"Primary Powerset" => {
+		"Primary" => {
 			"Broad Sword" => [
 				"Hack",
 				"Slash",
@@ -2063,7 +2063,7 @@ our $Archetypes = {
 				"Placate",
 			],
 		},
-		"Secondary Powerset" => {
+		"Secondary" => {
 			"Dark Armor" => [
 				"Hide",
 				"Dark Embrace",
@@ -2134,7 +2134,7 @@ our $Archetypes = {
 	},
 	Tanker => {
 		'Faction' => 'H',
-		"Epic Powerset" => {
+		"Epic" => {
 			"Arctic Mastery" => [
 				"Chilblain",
 				"Block of Ice",
@@ -2160,7 +2160,7 @@ our $Archetypes = {
 				"Fire Ball",
 			],
 		},
-		"Primary Powerset" => {
+		"Primary" => {
 			"Dark Armor" => [
 				"Dark Embrace",
 				"Death Shroud",
@@ -2238,7 +2238,7 @@ our $Archetypes = {
 				"Strength of Will",
 			],
 		},
-		"Secondary Powerset" => {
+		"Secondary" => {
 			"Battle Axe" => [
 				"Gash",
 				"Chop",
@@ -2375,7 +2375,7 @@ our $Archetypes = {
 				"Shadow Step",
 			],
 		},
-		"Primary Powerset" => {
+		"Primary" => {
 			"Umbral Blast" => [
 				"Shadow Bolt",
 				"Ebon Eye",
@@ -2393,7 +2393,7 @@ our $Archetypes = {
 				"Starless Step",
 			],
 		},
-		"Secondary Powerset" => {
+		"Secondary" => {
 			"Umbral Aura" => [
 				"Gravity Shield",
 				"Orbiting Death",

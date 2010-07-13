@@ -17,12 +17,13 @@ sub InitKeys {
 	$self->Profile->General ||= {
 		'Archetype' => 'Scrapper',
 		'Origin' => "Magic",
-		'Primary Powerset' => 'Martial Arts',
-		'Secondary Powerset' => 'Super Reflexes',
-		'Epic Powerset' => 'Weapon Mastery',
-		'Binds Directory' => "c:\\CoHTest\\",
+		'Primary' => 'Martial Arts',
+		'Secondary' => 'Super Reflexes',
+		'Epic' => 'Weapon Mastery',
+		'BindsDir' => "c:\\CoHTest\\",
 		'Reset File' => $self->Profile->GetBindFile('reset.txt'),
-		'Reset Key' => 'CTRL-M',
+		'ResetKey' => 'CTRL-M',
+		'ResetFeedback' => 1,
 	};
 }
 
@@ -63,34 +64,34 @@ sub FillTab {
 		callback => \&pickOrigin,
 	});
 	$powersBox->AddLabeledControl({
-		value => 'Primary Powerset',
+		value => 'Primary',
 		type => 'combo',
 		parent => $self,
 		module => $General,
-		contents => [sort keys %{$ArchData->{'Primary Powerset'}}],
+		contents => [sort keys %{$ArchData->{'Primary'}}],
 		tooltip => '',
 		callback => \&pickPrimaryPowerSet,
 	});
 	$powersBox->AddLabeledControl({
-		value => 'Secondary Powerset',
+		value => 'Secondary',
 		type => 'combo',
 		parent => $self,
 		module => $General,
-		contents => [sort keys %{$ArchData->{'Secondary Powerset'}}],
+		contents => [sort keys %{$ArchData->{'Secondary'}}],
 		tooltip => '',
 		callback => \&pickSecondaryPowerSet,
 	});
 	$powersBox->AddLabeledControl({
-		value => 'Epic Powerset',
+		value => 'Epic',
 		type => 'combo',
 		parent => $self,
 		module => $General,
-		contents => [sort keys %{$ArchData->{'Epic Powerset'}}],
+		contents => [sort keys %{$ArchData->{'Epic'}}],
 		tooltip => '',
 		callback => \&pickEpicPowerSet,
 	});
 	$powersBox->AddLabeledControl({
-		value => 'Power Pool 1',
+		value => 'Pool1',
 		type => 'combo',
 		parent => $self,
 		module => $General,
@@ -99,7 +100,7 @@ sub FillTab {
 		callback => \&pickPoolPower,
 	});
 	$powersBox->AddLabeledControl({
-		value => 'Power Pool 2',
+		value => 'Pool2',
 		type => 'combo',
 		parent => $self,
 		module => $General,
@@ -108,7 +109,7 @@ sub FillTab {
 		callback => \&pickPoolPower,
 	});
 	$powersBox->AddLabeledControl({
-		value => 'Power Pool 3',
+		value => 'Pool3',
 		type => 'combo',
 		parent => $self,
 		module => $General,
@@ -117,7 +118,7 @@ sub FillTab {
 		callback => \&pickPoolPower,
 	});
 	$powersBox->AddLabeledControl({
-		value => 'Power Pool 4',
+		value => 'Pool4',
 		type => 'combo',
 		parent => $self,
 		module => $General,
@@ -126,13 +127,13 @@ sub FillTab {
 		callback => \&pickPoolPower,
 	});
 	$powersBox->AddLabeledControl({
-		value => 'Binds Directory',
+		value => 'BindsDir',
 		type => 'dirpicker',
 		parent => $self,
 		module => $General,
 	});
 	$powersBox->AddLabeledControl({
-		value => 'Reset Key',
+		value => 'ResetKey',
 		type => 'keybutton',
 		parent => $self,
 		module => $General,
@@ -140,7 +141,7 @@ sub FillTab {
 	});
 
 	$powersBox->AddLabeledControl({
-		value => 'Reset Feedback',
+		value => 'ResetFeedback',
 		type => 'checkbox',
 		parent => $self,
 		module => $General,
@@ -166,19 +167,19 @@ sub pickOrigin { shift()->fillPickers; }
 
 sub pickPrimaryPowerSet {
 	my ($self, $event) = @_;
-	$self->Profile->General->{'Primary Powerset'} = $event->GetEventObject->GetValue;
+	$self->Profile->General->{'Primary'} = $event->GetEventObject->GetValue;
 	$self->fillPickers;
 }
 
 sub pickSecondaryPowerSet {
 	my ($self, $event) = @_;
-	$self->Profile->General->{'Secondary Powerset'} = $event->GetEventObject->GetValue;
+	$self->Profile->General->{'Secondary'} = $event->GetEventObject->GetValue;
 	$self->fillPickers;
 }
 
 sub pickEpicPowerSet {
 	my ($self, $event) = @_;
-	$self->Profile->General->{'Epic Powerset'} = $event->GetEventObject->GetValue;
+	$self->Profile->General->{'Epic'} = $event->GetEventObject->GetValue;
 	$self->fillPickers;
 }
 
@@ -194,27 +195,44 @@ sub fillPickers {
 	my $oPicker = Wx::Window::FindWindowById(id('Origin'));
 	$oPicker->SetStringSelection($g->{'Origin'});
 
-	my $pPicker = Wx::Window::FindWindowById(id('Primary Powerset'));
+	my $pPicker = Wx::Window::FindWindowById(id('Primary'));
 	$pPicker->Clear();
-	$pPicker->Append([sort keys %{$ArchData->{'Primary Powerset'}}]);
-	$pPicker->SetStringSelection($g->{'Primary Powerset'}) or $pPicker->SetSelection(1);
+	$pPicker->Append([sort keys %{$ArchData->{'Primary'}}]);
+	$pPicker->SetStringSelection($g->{'Primary'}) or $pPicker->SetSelection(1);
 
-	my $sPicker = Wx::Window::FindWindowById(id('Secondary Powerset'));
+	my $sPicker = Wx::Window::FindWindowById(id('Secondary'));
 	$sPicker->Clear();
-	$sPicker->Append([sort keys %{$ArchData->{'Secondary Powerset'}}]);
-	$sPicker->SetStringSelection($g->{'Secondary Powerset'}) or $sPicker->SetSelection(1);
+	$sPicker->Append([sort keys %{$ArchData->{'Secondary'}}]);
+	$sPicker->SetStringSelection($g->{'Secondary'}) or $sPicker->SetSelection(1);
 
-	my $ePicker = Wx::Window::FindWindowById(id('Epic Powerset'));
+	my $ePicker = Wx::Window::FindWindowById(id('Epic'));
 	$ePicker->Clear();
-	$ePicker->Append([sort keys %{$ArchData->{'Epic Powerset'}}]);
-	$ePicker->SetStringSelection($g->{'Epic Powerset'}) or $sPicker->SetSelection(1);
+	$ePicker->Append([sort keys %{$ArchData->{'Epic'}}]);
+	$ePicker->SetStringSelection($g->{'Epic'}) or $sPicker->SetSelection(1);
 
 	for my $i (1..4) {
-		my $ppPicker = Wx::Window::FindWindowById(id("Power Pool $i"));
+		my $ppPicker = Wx::Window::FindWindowById(id("Pool$i"));
 		$ppPicker->Clear();
 		$ppPicker->Append([sort keys %{$GameData::MiscPowers->{'Pool'}}]);
-		$ppPicker->SetStringSelection($g->{"Power Pool $i"}) or $ppPicker->SetSelection(1);
+		$ppPicker->SetStringSelection($g->{"Pool$i"}) or $ppPicker->SetSelection(1);
 	}
 }
+
+UI::Labels::Add({
+	Name => 'Name',
+	Archetype => 'Archetype',
+	Origin => 'Origin',
+	Primary => 'Primary Powerset',
+	Secondary => 'Secondary Powerset',
+	Epic => 'Epic / Patron Powerset',
+	Pool1 => 'Power Pool 1',
+	Pool2 => 'Power Pool 2',
+	Pool3 => 'Power Pool 3',
+	Pool4 => 'Power Pool 4',
+	BindsDir => 'Binds Directory',
+	ResetKey => 'Reset Key',
+	ResetFeedback => 'Give Feedback on Reset',
+});
+
 
 1;

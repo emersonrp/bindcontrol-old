@@ -141,7 +141,7 @@ sub FillTab {
 		%SoDDefaults,
 	});
 	$movementSizer->AddLabeledControl({
-		value => 'Mousechord SoD',
+		value => 'MousechordSoD',
 		type => 'checkbox',
 		%SoDDefaults,
 	});
@@ -2241,38 +2241,69 @@ sub sodSetDownFix {
 }
 
 
-UI::Labels::Add(
-	{
-		Left => 'Strafe Left',
-		Right => 'Strafe Right',
-		TurnLeft => 'Turn Left',
-		TurnRight => 'Turn Right',
-		AutoRun => 'Auto Run',
-		Follow => 'Follow Target',
-		NonSoDMode => 'Non-SoD Mode',
-		ToggleSoD => 'SoD Mode Toggle',
-		JumpMode => 'Toggle Jump Mode',
-		RunMode => 'Toggle Super Speed Mode',
-		FlyMode => 'Toggle Fly Mode',
-		GFlyMode => 'Toggle Group Fly Mode',
+UI::Labels::Add( {
+	Up => 'Up',
+	Down => 'Down',
+	Forward => 'Forward',
+	Back => 'Back',
+	Left => 'Strafe Left',
+	Right => 'Strafe Right',
+	TurnLeft => 'Turn Left',
+	TurnRight => 'Turn Right',
+	AutoRun => 'Auto Run',
+	Follow => 'Follow Target',
 
-		TPMode  => 'Teleport Bind',
-		TPCombo => 'Teleport Combo Key',
-		TPReset => 'Teleport Reset Key',
+	DefaultMode => 'Default SoD Mode',
+	MousechordSoD => 'Mousechord is SoD Forward',
+	AutoMouselook => 'Automatically Mouselook when moving',
 
-		TTPMode  => 'Team Teleport Bind',
-		TTPCombo => 'Team Teleport Combo Key',
-		TTPReset => 'Team Teleport Reset Key',
+	SprintPower => 'Power to use for Sprint',
 
-		TempMode => 'Toggle Temp Mode',
+	ChangeCamera => 'Change camera distance when moving',
+	CamdistBase => 'Base Camera Distance',
+	CamdistTravelling => 'Travelling Camera Distance',
 
-		NovaMode => 'Toggle Nova Form',
-		DwarfMode => 'Toggle Dwarf Form',
-		HumanMode => 'Human Form',
+	ChangeDetail => 'Change graphics detail level when moving',
+	DetailBase => 'Base Detail Level',
+	DetailTravelling => 'Travelling Detail Level',
 
-		SprintSoD => 'Enable Sprint SoD',
-	}
-);
+	NonSoDMode => 'Non-SoD Mode',
+	ToggleSoD => 'SoD Mode Toggle',
+	JumpMode => 'Toggle Jump Mode',
+	SimpleSJCJ => 'Simple Combat Jumping / Super Jump Toggle',
+
+	RunMode => 'Toggle Super Speed Mode',
+	SSOnlyWhenMoving => 'SuperSpeed only when moving',
+	SSSJModeEnable => 'Enable Super Speed / Super Jump Mode',
+
+	FlyMode => 'Toggle Fly Mode',
+	GFlyMode => 'Toggle Group Fly Mode',
+
+	SelfTellOnChange => 'Self-/tell when changing mode',
+
+	TPMode  => 'Teleport Bind',
+	TPCombo => 'Teleport Combo Key',
+	TPReset => 'Teleport Reset Key',
+	HideWinsDuringTP => 'Hide Windows when Teleporting',
+	AutoHoverTP => 'Automatically use Hover when Teleporting',
+
+	TTPMode  => 'Team Teleport Bind',
+	TTPCombo => 'Team Teleport Combo Key',
+	TTPReset => 'Team Teleport Reset Key',
+	AutoGFlyTTP => 'Automatically use Group Fly when Team Teleporting',
+
+	TempMode => 'Toggle Temp Mode',
+	TempTray => 'Temporary Travel Power Tray',
+
+	NovaMode => 'Toggle Nova Form',
+	NovaTray => 'Nova Travel Power Tray',
+	DwarfMode => 'Toggle Dwarf Form',
+	DwarfTray => 'Dwarf Travel Power Tray',
+	HumanMode => 'Human Form',
+	HumanTray => 'Human Travel Power Tray',
+
+	SprintSoD => 'Enable Sprint SoD',
+});
 
 package Module::SoD::Table;
 

@@ -11,7 +11,6 @@ sub Add {
 		%Labels,
 		%{shift()},
 	);
-print STDERR Data::Dumper::Dumper \%Labels;
 }
 
 
