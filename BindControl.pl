@@ -97,6 +97,10 @@ sub new {
 	Wx::Event::EVT_MENU( $self, id('MENUITEM_ABOUT'),    \&showAboutBox );
 
 
+	my $AppIcon = Wx::Icon->new();
+	$AppIcon->LoadFile('BindControl.ico', Wx::wxBITMAP_TYPE_ICO);
+	$self->SetIcon($AppIcon);
+
 	# TODO - read in the config for the window (size, location, etc)
 	# and apply it before ->Show()
 
