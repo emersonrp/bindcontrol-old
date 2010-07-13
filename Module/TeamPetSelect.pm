@@ -17,7 +17,8 @@ sub InitKeys {
 
 	my $self = shift;
 	$self->Profile->TeamPetSelect ||= {
-		EnableDirTeamSel => 1,
+		TPSEnable   => 1,
+		TPSSelMode  => '',
 		TeamSelect1 => 'UNBOUND',
 		TeamSelect2 => 'UNBOUND',
 		TeamSelect3 => 'UNBOUND',
@@ -38,6 +39,7 @@ sub InitKeys {
 		DecTeamSize => 'H',
 		IncTeamPos  => '4',
 		DecTeamPos  => '8',
+		Reset       => '',
 	};
 }
 
@@ -56,7 +58,7 @@ sub FillTab {
 	##### header
 	my $headerSizer = Wx::FlexGridSizer->new(0,2,10,10);
 
-	my $enablecb = Wx::CheckBox->new( $self, id('TPS Enable'), 'Enable Team/Pet Select');
+	my $enablecb = Wx::CheckBox->new( $self, id('TPSEnable'), 'Enable Team/Pet Select');
 	$enablecb->SetToolTip( Wx::ToolTip->new('Check this to enable the Team/Pet Select Binds') );
 
 	my $helpbutton = Wx::BitmapButton->new($self, -1, Utility::Icon('Help'));
@@ -68,64 +70,112 @@ sub FillTab {
 	$topSizer->Add($headerSizer);
 
 	##### direct-select keys
-	my $TPSDirectBox = Wx::StaticBoxSizer->new(Wx::StaticBox->new($self, -1, 'Direct Team/Pet Select'), Wx::wxVERTICAL);
-	my $TPSDirectSizer = Wx::FlexGridSizer->new(0,2,4,4);
+	my $TPSDirectBox = UI::ControlGroup->new($self, 'Direct Team/Pet Select');
 
-	my $picker = Wx::ComboBox->new(
-		$self, id('TeamPetMode'), '',
-		Wx::wxDefaultPosition, Wx::wxDefaultSize, 
-		['Teammates, then pets','Pets, then teammates','Teammates Only','Pets Only'],
-		Wx::wxCB_READONLY,
-	);
-	$picker->SetToolTip( Wx::ToolTip->new('Choose the order in which teammates and pets are selected with sequential keypresses') );
-	$TPSDirectSizer->Add( Wx::StaticText->new($self, -1, "Select Order"), 0, Wx::wxALIGN_RIGHT|Wx::wxALIGN_CENTER_VERTICAL );
-	$TPSDirectSizer->Add( $picker, 0, Wx::wxALL, 10 );
-
+	$TPSDirectBox->AddLabeledControl({
+		value => 'TPSSelMode',
+		type => 'combobox',
+		module => $TPS,
+		parent => $self,
+		contents => ['Teammates, then pets','Pets, then teammates','Teammates Only','Pets Only'],
+		tooltip => 'Choose the order in which teammates and pets are selected with sequential keypresses',
+	});
 	for my $selectid (1..8) {
-
-		$self->addLabeledButton($TPSDirectSizer, $TPS, "TeamSelect$selectid",
-			"Choose the key that will select team member / pet $selectid");
+		$TPSDirectBox->AddLabeledControl({
+			value => "TeamSelect$selectid",
+			type => 'keybutton',
+			module => $TPS,
+			parent => $self,
+			tooltip => "Choose the key that will select team member / pet $selectid",
+		});
 	}
-
-	$TPSDirectBox->Add($TPSDirectSizer);
 	$topSizer->Add($TPSDirectBox);
 
 
 	##### Pet Select Binds
-	my $PetSelBox =  Wx::StaticBoxSizer->new(Wx::StaticBox->new($self, -1, 'Pet Select'), Wx::wxVERTICAL); 
-	my $PetSelSizer = Wx::FlexGridSizer->new(0,2,4,4);
+	my $PetSelBox = UI::ControlGroup->new($self, 'Pet Select');
 
-	$self->addLabeledButton($PetSelSizer, $TPS, 'SelNextPet',
-		'Choose the key that will select the next pet from the currently selected one');
-	$self->addLabeledButton($PetSelSizer, $TPS, 'SelPrevPet',
-		'Choose the key that will select the previous pet from the currently selected one');
-	$self->addLabeledButton($PetSelSizer, $TPS, 'IncPetSize',
-		'Choose the key that will increase the size of your pet/henchman group rotation');
-	$self->addLabeledButton($PetSelSizer, $TPS, 'DecPetSize',
-		'Choose the key that will decrease the size of your pet/henchman group rotation');
-
-	$PetSelBox->Add($PetSelSizer);
+	$PetSelBox->AddLabeledControl({
+		value => 'SelNextPet',
+		type => 'keybutton',
+		module => $TPS,
+		parent => $self,
+		tooltip => 'Choose the key that will select the next pet from the currently selected one',
+	});
+	$PetSelBox->AddLabeledControl({
+		value => 'SelPrevPet',
+		type => 'keybutton',
+		module => $TPS,
+		parent => $self,
+		tooltip => 'Choose the key that will select the previous pet from the currently selected one',
+	});
+	$PetSelBox->AddLabeledControl({
+		value => 'IncPetSize',
+		type => 'keybutton',
+		module => $TPS,
+		parent => $self,
+		tooltip => 'Choose the key that will increase the size of your pet/henchman group rotation',
+	});
+	$PetSelBox->AddLabeledControl({
+		value => 'DecPetSize',
+		type => 'keybutton',
+		module => $TPS,
+		parent => $self,
+		tooltip => 'Choose the key that will decrease the size of your pet/henchman group rotation',
+	});
 	$topSizer->Add($PetSelBox);
 
 	##### Team Select Binds
-	my $TeamSelBox =  Wx::StaticBoxSizer->new(Wx::StaticBox->new($self, -1, 'Team Select'), Wx::wxVERTICAL); 
-	my $TeamSelSizer = Wx::FlexGridSizer->new(0,2,4,4);
-	$self->addLabeledButton($TeamSelSizer, $TPS, 'SelNextTeam',
-		'Choose the key that will select the next teammate from the currently selected one');
-	$self->addLabeledButton($TeamSelSizer, $TPS, 'SelPrevTeam',
-		'Choose the key that will select the previous teammate from the currently selected one');
-	$self->addLabeledButton($TeamSelSizer, $TPS, 'IncTeamSize',
-		'Choose the key that will increase the size of your teammate rotation');
-	$self->addLabeledButton($TeamSelSizer, $TPS, 'DecTeamSize',
-		'Choose the key that will decrease the size of your teammate rotation');
-	$self->addLabeledButton($TeamSelSizer, $TPS, 'IncTeamPos',
-		'Choose the key that will move you to the next higher slot in the team rotation');
-	$self->addLabeledButton($TeamSelSizer, $TPS, 'DecTeamPos',
-		'Choose the key that will move you to the next lower slot in the team rotation');
-	$self->addLabeledButton($TeamSelSizer, $TPS, 'Reset',
-		'Choose the key that will reset your team rotation to solo');
-
-	$TeamSelBox->Add($TeamSelSizer);
+	my $TeamSelBox = UI::ControlGroup->new($self, 'Team Select');
+	$TeamSelBox->AddLabeledControl({
+		value =>'SelNextTeam',
+		type => 'keybutton',
+		module => $TPS,
+		parent => $self,
+		tooltip => 'Choose the key that will select the next teammate from the currently selected one',
+	});
+	$TeamSelBox->AddLabeledControl({
+		value =>'SelPrevTeam',
+		type => 'keybutton',
+		module => $TPS,
+		parent => $self,
+		tooltip => 'Choose the key that will select the previous teammate from the currently selected one',
+	});
+	$TeamSelBox->AddLabeledControl({
+		value =>'IncTeamSize',
+		type => 'keybutton',
+		module => $TPS,
+		parent => $self,
+		tooltip => 'Choose the key that will increase the size of your teammate rotation',
+	});
+	$TeamSelBox->AddLabeledControl({
+		value =>'DecTeamSize',
+		type => 'keybutton',
+		module => $TPS,
+		parent => $self,
+		tooltip => 'Choose the key that will decrease the size of your teammate rotation',
+	});
+	$TeamSelBox->AddLabeledControl({
+		value =>'IncTeamPos',
+		type => 'keybutton',
+		module => $TPS,
+		parent => $self,
+		tooltip => 'Choose the key that will move you to the next higher slot in the team rotation',
+	});
+	$TeamSelBox->AddLabeledControl({
+		value =>'DecTeamPos',
+		type => 'keybutton',
+		module => $TPS,
+		parent => $self,
+		tooltip => 'Choose the key that will move you to the next lower slot in the team rotation',
+	});
+	$TeamSelBox->AddLabeledControl({
+		value =>'Reset',
+		type => 'keybutton',
+		module => $TPS,
+		parent => $self,
+		tooltip => 'Choose the key that will reset your team rotation to solo',
+	});
 	$topSizer->Add($TeamSelBox);
 
 	$self->TabTitle = 'Team / Pet Selection';
@@ -139,12 +189,12 @@ sub PopulateBindFiles {
 	my $profile    = shift->Profile;
 	my $ResetFile  = $profile->General->{'ResetFile'};
 	my $TPS = $profile->TeamPetSelect;
-	if ($TPS->{'TeamPetMode'} < 3) {
+	if ($TPS->{'TPSSelMode'} < 3) {
 		my $selmethod = "teamselect";
 		my $selnummod = 0;
 		my $selmethod1 = "petselect";
 		my $selnummod1 = 1;
-		if ($TPS->{'TeamPetMode'} == 2) {
+		if ($TPS->{'TPSSelMode'} == 2) {
 			$selmethod = "petselect";
 			$selnummod = 1;
 			$selmethod1 = "teamselect";
@@ -166,7 +216,7 @@ sub PopulateBindFiles {
 	} else {
 		my $selmethod = "teamselect";
 		my $selnummod = 0;
-		if ($TPS->{'TeamPetMode'} == 4) {
+		if ($TPS->{'TPSSelMode'} == 4) {
 			$selmethod = "petselect";
 			$selnummod = 1;
 		}
@@ -317,6 +367,7 @@ Single Key Team Selection binds based on binds from Weap0nX.
 
 
 UI::Labels::Add({
+	TPSSelMode => "Team/Pet selection mode",
 	TeamSelect1 => "Select First Team Member/Pet",
 	TeamSelect2 => "Select Second Team Member/Pet",
 	TeamSelect3 => "Select Third Team Member/Pet",
