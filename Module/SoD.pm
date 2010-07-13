@@ -17,8 +17,6 @@ sub InitKeys {
 	my $self = shift;
 
 	$self->Profile->SoD ||= {
-
-		Base => 1,
 		Up => "SPACE",
 		Down => "X",
 		Forward => "W",
@@ -27,51 +25,60 @@ sub InitKeys {
 		Right => "D",
 		TurnLeft => "Q",
 		TurnRight => "E",
-
-		RunMode => "C",
-		FlyMode => "F",
 		AutoRun => "R",
 		Follow => "TILDE",
+		DefaultMode => '',
+		MousechordSoD => 1,
+		AutoMouseLook => 0,
+
+		SprintPower => 'Sprint',
+
+		ChangeCamera => 1,
+		CamdistBase => 15,
+		CamdistTravelling => 60,
+
+		ChangeDetail => 1,
+		DetailBase => 100,
+		DetailTravelling => 50,
+
+		NonSoDMode => 1,
+		ToggleSoD => 'CTRL-M',
+		JumpMode => "T",
+		SimpleSJCJ => 1,
+
+		RunMode => "C",
+		SSOnlyWhenMoving => 0,
+		SSSJModeEnable => 1,
+
+		FlyMode => "F",
+		GFlyMode => "G",
+
+		SelfTellOnChange => 1,
+
+		TPMode => 'SHIFT-LBUTTON',
+		TPCombo => 'SHIFT',
+		TPReset => 'CTRL-T',
+
+		TTPMode => 'SHIFT-CTRL-LBUTTON',
+		TTPCombo => 'SHIFT-CTRL',
+		TTPReset => 'SHIFT-CTRL-T',
+
+		TPHideWindows => 0,
+
 		RunPrimary => "Super Speed",
 		RunPrimaryNumber => 2,
 		RunSecondary => "Sprint",
 		RunSecondaryNumber => 1,
-		FlyHover => undef,
-		FlyFly => undef,
-		FlyGFly => undef,
+		FlyHover => 1,
+		FlyFly => '',
+		FlyGFly => '',
 		Unqueue => 1,
-		AutoMouseLook => undef,
 		ToggleSoD => "CTRL+M",
 		Enable => undef,
 	};
 
 	my $SoD = $self->Profile->SoD;
 
-	# $SoD->{'MouseChord'} ||= undef;
-	$SoD->{'JumpMode'} ||= "T";
-	$SoD->{'GFlyMode'} ||= "G";
-	$SoD->{'NonSoDMode'} ||= "UNBOUND";
-	$SoD->{'BaseMode'} ||= "UNBOUND";
-	$SoD->{'Default'} ||= "Jump";
-
-	$SoD->{'JumpCJ'} = 1;
-	$SoD->{'JumpSJ'} = 1;
-
-	# $SoD->{'Run.UseCamdist'} ||= undef;
-	# $SoD->{'Fly.UseCamdist'} ||= undef;
-	$SoD->{'CamdistBase'} ||= "15";
-	$SoD->{'CamdistTravelling'} ||= "60";
-
-	$SoD->{'SS'} ||= {};
-	if (!$SoD->{'SSSS'} and ($SoD->{'RunPrimaryNumber'} == 2)) { $SoD->{'SSSS'} = 1; }
-
-	$SoD->{'TTPMode'} ||="SHIFT+CTRL+LBUTTON";
-	$SoD->{'TTPCombo'} ||="SHIFT+CTRL";
-	$SoD->{'TTPReset'} ||="SHIFT+CTRL+T";
-
-	$SoD->{'TPMode'} ||= "SHIFT+LBUTTON";
-	$SoD->{'TPCombo'} ||= "SHIFT";
-	$SoD->{'TPReset'} ||= "CTRL+T";
 	$SoD->{'TPHideWindows'} ||= 1;
 
 	$SoD->{'NovaMode'} ||= "T";
@@ -96,10 +103,6 @@ sub InitKeys {
 	$SoD->{'HumanHumanPBind'} ||= "nop";
 	$SoD->{'HumanNovaPBind'}  ||= "nop";
 	$SoD->{'HumanDwarfPBind'} ||= "nop";
-
-	# TODO!  This number needs to be divided by 100 before being written into the bind.
-	$SoD->{'DetailBase'}       ||= "100";
-	$SoD->{'DetailTravelling'} ||= "50";
 
 	#  Temp Travel Powers
 	$SoD->{'TempTray'} ||= "6";
@@ -1151,7 +1154,7 @@ sub PopulateBindFiles {
 							if ($t->{'canss'}) {
 								$t->{$SoD->{'Default'} . "Mode"} = $t->{'RunMode'};
 								my $sssj;
-								if ($SoD->{'SSSSSJMode'}) { $sssj = $t->{'jump'} }
+								if ($SoD->{'SSSSSJModeEnable'}) { $sssj = $t->{'jump'} }
 								if ($SoD->{'SSMobileOnly'}) {
 									makeSoDFile({
 										t => $t,

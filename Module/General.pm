@@ -15,15 +15,20 @@ sub InitKeys {
 	my $self = shift;
 
 	$self->Profile->General ||= {
-		'Archetype' => 'Scrapper',
-		'Origin' => "Magic",
-		'Primary' => 'Martial Arts',
-		'Secondary' => 'Super Reflexes',
-		'Epic' => 'Weapon Mastery',
-		'BindsDir' => "c:\\CoHTest\\",
-		'Reset File' => $self->Profile->GetBindFile('reset.txt'),
-		'ResetKey' => 'CTRL-M',
-		'ResetFeedback' => 1,
+		Name => '',
+		Archetype => 'Scrapper',
+		Origin => "Magic",
+		Primary => 'Martial Arts',
+		Secondary => 'Super Reflexes',
+		Epic => 'Weapon Mastery',
+		BindsDir => "c:\\CoHTest\\",
+		ResetFile => $self->Profile->GetBindFile('reset.txt'),
+		ResetKey => 'CTRL-M',
+		ResetFeedback => 1,
+		Pool1 => '',
+		Pool2 => '',
+		Pool3 => '',
+		Pool4 => '',
 	};
 }
 
@@ -32,11 +37,9 @@ sub FillTab {
 	my $self = shift;
 	my $General = $self->Profile->General;
 
-
 	my $ArchData = $GameData::Archetypes->{$General->{'Archetype'}};
 
 	my $topSizer = Wx::BoxSizer->new(Wx::wxVERTICAL);
-
 
 	my $powersBox = UI::ControlGroup->new($self, 'Powers and Info');
 	$powersBox->AddLabeledControl({

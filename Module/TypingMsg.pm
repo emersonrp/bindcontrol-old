@@ -5,7 +5,7 @@ use strict;
 package Module::TypingMsg;
 use parent "Module::Module";
 
-use Wx qw();
+use Wx qw(wxVERTICAL);
 
 use Utility qw(id);
 
@@ -17,36 +17,47 @@ sub InitKeys {
 	my $self = shift;
 
 	$self->Profile->Typing ||= {
-		'Enable'              => 0,
-		'Message'             => "afk Typing Message",
-		'Start Chat'          => 'ENTER',
-		'Primary Slashchat'   => '/',
-		'Secondary Slashchat' => ';',
-		'Autoreply'           => 'BACKSPACE',
-		'Tell Target'         => 'COMMA',
-		'QuickChat'           => q|'|,
+		Enable             => 1,
+		Message            => "afk Typing Message",
+		StartChat          => 'ENTER',
+		PrimarySlashchat   => '/',
+		SecondarySlashchat => ';',
+		Autoreply          => 'BACKSPACE',
+		TellTarget         => 'COMMA',
+		QuickChat          => q|'|,
 	};
 }
 
 sub FillTab {
 
 	my $self = shift;
-
-	$self->TabTitle = 'Typing Message';
-
 	my $Typing = $self->Profile->Typing;
 
-	my $sizer = Wx::FlexGridSizer->new(0,2,10,10);
+	my $topSizer = Wx::BoxSizer->new(wxVERTICAL);
+	my $sizer = UI::ControlGroup->new($self, 'Chat Binds');
 
+	$sizer->AddLabeledControl({
+		value => 'Enable',
+		type => 'checkbox',
+		module => $Typing,
+		parent => $self,
+		tooltip => 'Enable / Disable chat binds',
+	});
 	for my $b ( (
-		['Start Chat',     'Choose the key combo that activates the Chat bar'],
-		['Primary Slashchat',  'Choose the key combo that activates the Chat bar with a slash already typed'],
-		['Secondary Slashchat','Choose the second key combo that activates the Chat bar with a slash already typed'],
+		['StartChat',     'Choose the key combo that activates the Chat bar'],
+		['PrimarySlashchat',  'Choose the key combo that activates the Chat bar with a slash already typed'],
+		['SecondarySlashchat','Choose the second key combo that activates the Chat bar with a slash already typed'],
 		['Autoreply',      'Choose the key combo that Autoreplies to incoming tells'],
-		['Tell Target',    'Choose the key combo that starts a /tell to your current target'],
+		['TellTarget',    'Choose the key combo that starts a /tell to your current target'],
 		['QuickChat',      'Choose the key combo that activates QuickChat'],
 	)) {
-		$self->addLabeledButton($sizer, $Typing, @$b);
+		$sizer->AddLabeledControl({
+			value => $b->[0],
+			type => 'keybutton',
+			module => $Typing,
+			parent => $self,
+			tooltip => $b->[1],
+		});
 	}
 
 # # # TODO -- this is shiny, you can compose a multipart emote etc for typing.  Implement this.
@@ -57,8 +68,9 @@ sub FillTab {
 	# cbToolTip("Choose the message to display when you are typing chat messages or commands");
 	# my $msghbox = cbTextBox("Message",$Typing->{'Message'},cbTextBoxCB(profile,Typing,"Message"));
 
-	$self->SetSizer($sizer);
-
+	$topSizer->Add($sizer);
+	$self->SetSizer($topSizer);
+	$self->TabTitle = 'Typing Message';
 	return $self;
 }
 
@@ -100,5 +112,16 @@ sub bindisused {
 	my ($profile) = @_;
 	return $profile->{'Typing'} ? $profile->{'Typing'}->{'enable'} : undef;
 }
+
+UI::Labels::Add({
+	Enable => 'Enable Chat Binds',
+	Message => '"afk typing" message',
+	StartChat => 'Start Chat',
+	PrimarySlashchat => 'Start Chat with / already supplied',
+	SecondarySlashchat => 'Alternate Start Chat with / already supplied',
+	AutoReply => 'Auto Reply to incoming /tell',
+	TellTarget => 'Send /tell to current target',
+	Quickchat => 'QuickChat',
+});
 
 1;
