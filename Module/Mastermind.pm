@@ -18,51 +18,51 @@ sub InitKeys {
 	$self->Profile->MastermindPets ||= {
 		Enable => undef,
 
-		PetSelectAll => 'LALT-V',
+		PetSelectAll => 'ALT-V',
 		PetSelectAllResponse => 'Orders?',
 		PetSelectAllResponseMethod => 'Petsay',
 
-		PetSelectMinions => 'LALT-Z',
+		PetSelectMinions => 'ALT-Z',
 		PetSelectMinionsResponse => 'Orders?',
 		PetSelectMinionsResponseMethod => 'Petsay',
 
-		PetSelectLieutenants => 'LALT-X',
+		PetSelectLieutenants => 'ALT-X',
 		PetSelectLieutenantsResponse => 'Orders?',
 		PetSelectLieutenantsResponseMethod => 'Petsay',
 
-		PetSelectBoss => 'LALT-C',
+		PetSelectBoss => 'ALT-C',
 		PetSelectBossResponse => 'Orders?',
 		PetSelectBossResponseMethod => 'Petsay',
 
-		PetBodyguard => 'LALT-G',
+		PetBodyguard => 'ALT-G',
 		PetBodyguardResponse => 'Bodyguarding.',
 		PetBodyguardResponseMethod => 'Petsay',
 
-		PetAggressive => 'LALT-A',
+		PetAggressive => 'ALT-A',
 		PetAggressiveResponse => 'Kill On Sight.',
 		PetAggressiveResponseMethod => 'Petsay',
 
-		PetDefensive => 'LALT-S',
+		PetDefensive => 'ALT-S',
 		PetDefensiveResponse => 'Return Fire Only.',
 		PetDefensiveResponseMethod => 'Petsay',
 
-		PetPassive => 'LALT-D',
+		PetPassive => 'ALT-D',
 		PetPassiveResponse => 'At Ease.',
 		PetPassiveResponseMethod => 'Petsay',
 
-		PetAttack => 'LALT-Q',
+		PetAttack => 'ALT-Q',
 		PetAttackResponse => 'Open Fire!',
 		PetAttackResponseMethod => 'Petsay',
 
-		PetFollow => 'LALT-W',
+		PetFollow => 'ALT-W',
 		PetFollowResponse => 'Falling In.',
 		PetFollowResponseMethod => 'Petsay',
 
-		PetStay => 'LALT-E',
+		PetStay => 'ALT-E',
 		PetStayResponse => 'Holding This Position',
 		PetStayResponseMethod => 'Petsay',
 
-		PetGoto => 'LALT-LBUTTON',
+		PetGoto => 'ALT-LBUTTON',
 		PetGotoResponse => 'Moving To Checkpoint.',
 		PetGotoResponseMethod => 'Petsay',
 
@@ -76,7 +76,7 @@ sub InitKeys {
 		PetBackgroundGotoEnabled => 0,  # TODO -- need UI for this
 
 
-		PetChatToggle => 'LALT-M',
+		PetChatToggle => 'ALT-M',
 		PetSelect1 => 'F1',
 		PetSelect2 => 'F2',
 		PetSelect3 => 'F3',
@@ -109,14 +109,6 @@ sub FillTab {
 
 	my $MMP = $self->Profile->MastermindPets;
 
-	if ($self->Profile->General->{'Archetype'} eq "Mastermind") {
-		# TODO "GameData::ATPrimaries" can probably be replaced with nice hashes.
-		$MMP->{'Primary'} = $Gamedata::ATPrimaries[$self->Profile->{'atnumber'}][$self->Profile->{'primaryset'}];
-		$MMP->{'Primnumber'} = $self->Profile->{'primaryset'};
-	} else {
-		$MMP->{'Primary'} = "Mercenaries";
-	}
-
 	my $sizer = Wx::BoxSizer->new(Wx::wxVERTICAL);
 
 	my $useCB = Wx::CheckBox->new( $self, -1, 'Enable Mastermind Pet Binds');
@@ -136,7 +128,7 @@ sub FillTab {
 	# Iterate the data structure at the bottom and make the grid of controls for the basic pet binds
 	my $ChatOptions = [ qw( Local Self-Tell Petsay None ) ];
 	my $PetCommandKeyRows = Wx::FlexGridSizer->new(0,5,2,2);
-	for my $k (getPetCommandKeyDefinitions()) {
+	for my $k (petCommandKeyDefinitions()) {
 
 		my $basename = $k->{'basename'};  # all of the fieldnames we look up in the MMP are based on this value
 
@@ -144,7 +136,7 @@ sub FillTab {
 		my $ab = Wx::Button->    new($self, Utility::id($basename), $MMP->{$basename});
 
 		my $cl = Wx::StaticText->new($self, -1, "Respond via:");
-		my $cm = Wx::ComboBox->  new($self, Utility::id("${basename}RespPicker"), $MMP->{"${basename}ResponseMethod"},
+		my $cm = Wx::ComboBox->  new($self, Utility::id("${basename}ResponseMethod"), $MMP->{"${basename}ResponseMethod"},
 				Wx::wxDefaultPosition, Wx::wxDefaultSize, $ChatOptions, Wx::wxCB_READONLY);
 		my $cr = Wx::TextCtrl->  new($self, Utility::id("${basename}Response"),   $MMP->{"${basename}Response"});
 
@@ -677,7 +669,7 @@ sub PopulateBindFiles {
 		Robotics    => { min => "dron", lts => "prot", bos => "ass", },
 		Necromancy  => { min => "zom",  lts => "grav", bos => "lich", },
 		Thugs       => { min => "thu",  lts => "enf",  bos => "bru", },
-	}->{ $MMP->{'Primary'} };
+	}->{ $profile->General->{'Primary'} };
 	# "Local","Self-Tell","Petsay","None";
 	mmSubBind($profile,$ResetFile,"all",undef,$powers);
 	mmQuietSubBind($profile,$allfile,"all",undef,$powers);
@@ -728,7 +720,7 @@ sub findconflicts {
 sub bindisused { shift->MastermindPets->{'Enable'} }
 
 
-sub getPetCommandKeyDefinitions {
+sub petCommandKeyDefinitions {
 	(
 		{
 			label      => 'Select All',

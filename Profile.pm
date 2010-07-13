@@ -37,9 +37,9 @@ sub new {
 	$self->AddModule(Module::Mastermind->new($self));
 	$self->AddModule(Module::TeamPetSelect->new($self));
 	$self->AddModule(Module::TypingMsg->new($self));
-	$self->AddModule(Module::SimpleBinds->new($self));
-	$self->AddModule(Module::BufferBinds->new($self));
-	$self->AddModule(Module::ComplexBinds->new($self));
+	# $self->AddModule(Module::SimpleBinds->new($self));
+	# $self->AddModule(Module::BufferBinds->new($self));
+	# $self->AddModule(Module::ComplexBinds->new($self));
 	$self->AddModule(Module::CustomBinds->new($self));
 
 	return $self;
