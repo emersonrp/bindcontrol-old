@@ -46,11 +46,11 @@ sub AddLabeledControl {
 
 	my $control;
 	given ($type) {
-		when (/keybutton/) {
+		when ('keybutton') {
 			$control = Wx::Button->new( $parent, id($value), $module->{$value});
 			Wx::Event::EVT_BUTTON( $parent, $control, sub { $self->KeyPickerDialog($p) } );
 		}
-		when (/combo/) {
+		when ('combo') {
 			$control = Wx::ComboBox->new(
 				$parent, id($value), $module->{$value},
 				Wx::wxDefaultPosition, Wx::wxDefaultSize,
@@ -58,20 +58,20 @@ sub AddLabeledControl {
 				Wx::wxCB_READONLY);
 			Wx::Event::EVT_COMBOBOX( $parent, $control, $callback ) if $callback;
 		}
-		when (/text/) {
+		when ('text') {
 			$control = Wx::TextCtrl->new($parent, id($value), $module->{$value});
 		}
-		when (/checkbox/) {
+		when ('checkbox') {
 			$control = Wx::CheckBox->new($parent, id($value), $UI::Labels::Labels{$value} || $value);
 			$text->SetLabel('');
 			$control->SetValue($module->{$value});
 		}
-		when (/spinbox/) {
+		when ('spinbox') {
 			$control = Wx::SpinCtrl->new($parent, 0, id($value));
 			$control->SetValue($module->{$value});
 			$control->SetRange(@$contents);
 		}
-		when (/dirpicker/) {
+		when ('dirpicker') {
 			$control = Wx::DirPickerCtrl->new(
 				$parent, -1, $module->{$value}, $value, 
 				Wx::wxDefaultPosition, Wx::wxDefaultSize,

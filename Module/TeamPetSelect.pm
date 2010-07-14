@@ -74,7 +74,7 @@ sub FillTab {
 
 	$TPSDirectBox->AddLabeledControl({
 		value => 'TPSSelMode',
-		type => 'combobox',
+		type => 'combo',
 		module => $TPS,
 		parent => $self,
 		contents => ['Teammates, then pets','Pets, then teammates','Teammates Only','Pets Only'],
